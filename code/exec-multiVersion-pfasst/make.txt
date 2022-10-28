@@ -1,0 +1,118 @@
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+/Users/emmaliu/internship2022/installs//Chombo/lib/mk/Make.defs:35: warning: overriding commands for target `.SUFFIXES'
+/Users/emmaliu/internship2022/installs//Chombo/lib/mk/Make.defs:35: warning: ignoring old commands for target `.SUFFIXES'
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+HOST_DEFS=/Users/emmaliu/internship2022/installs/BISICLES/code/mk/Make.defs.cs-it-7093680
+including /Users/emmaliu/internship2022/installs/BISICLES/code/mk/Make.defs.cs-it-7093680 
+python:   
+rm -f -r [odftp]/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI /Users/emmaliu/internship2022/installs//Chombo/lib/lib2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a *2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.ex core *.tmp[12]
+cd ../lib; /Library/Developer/CommandLineTools/usr/bin/make lib
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+/Users/emmaliu/internship2022/installs//Chombo/lib/mk/Make.defs:35: warning: overriding commands for target `.SUFFIXES'
+/Users/emmaliu/internship2022/installs//Chombo/lib/mk/Make.defs:35: warning: ignoring old commands for target `.SUFFIXES'
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+HOST_DEFS=/Users/emmaliu/internship2022/installs/BISICLES/code/mk/Make.defs.cs-it-7093680
+including /Users/emmaliu/internship2022/installs/BISICLES/code/mk/Make.defs.cs-it-7093680 
+python:   
+/Library/Developer/CommandLineTools/usr/bin/make --no-print-directory --directory=/Users/emmaliu/internship2022/installs/Chombo/lib/src/BaseTools  lib
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+make[3]: Nothing to be done for `lib'.
+/Library/Developer/CommandLineTools/usr/bin/make --no-print-directory --directory=/Users/emmaliu/internship2022/installs/Chombo/lib/src/BoxTools  lib
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+make[3]: Nothing to be done for `lib'.
+/Library/Developer/CommandLineTools/usr/bin/make --no-print-directory --directory=/Users/emmaliu/internship2022/installs/Chombo/lib/src/AMRTools  lib
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+make[3]: Nothing to be done for `lib'.
+/Library/Developer/CommandLineTools/usr/bin/make --no-print-directory --directory=/Users/emmaliu/internship2022/installs/Chombo/lib/src/AMRTimeDependent  lib
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+make[3]: Nothing to be done for `lib'.
+/Library/Developer/CommandLineTools/usr/bin/make --no-print-directory --directory=/Users/emmaliu/internship2022/installs/Chombo/lib/src/AMRElliptic  lib
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+make[3]: Nothing to be done for `lib'.
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+/Users/emmaliu/internship2022/installs//Chombo/lib/mk/Make.defs:35: warning: overriding commands for target `.SUFFIXES'
+/Users/emmaliu/internship2022/installs//Chombo/lib/mk/Make.defs:35: warning: ignoring old commands for target `.SUFFIXES'
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+HOST_DEFS=/Users/emmaliu/internship2022/installs/BISICLES/code/mk/Make.defs.cs-it-7093680
+including /Users/emmaliu/internship2022/installs/BISICLES/code/mk/Make.defs.cs-it-7093680 
+python:   
+Depending driver.cpp ...
+Depending fsrc/encap.f90 ...
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+/Users/emmaliu/internship2022/installs//Chombo/lib/mk/Make.defs:35: warning: overriding commands for target `.SUFFIXES'
+/Users/emmaliu/internship2022/installs//Chombo/lib/mk/Make.defs:35: warning: ignoring old commands for target `.SUFFIXES'
+Configured with: --prefix=/Library/Developer/CommandLineTools/usr --with-gxx-include-dir=/Library/Developer/CommandLineTools/SDKs/MacOSX12.3.sdk/usr/include/c++/4.2.1
+HOST_DEFS=/Users/emmaliu/internship2022/installs/BISICLES/code/mk/Make.defs.cs-it-7093680
+including /Users/emmaliu/internship2022/installs/BISICLES/code/mk/Make.defs.cs-it-7093680 
+python:   
+mpicxx -g -pedantic -Wall  -std=c++11 -march=native -Wno-long-long -Wno-sign-compare -Wno-deprecated -Wno-unused-local-typedefs -Wno-overloaded-virtual -Wno-unknown-pragmas    -DCH_SPACEDIM=2 -DCH_Darwin    -DCH_MPI -DMPICH_SKIP_MPICXX -ULAM_WANT_MPI2CPP -DMPI_NO_CPPBIND    -DCH_USE_SETVAL -DCH_USE_COMPLEX    -DCH_USE_MEMORY_TRACKING    -DCH_USE_64 -DCH_USE_DOUBLE -DCH_USE_HDF5 -I/Users/emmaliu/internship2022/installs/hdf5-1.12.2/include   -I. -Ifsrc      -DCH_USE_LAPACK    -DCH_FORT_UNDERSCORE -I/Users/emmaliu/internship2022/installs//Chombo/lib/src/AMRElliptic -I/Users/emmaliu/internship2022/installs//Chombo/lib/src/AMRTimeDependent -I/Users/emmaliu/internship2022/installs//Chombo/lib/src/AMRTools -I/Users/emmaliu/internship2022/installs//Chombo/lib/src/BoxTools -I/Users/emmaliu/internship2022/installs//Chombo/lib/src/BaseTools   -DSVN_REV='"4190M"' -DSVN_REP='"https://anag-repo.lbl.gov/svn/BISICLES"' -DSVN_URL='"https://anag-repo.lbl.gov/svn/BISICLES/private/branches/ParallelInTime"' -I/Users/emmaliu/internship2022/installs/BISICLES/code/mk/../src -I/Users/emmaliu/internship2022/installs/BISICLES/code/mk/../util  -DCH_LANG_CC -c driver.cpp -o o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/driver.o
+In file included from driver.cpp:61:
+/Users/emmaliu/internship2022/installs/BISICLES/code/mk/../src/Regression.H:37:11: warning: unused variable 'ghostVect' [-Wunused-variable]
+  IntVect ghostVect = IntVect::Unit;
+          ^
+In file included from driver.cpp:32:
+/Users/emmaliu/internship2022/installs/BISICLES/code/mk/../src/MarineIBC.H:97:8: warning: private field 'm_domainLength' is not used [-Wunused-private-field]
+  Real m_domainLength, m_domainWidth;
+       ^
+2 warnings generated.
+gfortran  -g -ggdb -Wall -W  -Wno-line-truncation -fno-second-underscore  -Wno-unused-parameter -Wno-unused-variable  -DCH_MPI -I/Users/emmaliu/internship2022/installs/PFASST_design/include -I/Users/emmaliu/internship2022/installs/PFASST_design/build   -c fsrc/encap.f90 -o o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/encap.o
+fsrc/encap.f90:37:44:
+
+   37 |   subroutine Pf_CreateObject(Chombo_MPI_comm) bind(c, name="Pf_CreateObject")
+      |                                            1
+Warning: Variable 'chombo_mpi_comm' at (1) is a dummy argument of the BIND(C) procedure 'pf_createobject' but may not be C interoperable [-Wc-binding-type]
+/bin/csh -f -c "mpicxx -g -pedantic -Wall  -std=c++11 -march=native -Wno-long-long -Wno-sign-compare -Wno-deprecated -Wno-unused-local-typedefs -Wno-overloaded-virtual -Wno-unknown-pragmas        o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/driver.o o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/encap.o   -L../lib/ -lBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI  -L/Users/emmaliu/internship2022/installs//Chombo/lib -lamrelliptic2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI -lamrtimedependent2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI -lamrtools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI -lboxtools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI -lbasetools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI  -L/Users/emmaliu/internship2022/installs/hdf5-1.12.2/lib -lhdf5 -lz     -L/usr/local/lib/gcc/11 -lgfortran   -L/Users/emmaliu/internship2022/installs/PFASST_design/lib -lpfasst -L/usr/local/lib/gcc/11 -lgfortran -I/Users/emmaliu/internship2022/installs/PFASST_design/build -I/Users/emmaliu/internship2022/installs/PFASST_design/include -o driver2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.ex |&  awk -f /Users/emmaliu/internship2022/installs//Chombo/lib/mk/tempnam.awk"
+ld: warning: object file (o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/encap.o) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: dylib (/usr/local/lib/gcc/11/libgfortran.dylib) was built for newer macOS version (12.2) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(amrIceF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrtools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(AverageF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(BasalFrictionRelationF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(DerivativesF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrelliptic2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(ViscousTensorOpF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(ConstitutiveRelationF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(NyeCrevasseF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(SigmaCSF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(DivergenceF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(ExtrapBCF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrtools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(InterpF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(BisiclesF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrelliptic2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(AMRPoissonOpF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(ControlF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(L1L2ConstitutiveRelationF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrtools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(AverageFaceF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libboxtools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(CellToEdgeF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(ColumnThermodynamics.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(IceThermodynamicsF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libboxtools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(EdgeToCellF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(CalvingF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libbasetools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(CH_CountersF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrtimedependent2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(GodunovPhysicsF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrelliptic2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(VCAMRPoissonOpF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrtools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(InterpFace.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(IntInterpF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrtimedependent2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(AdvectPhysicsF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(CrevasseF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrtimedependent2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(GodunovUtilitiesF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(FIBCF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrtools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(LevelFluxRegisterF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (/Users/emmaliu/internship2022/installs//Chombo/lib/libamrtools2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(QuadCFInterpF.o)) was built for newer macOS version (12.4) than being linked (12.0)
+ld: warning: object file (../lib//libBisicles2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.a(vanderveen.o)) was built for newer macOS version (12.4) than being linked (12.0)
+Undefined symbols for architecture x86_64:
+  "___pf_mod_comm_mpi_MOD_pf_mpi_create", referenced from:
+      _Pf_CreateObject in encap.o
+  "___pf_mod_dtype_MOD___vtab_pf_mod_dtype_Pf_encap_t", referenced from:
+      _Pf_CreateObject in encap.o
+  "___pf_mod_dtype_MOD___vtab_pf_mod_dtype_Pf_factory_t", referenced from:
+      _Pf_CreateObject in encap.o
+  "___pf_mod_dtype_MOD___vtab_pf_mod_dtype_Pf_stepper_t", referenced from:
+      _Pf_CreateObject in encap.o
+  "___pf_mod_dtype_MOD___vtab_pf_mod_dtype_Pf_sweeper_t", referenced from:
+      _Pf_CreateObject in encap.o
+  "___pf_mod_dtype_MOD___vtab_pf_mod_dtype_Pf_user_level_t", referenced from:
+      _Pf_CreateObject in encap.o
+  "___pf_mod_pfasst_MOD_pf_pfasst_create", referenced from:
+      _Pf_CreateObject in encap.o
+ld: symbol(s) not found for architecture x86_64
+clang: error: linker command failed with exit code 1 (use -v to see invocation)
+make[1]: *** [driver2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI.ex] Error 1
+make: *** [driver] Error 2

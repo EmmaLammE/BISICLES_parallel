@@ -1,0 +1,56 @@
+
+
+DEBUG ?= FALSE
+MKVERBOSE ?= TRUE
+
+
+#  File for compiler options
+include $(LIBPFASST)/Makefile.local
+
+
+VPATHS = $(LIBPFASST)/src
+LDFLAGS +=  -L$(LIBPFASST)/lib -lpfasst 
+VPATH += $(VPATHS)
+
+#  Source files
+FSRC = $(VPATHS)/pfasst.f90 \
+       $(VPATHS)/pf_comm.f90 \
+       $(VPATHS)/pf_dtype.f90 \
+       $(VPATHS)/pf_fft.f90 \
+       $(VPATHS)/pf_hooks.f90 \
+       $(VPATHS)/pf_interpolate.f90 \
+       $(VPATHS)/pf_mgrit.f90 \
+       $(VPATHS)/pf_parallel.f90 \
+       $(VPATHS)/pf_parareal.f90 \
+       $(VPATHS)/pf_parallel_oc.f90 \
+       $(VPATHS)/pf_pfasst.f90 \
+       $(VPATHS)/pf_quadrature.f90 \
+       $(VPATHS)/pf_restrict.f90 \
+       $(VPATHS)/pf_results.f90 \
+       $(VPATHS)/pf_rkstepper.f90 \
+       $(VPATHS)/pf_erkstepper.f90 \
+       $(VPATHS)/pf_solutions.f90 \
+       $(VPATHS)/pf_stop.f90 \
+       $(VPATHS)/pf_timer.f90 \
+       $(VPATHS)/pf_utils.f90 \
+       $(VPATHS)/pf_ham_sys_encap.f90 \
+       $(VPATHS)/pf_ndarray_encap.f90 \
+       $(VPATHS)/pf_ndarray_oc_encap.f90 \
+       $(VPATHS)/pf_ndsysarray_encap.f90 \
+       $(VPATHS)/pf_zndsysarray_encap.f90 \
+       $(VPATHS)/pf_zndarray_encap.f90 \
+       $(VPATHS)/pf_exp_sweeper.f90 \
+       $(VPATHS)/pf_fexp_sweeper.f90 \
+       $(VPATHS)/pf_imex_sweeper.f90 \
+       $(VPATHS)/pf_imexR_sweeper.f90 \
+       $(VPATHS)/pf_imexQ_oc_sweeper.f90 \
+       $(VPATHS)/pf_imk_sweeper.f90 \
+       $(VPATHS)/pf_magpicard_sweeper.f90 \
+       $(VPATHS)/pf_misdcQ_sweeper.f90 \
+       $(VPATHS)/pf_misdcQ_oc_sweeper.f90 \
+       $(VPATHS)/pf_verlet_sweeper.f90 \
+       $(VPATHS)/pf_fexp_sweeper.f90 \
+
+OBJ  = $(subst $(LIBPFASST)/src, $(LIBPFASST)/build,$(FSRC:.f90=.o))
+
+

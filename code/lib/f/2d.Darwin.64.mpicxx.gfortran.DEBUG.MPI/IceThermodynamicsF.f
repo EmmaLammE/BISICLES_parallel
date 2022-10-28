@@ -1,0 +1,363 @@
+      subroutine COMPOSEINTERNALENERGYICE(
+     &           F
+     &           ,iFlo0,iFlo1
+     &           ,iFhi0,iFhi1
+     &           ,nFcomp
+     &           ,T
+     &           ,iTlo0,iTlo1
+     &           ,iThi0,iThi1
+     &           ,nTcomp
+     &           ,W
+     &           ,iWlo0,iWlo1
+     &           ,iWhi0,iWhi1
+     &           ,nWcomp
+     &           ,C
+     &           ,L
+     &           ,iboxlo0,iboxlo1
+     &           ,iboxhi0,iboxhi1
+     &           )
+      implicit none
+      integer*8 ch_flops
+      COMMON/ch_timer/ ch_flops
+      integer nFcomp
+      integer iFlo0,iFlo1
+      integer iFhi0,iFhi1
+      REAL*8 F(
+     &           iFlo0:iFhi0,
+     &           iFlo1:iFhi1,
+     &           0:nFcomp-1)
+      integer nTcomp
+      integer iTlo0,iTlo1
+      integer iThi0,iThi1
+      REAL*8 T(
+     &           iTlo0:iThi0,
+     &           iTlo1:iThi1,
+     &           0:nTcomp-1)
+      integer nWcomp
+      integer iWlo0,iWlo1
+      integer iWhi0,iWhi1
+      REAL*8 W(
+     &           iWlo0:iWhi0,
+     &           iWlo1:iWhi1,
+     &           0:nWcomp-1)
+      REAL*8 C
+      REAL*8 L
+      integer iboxlo0,iboxlo1
+      integer iboxhi0,iboxhi1
+      integer i0,i1, ncomp, n
+      ncomp = nTcomp
+      do i1 = iboxlo1,iboxhi1
+      do i0 = iboxlo0,iboxhi0
+      do n = 0, ncomp-1
+         F(i0,i1,n) = T(i0,i1,n) * C + 
+     &        W(i0,i1,n) * L 
+      end do
+      enddo
+      enddo
+      return 
+      end
+      subroutine DECOMPOSEINTERNALENERGYICE(
+     &           T
+     &           ,iTlo0,iTlo1
+     &           ,iThi0,iThi1
+     &           ,nTcomp
+     &           ,W
+     &           ,iWlo0,iWlo1
+     &           ,iWhi0,iWhi1
+     &           ,nWcomp
+     &           ,F
+     &           ,iFlo0,iFlo1
+     &           ,iFhi0,iFhi1
+     &           ,nFcomp
+     &           ,P
+     &           ,iPlo0,iPlo1
+     &           ,iPhi0,iPhi1
+     &           ,nPcomp
+     &           ,C
+     &           ,L
+     &           ,beta
+     &           ,Tr
+     &           ,Tmin
+     &           ,iboxlo0,iboxlo1
+     &           ,iboxhi0,iboxhi1
+     &           )
+      implicit none
+      integer*8 ch_flops
+      COMMON/ch_timer/ ch_flops
+      integer nTcomp
+      integer iTlo0,iTlo1
+      integer iThi0,iThi1
+      REAL*8 T(
+     &           iTlo0:iThi0,
+     &           iTlo1:iThi1,
+     &           0:nTcomp-1)
+      integer nWcomp
+      integer iWlo0,iWlo1
+      integer iWhi0,iWhi1
+      REAL*8 W(
+     &           iWlo0:iWhi0,
+     &           iWlo1:iWhi1,
+     &           0:nWcomp-1)
+      integer nFcomp
+      integer iFlo0,iFlo1
+      integer iFhi0,iFhi1
+      REAL*8 F(
+     &           iFlo0:iFhi0,
+     &           iFlo1:iFhi1,
+     &           0:nFcomp-1)
+      integer nPcomp
+      integer iPlo0,iPlo1
+      integer iPhi0,iPhi1
+      REAL*8 P(
+     &           iPlo0:iPhi0,
+     &           iPlo1:iPhi1,
+     &           0:nPcomp-1)
+      REAL*8 C
+      REAL*8 L
+      REAL*8 beta
+      REAL*8 Tr
+      REAL*8 Tmin
+      integer iboxlo0,iboxlo1
+      integer iboxhi0,iboxhi1
+      integer i0,i1, ncomp, n
+      REAL*8 Tp, Fp
+      ncomp = nTcomp
+      do i1 = iboxlo1,iboxhi1
+      do i0 = iboxlo0,iboxhi0
+       do n = 0, ncomp-1
+          Tp = Tr - P(i0,i1,n) * beta
+          Fp = C*Tp
+          if (F(i0,i1,n) > Fp) then
+             T(i0,i1,n) = Tp
+             W(i0,i1,n) = (F(i0,i1,n) - Fp) / L
+          else
+           T(i0,i1,n) = max( Tmin, 
+     &            (F(i0,i1,n))/C)
+             W(i0,i1,n) = (0.0d0)
+          end if
+       end do
+      enddo
+      enddo
+      return 
+      end
+      subroutine COLUMNTHERMODYAMICSSETCONSTANTS(
+     &           a_seconds_per_unit_time
+     &           ,a_ice_density
+     &           ,a_water_density
+     &           ,a_gravity
+     &           ,a_ice_heat_capacity
+     &           ,a_ice_latent_heat
+     &           ,a_ice_conductivity
+     &           ,a_moisture_conductivity
+     &           ,a_ice_pressure_melt_factor
+     &           ,a_triple_point
+     &           ,a_water_fraction_drain
+     &           ,a_water_fraction_max
+     &           ,a_water_drain_factor
+     &           ,a_till_water_drain_factor
+     &           ,a_till_water_max
+     &           )
+      implicit none
+      integer*8 ch_flops
+      COMMON/ch_timer/ ch_flops
+      REAL*8 a_seconds_per_unit_time
+      REAL*8 a_ice_density
+      REAL*8 a_water_density
+      REAL*8 a_gravity
+      REAL*8 a_ice_heat_capacity
+      REAL*8 a_ice_latent_heat
+      REAL*8 a_ice_conductivity
+      REAL*8 a_moisture_conductivity
+      REAL*8 a_ice_pressure_melt_factor
+      REAL*8 a_triple_point
+      REAL*8 a_water_fraction_drain
+      REAL*8 a_water_fraction_max
+      REAL*8 a_water_drain_factor
+      REAL*8 a_till_water_drain_factor
+      REAL*8 a_till_water_max
+      call column_thermodynamics_set_constants(
+     &     a_seconds_per_unit_time , 
+     &     a_ice_density , a_water_density, a_gravity ,
+     &     a_ice_heat_capacity, a_ice_latent_heat,
+     &     a_ice_conductivity , a_moisture_conductivity,
+     &     a_ice_pressure_melt_factor, a_triple_point)
+       call column_thermodynamics_set_water_constants(
+     &     a_water_fraction_drain, a_water_fraction_max,
+     &     a_water_drain_factor, a_till_water_drain_factor,
+     &     a_till_water_max)
+      return 
+      end 
+      subroutine UPDATEINTERNALENERGY(
+     &           energy
+     &           ,ienergylo0,ienergylo1
+     &           ,ienergyhi0,ienergyhi1
+     &           ,nenergycomp
+     &           ,tillwaterdepth
+     &           ,itillwaterdepthlo0,itillwaterdepthlo1
+     &           ,itillwaterdepthhi0,itillwaterdepthhi1
+     &           ,senergy
+     &           ,isenergylo0,isenergylo1
+     &           ,isenergyhi0,isenergyhi1
+     &           ,benergy
+     &           ,ibenergylo0,ibenergylo1
+     &           ,ibenergyhi0,ibenergyhi1
+     &           ,sflux
+     &           ,isfluxlo0,isfluxlo1
+     &           ,isfluxhi0,isfluxhi1
+     &           ,bflux
+     &           ,ibfluxlo0,ibfluxlo1
+     &           ,ibfluxhi0,ibfluxhi1
+     &           ,tillWaterDrainFactor
+     &           ,itillWaterDrainFactorlo0,itillWaterDrainFactorlo1
+     &           ,itillWaterDrainFactorhi0,itillWaterDrainFactorhi1
+     &           ,floatingMaskOld
+     &           ,ifloatingMaskOldlo0,ifloatingMaskOldlo1
+     &           ,ifloatingMaskOldhi0,ifloatingMaskOldhi1
+     &           ,floatingMaskNew
+     &           ,ifloatingMaskNewlo0,ifloatingMaskNewlo1
+     &           ,ifloatingMaskNewhi0,ifloatingMaskNewhi1
+     &           ,rhs
+     &           ,irhslo0,irhslo1
+     &           ,irhshi0,irhshi1
+     &           ,nrhscomp
+     &           ,thckold
+     &           ,ithckoldlo0,ithckoldlo1
+     &           ,ithckoldhi0,ithckoldhi1
+     &           ,thcknew
+     &           ,ithcknewlo0,ithcknewlo1
+     &           ,ithcknewhi0,ithcknewhi1
+     &           ,usig
+     &           ,iusiglo0,iusiglo1
+     &           ,iusighi0,iusighi1
+     &           ,nusigcomp
+     &           ,sigma
+     &           ,isigmahi0
+     &           ,dsigma
+     &           ,idsigmahi0
+     &           ,time
+     &           ,dt
+     &           ,nlay
+     &           ,sdiric
+     &           ,iboxlo0,iboxlo1
+     &           ,iboxhi0,iboxhi1
+     &           )
+      implicit none
+      integer*8 ch_flops
+      COMMON/ch_timer/ ch_flops
+      integer nenergycomp
+      integer ienergylo0,ienergylo1
+      integer ienergyhi0,ienergyhi1
+      REAL*8 energy(
+     &           ienergylo0:ienergyhi0,
+     &           ienergylo1:ienergyhi1,
+     &           0:nenergycomp-1)
+      integer itillwaterdepthlo0,itillwaterdepthlo1
+      integer itillwaterdepthhi0,itillwaterdepthhi1
+      REAL*8 tillwaterdepth(
+     &           itillwaterdepthlo0:itillwaterdepthhi0,
+     &           itillwaterdepthlo1:itillwaterdepthhi1)
+      integer isenergylo0,isenergylo1
+      integer isenergyhi0,isenergyhi1
+      REAL*8 senergy(
+     &           isenergylo0:isenergyhi0,
+     &           isenergylo1:isenergyhi1)
+      integer ibenergylo0,ibenergylo1
+      integer ibenergyhi0,ibenergyhi1
+      REAL*8 benergy(
+     &           ibenergylo0:ibenergyhi0,
+     &           ibenergylo1:ibenergyhi1)
+      integer isfluxlo0,isfluxlo1
+      integer isfluxhi0,isfluxhi1
+      REAL*8 sflux(
+     &           isfluxlo0:isfluxhi0,
+     &           isfluxlo1:isfluxhi1)
+      integer ibfluxlo0,ibfluxlo1
+      integer ibfluxhi0,ibfluxhi1
+      REAL*8 bflux(
+     &           ibfluxlo0:ibfluxhi0,
+     &           ibfluxlo1:ibfluxhi1)
+      integer itillWaterDrainFactorlo0,itillWaterDrainFactorlo1
+      integer itillWaterDrainFactorhi0,itillWaterDrainFactorhi1
+      REAL*8 tillWaterDrainFactor(
+     &           itillWaterDrainFactorlo0:itillWaterDrainFactorhi0,
+     &           itillWaterDrainFactorlo1:itillWaterDrainFactorhi1)
+      integer ifloatingMaskOldlo0,ifloatingMaskOldlo1
+      integer ifloatingMaskOldhi0,ifloatingMaskOldhi1
+      integer floatingMaskOld(
+     &           ifloatingMaskOldlo0:ifloatingMaskOldhi0,
+     &           ifloatingMaskOldlo1:ifloatingMaskOldhi1)
+      integer ifloatingMaskNewlo0,ifloatingMaskNewlo1
+      integer ifloatingMaskNewhi0,ifloatingMaskNewhi1
+      integer floatingMaskNew(
+     &           ifloatingMaskNewlo0:ifloatingMaskNewhi0,
+     &           ifloatingMaskNewlo1:ifloatingMaskNewhi1)
+      integer nrhscomp
+      integer irhslo0,irhslo1
+      integer irhshi0,irhshi1
+      REAL*8 rhs(
+     &           irhslo0:irhshi0,
+     &           irhslo1:irhshi1,
+     &           0:nrhscomp-1)
+      integer ithckoldlo0,ithckoldlo1
+      integer ithckoldhi0,ithckoldhi1
+      REAL*8 thckold(
+     &           ithckoldlo0:ithckoldhi0,
+     &           ithckoldlo1:ithckoldhi1)
+      integer ithcknewlo0,ithcknewlo1
+      integer ithcknewhi0,ithcknewhi1
+      REAL*8 thcknew(
+     &           ithcknewlo0:ithcknewhi0,
+     &           ithcknewlo1:ithcknewhi1)
+      integer nusigcomp
+      integer iusiglo0,iusiglo1
+      integer iusighi0,iusighi1
+      REAL*8 usig(
+     &           iusiglo0:iusighi0,
+     &           iusiglo1:iusighi1,
+     &           0:nusigcomp-1)
+      integer isigmahi0
+      REAL*8 sigma(
+     &           0:isigmahi0)
+      integer idsigmahi0
+      REAL*8 dsigma(
+     &           0:idsigmahi0)
+      REAL*8 time
+      REAL*8 dt
+      integer nlay
+      integer sdiric
+      integer iboxlo0,iboxlo1
+      integer iboxhi0,iboxhi1
+      REAL*8 colenergy(0:nlay-1), colrhs(0:nlay-1)
+      REAL*8 colusig(0:nlay)
+      integer i0,i1
+      integer layer
+      integer mask
+      do i1 = iboxlo1,iboxhi1
+      do i0 = iboxlo0,iboxhi0
+      do layer = 0, nlay - 1
+         colenergy(layer) = energy(i0,i1, layer)
+         colrhs(layer) = rhs(i0,i1, layer)
+      end do
+      do layer = 0, nlay
+         colusig(layer) = usig(i0,i1, layer)
+      end do
+      mask = floatingMaskOld(i0,i1)
+      if (floatingMaskNew(i0,i1).eq.(2)) then
+         mask = (2)
+      end if
+      call column_thermodynamics_update_internal_energy(colenergy,
+     &     tillwaterdepth(i0,i1),
+     &     senergy(i0,i1),
+     &     sflux(i0,i1), sdiric.gt.0, 
+     &     benergy(i0,i1), mask,
+     &     bflux(i0,i1), colrhs,  
+     &     thckold(i0,i1),  thcknew(i0,i1),
+     &     tillWaterDrainFactor(i0,i1),
+     &     colusig, sigma, dsigma, time, dt, nlay)   
+      do layer = 0, nlay - 1
+         energy(i0,i1, layer) = colenergy(layer)
+      end do
+      enddo
+      enddo
+      return
+      end 

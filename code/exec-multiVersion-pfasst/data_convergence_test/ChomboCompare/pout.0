@@ -1,0 +1,11 @@
+numCrseStart 0
+exact Filename = ./../dt0.14/pf_nlevel2_nproc1_dt0.14_compuVel_grid0128.petsc.000000.2d.hdf5
+computed Filename = ./../dt0.14/ref_dt0.14_grid0128.petsc.000007.2d.hdf5
+error Filename = ./compareResults/compareOut_pf_ref_dt0.14_grid0128.hdf5
+error, step 0: L1, L2, Max, sum
+thickness: 5.5367e+08, 1.3821e+04, 6.8756e-01, 4.5612e+06
+
+Vector NSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEE: 24 bytes (0 Mb)
+---------------------------------
+Total Unfreed : 24 bytes (0 Mb)
+peak memory usage: 6034650 bytes (5 Mb)

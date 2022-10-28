@@ -1,0 +1,148 @@
+#-*- Mode: Makefile -*- 
+# linking
+FC = mpifort # mpif90
+CC = mpicc
+# CXX = mpixx
+LD = $(FC)
+AR=ar rcs
+FFLAGS = -Ibuild -Jinclude -cpp -ffree-line-length-none -fallow-argument-mismatch
+
+DEBUG ?= TRUE
+ifeq ($(DEBUG),TRUE)
+FFLAGS += -fcheck=all -fbacktrace -g -ffpe-trap=invalid,zero,overflow -fbounds-check -fimplicit-none -ffree-line-length-none
+else
+FFLAGS += -O3 
+endif
+
+
+BISICLES_MAKEFILES += Make.defs
+
+
+# a bunch of common defs for the various BISICLES make files
+MACHINE := $(shell uname)
+UNAMEM := $(shell uname -m)
+UNAMEN := $(shell uname -n)
+WHO := $(shell whoami)
+THIS_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
+# default BISICLES_HOME and CHOMBO_HOME if not defined
+ifeq ($(BISICLES_HOME),)
+BISICLES_HOME := $(THIS_DIR)/../../../
+endif
+ifeq ($(BISICLES_BRANCH),)
+BISICLES_BRANCH := $(THIS_DIR)/../../
+endif
+
+ifeq ($(CHOMBO_HOME),)
+CHOMBO_HOME := $(BISICLES_HOME)/Chombo/lib
+endif
+
+# For the ChomboNVector headers
+# Point at the chombo-nvector headers and boost
+#BOOST_INCLUDE = /usr/local/include/boost/
+#NVECTOR_HOME = /home/dan/people/Sundials/chombo-nvector/
+#XTRACXXFLAGS += -I$(SUNDIALS_INSTALLDIR)/include -I../ -I$(BOOST_INCLUDE)
+#XTRALDFLAGS += -L$(SUNDIALS_INSTALLDIR)/lib -lsundials_nvecparallel -lsundials_arkode
+
+include $(CHOMBO_HOME)/mk/Make.defs
+include $(CHOMBO_HOME)/mk/Make.defs.config
+
+# pfasst
+# include $(LIBPFASST)/Makefile.defaults
+# include $(LIBPFASST)/Makefile.rules
+# include $(LIBPFASST)/.depend
+
+DIM=2
+LibNames := AMRElliptic AMRTimeDependent AMRTools BoxTools BaseTools
+
+#Bisicles: lib
+
+#XTRACPPFLAGS :=-I$(THIS_DIR)/../src -I$(THIS_DIR)/../util -I$(NVECTOR_HOME) -I$(SUNDIALS_INSTALLDIR)/include
+XTRACPPFLAGS :=-I$(THIS_DIR)/../src -I$(THIS_DIR)/../util 
+include $(CHOMBO_HOME)/mk/Make.example
+
+#see if there is a host specific file.
+HOST_DEFS := $(THIS_DIR)/Make.defs.$(UNAMEN)
+
+#NERSC_HOST is more useful than UNAMEN on NERSC hosts....
+ifneq ($(NERSC_HOST),)
+HOST_DEFS := $(THIS_DIR)/Make.defs.$(NERSC_HOST)
+endif
+
+$(info HOST_DEFS=$(HOST_DEFS))
+ifneq ($(wildcard $(HOST_DEFS)), )
+$(info including $(HOST_DEFS) )
+include $(HOST_DEFS)
+else
+NONE_DEFS=$(THIS_DIR)/Make.defs.none
+$(info NONE_DEFS=$(NONE_DEFS))
+ifneq ($(wildcard $(NONE_DEFS)), )
+$(info including $(NONE_DEFS) )
+include $(NONE_DEFS)
+endif
+endif
+
+#if PYTHON_INC was not defined, try to work it out from PYTHON_VERSION
+ifeq ($(PYTHON_INC),)
+
+ifeq ($(PYTHON_VERSION),2.7)
+#python 2.7 standard install
+PYTHON_INC := -I/usr/include/python2.7 
+PYTHON_LIBS := -lpython2.7
+endif
+
+ifeq ($(PYTHON_VERSION),2.6)
+#python 2.6 standard install
+PYTHON_INC := -I/usr/include/python2.6
+PYTHON_LIBS := -lpython2.6
+endif
+
+ifeq ($(PYTHON_VERSION),2.4)
+#python 2.4 standard install
+PYTHON_INC := -I/usr/include/python2.4
+PYTHON_LIBS := -lpython2.4
+endif
+
+endif
+
+$(info python: $(PYTHON_INC) $(PYTHON_LIBS) )
+ifneq ($(PYTHON_INC),)
+CPPFLAGS :=$(PYTHON_INC) -DHAVE_PYTHON	$(CPPFLAGS)
+LIBFLAGS+=$(PYTHON_LIBS) 
+endif
+
+SVN_REV=$(shell cd $(BISICLES_BRANCH) ; svnversion -n)
+ifeq ($(SVN_REV),)
+SVN_REV := unknown
+SVN_REP := unknown
+SVN_URL := unknown
+else
+
+SVN_REP := $(shell cd $(BISICLES_BRANCH) ; svn info | awk '/Repository Root:/ {print $$3}')
+ifeq ($(SVN_REP),)
+SVN_REP := unknown
+endif
+
+SVN_URL := $(shell cd $(BISICLES_BRANCH) ; svn info | awk '/^URL:/ {print $$2}')
+ifeq ($(SVN_URL),)
+SVN_URL := unknown
+endif
+
+endif
+
+CPPFLAGS += -DSVN_REV='"$(SVN_REV)"'
+CPPFLAGS += -DSVN_REP='"$(SVN_REP)"'
+CPPFLAGS += -DSVN_URL='"$(SVN_URL)"'
+
+#LIBFLAGS +=  -lsundials_nvecparallel -lsundials_arkode
+
+# pfasst linking
+# ifeq ($(USE_PFASST),TRUE)
+# @echo "Linking fortran to cpp..."
+# @$(FC) $(FFLAGS) $(FFLAGS_EXTRA)  $^ $(OUTPUT_OPTION) $(LDFLAGS)
+# endif
+
+nolink: $(shell $(CHOMBO_HOME)/mk/reverse $(LibNames)) $(objects)  
+	@echo BISICLES Objects built
+
+

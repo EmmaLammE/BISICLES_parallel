@@ -1,0 +1,203 @@
+number_procs = 1, rank = 0
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false
+AmrIce::initGrids
+Level 0: 16384 cells: ((0,0) (31,31) (0,0))[0] # ((0,32) (31,63) (0,0))[0] # ((0,64) (31,95) (0,0))[0] # ((0,96) (31,127) (0,0))[0]
+((32,0) (63,31) (0,0))[0] # ((32,32) (63,63) (0,0))[0] # ((32,64) (63,95) (0,0))[0] # ((32,96) (63,127) (0,0))[0]
+((64,0) (95,31) (0,0))[0] # ((64,32) (95,63) (0,0))[0] # ((64,64) (95,95) (0,0))[0] # ((64,96) (95,127) (0,0))[0]
+((96,0) (127,31) (0,0))[0] # ((96,32) (127,63) (0,0))[0] # ((96,64) (127,95) (0,0))[0] # ((96,96) (127,127) (0,0))[0]
+
+
+AmrIce::initData
+AmrIce::computeA
+9.2e-18 <= A(x,y,sigma) <= 9.2e-18
+Sum(rhs) for velocity solve = -2.01699e+16
+computing an initial guess by solving the velocity equations  with constant mu = 1e+06 and constant initial velocity = (0,0)
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+JFNK initial residual norm = 1.00849e+08
+JFNK convergence metric = 1.00849e+08
+      RelaxSolver:: initial Residual norm = 1.00849e+08
+      RelaxSolver:: iteration = 1 residual norm = 8130.1, rate = 12404.5
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+JFNK initial residual norm = 617724
+JFNK convergence metric = 617724
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 617724
+      RelaxSolver:: iteration = 1 residual norm = 660.861, rate = 934.727
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 0 residual norm = 50611.8 rate = 12.2052
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 50611.8
+      RelaxSolver:: iteration = 1 residual norm = 66.7753, rate = 757.942
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 1 residual norm = 7002.93 rate = 7.22723
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 7002.93
+      RelaxSolver:: iteration = 1 residual norm = 3.40027, rate = 2059.52
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 2 residual norm = 1241.36 rate = 5.64132
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 1241.36
+      RelaxSolver:: iteration = 1 residual norm = 0.110499, rate = 11234.1
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 3 residual norm = 243.835 rate = 5.09099
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 243.835
+      RelaxSolver:: iteration = 1 residual norm = 0.0718768, rate = 3392.41
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 4 residual norm = 50.2843 rate = 4.84913
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 50.2843
+      RelaxSolver:: iteration = 1 residual norm = 0.0186843, rate = 2691.26
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 5 residual norm = 10.667 rate = 4.71401
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 10.667
+      RelaxSolver:: iteration = 1 residual norm = 0.00402854, rate = 2647.85
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 6 residual norm = 2.30628 rate = 4.6252
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 2.30628
+      RelaxSolver:: iteration = 1 residual norm = 0.000812364, rate = 2838.97
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 7 residual norm = 0.505673 rate = 4.56081
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 0.505673
+      RelaxSolver:: iteration = 1 residual norm = 0.000159288, rate = 3174.59
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 8 residual norm = 0.112101 rate = 4.51088
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 0.112101
+      RelaxSolver:: iteration = 1 residual norm = 3.09129e-05, rate = 3626.34
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 9 residual norm = 0.0250785 rate = 4.46999
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 0.0250785
+      RelaxSolver:: iteration = 1 residual norm = 5.99941e-06, rate = 4180.16
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 10 residual norm = 0.00565487 rate = 4.43485
+JFNK final residual norm = 0.00565487
+JFNKSolver converged -- final norm(resid) = 0.00565487 after 11 iterations
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+AmrIce::initialize
+AmrIce::initGrids
+Level 0: 16384 cells: ((0,0) (31,31) (0,0))[0] # ((0,32) (31,63) (0,0))[0] # ((0,64) (31,95) (0,0))[0] # ((0,96) (31,127) (0,0))[0]
+((32,0) (63,31) (0,0))[0] # ((32,32) (63,63) (0,0))[0] # ((32,64) (63,95) (0,0))[0] # ((32,96) (63,127) (0,0))[0]
+((64,0) (95,31) (0,0))[0] # ((64,32) (95,63) (0,0))[0] # ((64,64) (95,95) (0,0))[0] # ((64,96) (95,127) (0,0))[0]
+((96,0) (127,31) (0,0))[0] # ((96,32) (127,63) (0,0))[0] # ((96,64) (127,95) (0,0))[0] # ((96,96) (127,127) (0,0))[0]
+
+
+AmrIce::initData
+AmrIce::computeA
+9.2e-18 <= A(x,y,sigma) <= 9.2e-18
+Sum(rhs) for velocity solve = -2.01699e+16
+computing an initial guess by solving the velocity equations  with constant mu = 1e+06 and constant initial velocity = (0,0)
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+JFNK initial residual norm = 1.00849e+08
+JFNK convergence metric = 1.00849e+08
+      RelaxSolver:: initial Residual norm = 1.00849e+08
+      RelaxSolver:: iteration = 1 residual norm = 8130.1, rate = 12404.5
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+JFNK initial residual norm = 617724
+JFNK convergence metric = 617724
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 617724
+      RelaxSolver:: iteration = 1 residual norm = 660.861, rate = 934.727
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 0 residual norm = 50611.8 rate = 12.2052
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 50611.8
+      RelaxSolver:: iteration = 1 residual norm = 66.7753, rate = 757.942
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 1 residual norm = 7002.93 rate = 7.22723
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 7002.93
+      RelaxSolver:: iteration = 1 residual norm = 3.40027, rate = 2059.52
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 2 residual norm = 1241.36 rate = 5.64132
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 1241.36
+      RelaxSolver:: iteration = 1 residual norm = 0.110499, rate = 11234.1
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 3 residual norm = 243.835 rate = 5.09099
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 243.835
+      RelaxSolver:: iteration = 1 residual norm = 0.0718768, rate = 3392.41
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 4 residual norm = 50.2843 rate = 4.84913
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 50.2843
+      RelaxSolver:: iteration = 1 residual norm = 0.0186843, rate = 2691.26
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 5 residual norm = 10.667 rate = 4.71401
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 10.667
+      RelaxSolver:: iteration = 1 residual norm = 0.00402854, rate = 2647.85
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 6 residual norm = 2.30628 rate = 4.6252
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 2.30628
+      RelaxSolver:: iteration = 1 residual norm = 0.000812364, rate = 2838.97
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 7 residual norm = 0.505673 rate = 4.56081
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 0.505673
+      RelaxSolver:: iteration = 1 residual norm = 0.000159288, rate = 3174.59
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 8 residual norm = 0.112101 rate = 4.51088
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 0.112101
+      RelaxSolver:: iteration = 1 residual norm = 3.09129e-05, rate = 3626.34
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 9 residual norm = 0.0250785 rate = 4.46999
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 0.0250785
+      RelaxSolver:: iteration = 1 residual norm = 5.99941e-06, rate = 4180.16
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 10 residual norm = 0.00565487 rate = 4.43485
+JFNK final residual norm = 0.00565487
+JFNKSolver converged -- final norm(resid) = 0.00565487 after 11 iterations
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+AmrIce::setState
+resetting solution time from 0  to 0
+Sum(rhs) for velocity solve = -2.01699e+16
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+JFNK initial residual norm = 0.00565487
+JFNK convergence metric = 0.00565487
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 0.00565487
+      RelaxSolver:: iteration = 1 residual norm = 1.17286e-06, rate = 4821.45
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 0 residual norm = 0.00128421 rate = 4.40338
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+      RelaxSolver:: initial Residual norm = 0.00128421
+      RelaxSolver:: iteration = 1 residual norm = 2.32271e-07, rate = 5528.93
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+ Picard iteration 1 residual norm = 0.000293583 rate = 4.37427
+JFNK final residual norm = 0.000293583
+JFNKSolver converged -- final norm(resid) = 0.000293583 after 2 iterations
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+AmrIce::setState
+resetting solution time from 0  to 0
+Sum(rhs) for velocity solve = -2.01699e+16
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+JFNK initial residual norm = 0.000293583
+JFNK convergence metric = 0.000293583
+JFNK final residual norm = 0.000293583
+JFNKSolver converged -- final norm(resid) = 0.000293583 after 0 iterations
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+AmrIce::setState
+resetting solution time from 0  to -4.45563e-17
+Sum(rhs) for velocity solve = -2.01699e+16
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
+JFNK initial residual norm = 0.000293583
+JFNK convergence metric = 0.000293583
+JFNK final residual norm = 0.000293583
+JFNKSolver converged -- final norm(resid) = 0.000293583 after 0 iterations
+IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)

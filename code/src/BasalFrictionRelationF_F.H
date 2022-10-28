@@ -1,0 +1,214 @@
+#ifndef _BASALFRICTIONRELATIONF_F_H_
+#define _BASALFRICTIONRELATIONF_F_H_
+
+#include "FORT_PROTO.H"
+#include "CH_Timer.H"
+#include "REAL.H"
+
+extern "C"
+{
+
+#ifndef GUARDBFRICTIONPOWER 
+#define GUARDBFRICTIONPOWER 
+// Prototype for Fortran procedure BFRICTIONPOWER ...
+//
+void FORTRAN_NAME( BFRICTIONPOWER ,bfrictionpower )(
+      CHFp_FRA1(alpha)
+      ,CHFp_CONST_FRA(u)
+      ,CHFp_CONST_FRA1(C)
+      ,CHFp_CONST_FRA1(p)
+      ,CHFp_CONST_FIA1(mask)
+      ,CHFp_CONST_REAL(m)
+      ,CHFp_CONST_REAL(n)
+      ,CHFp_BOX(box) );
+
+#define FORT_BFRICTIONPOWER FORTRAN_NAME( inlineBFRICTIONPOWER, inlineBFRICTIONPOWER)
+#define FORTNT_BFRICTIONPOWER FORTRAN_NAME( BFRICTIONPOWER, bfrictionpower)
+
+inline void FORTRAN_NAME(inlineBFRICTIONPOWER, inlineBFRICTIONPOWER)(
+      CHFp_FRA1(alpha)
+      ,CHFp_CONST_FRA(u)
+      ,CHFp_CONST_FRA1(C)
+      ,CHFp_CONST_FRA1(p)
+      ,CHFp_CONST_FIA1(mask)
+      ,CHFp_CONST_REAL(m)
+      ,CHFp_CONST_REAL(n)
+      ,CHFp_BOX(box) )
+{
+ CH_TIMELEAF("FORT_BFRICTIONPOWER");
+ FORTRAN_NAME( BFRICTIONPOWER ,bfrictionpower )(
+      CHFt_FRA1(alpha)
+      ,CHFt_CONST_FRA(u)
+      ,CHFt_CONST_FRA1(C)
+      ,CHFt_CONST_FRA1(p)
+      ,CHFt_CONST_FIA1(mask)
+      ,CHFt_CONST_REAL(m)
+      ,CHFt_CONST_REAL(n)
+      ,CHFt_BOX(box) );
+}
+#endif  // GUARDBFRICTIONPOWER 
+
+#ifndef GUARDBFRICTIONAUU 
+#define GUARDBFRICTIONAUU 
+// Prototype for Fortran procedure BFRICTIONAUU ...
+//
+void FORTRAN_NAME( BFRICTIONAUU ,bfrictionauu )(
+      CHFp_FRA1(alpha)
+      ,CHFp_CONST_FRA(u)
+      ,CHFp_BOX(box) );
+
+#define FORT_BFRICTIONAUU FORTRAN_NAME( inlineBFRICTIONAUU, inlineBFRICTIONAUU)
+#define FORTNT_BFRICTIONAUU FORTRAN_NAME( BFRICTIONAUU, bfrictionauu)
+
+inline void FORTRAN_NAME(inlineBFRICTIONAUU, inlineBFRICTIONAUU)(
+      CHFp_FRA1(alpha)
+      ,CHFp_CONST_FRA(u)
+      ,CHFp_BOX(box) )
+{
+ CH_TIMELEAF("FORT_BFRICTIONAUU");
+ FORTRAN_NAME( BFRICTIONAUU ,bfrictionauu )(
+      CHFt_FRA1(alpha)
+      ,CHFt_CONST_FRA(u)
+      ,CHFt_BOX(box) );
+}
+#endif  // GUARDBFRICTIONAUU 
+
+#ifndef GUARDBFRICTIONPLIMITTSAI 
+#define GUARDBFRICTIONPLIMITTSAI 
+// Prototype for Fortran procedure BFRICTIONPLIMITTSAI ...
+//
+void FORTRAN_NAME( BFRICTIONPLIMITTSAI ,bfrictionplimittsai )(
+      CHFp_FRA1(alpha)
+      ,CHFp_CONST_FRA(u)
+      ,CHFp_CONST_FRA1(p)
+      ,CHFp_CONST_FRA1(a)
+      ,CHFp_BOX(box) );
+
+#define FORT_BFRICTIONPLIMITTSAI FORTRAN_NAME( inlineBFRICTIONPLIMITTSAI, inlineBFRICTIONPLIMITTSAI)
+#define FORTNT_BFRICTIONPLIMITTSAI FORTRAN_NAME( BFRICTIONPLIMITTSAI, bfrictionplimittsai)
+
+inline void FORTRAN_NAME(inlineBFRICTIONPLIMITTSAI, inlineBFRICTIONPLIMITTSAI)(
+      CHFp_FRA1(alpha)
+      ,CHFp_CONST_FRA(u)
+      ,CHFp_CONST_FRA1(p)
+      ,CHFp_CONST_FRA1(a)
+      ,CHFp_BOX(box) )
+{
+ CH_TIMELEAF("FORT_BFRICTIONPLIMITTSAI");
+ FORTRAN_NAME( BFRICTIONPLIMITTSAI ,bfrictionplimittsai )(
+      CHFt_FRA1(alpha)
+      ,CHFt_CONST_FRA(u)
+      ,CHFt_CONST_FRA1(p)
+      ,CHFt_CONST_FRA1(a)
+      ,CHFt_BOX(box) );
+}
+#endif  // GUARDBFRICTIONPLIMITTSAI 
+
+#ifndef GUARDBFRICTIONPLIMITLEGUY 
+#define GUARDBFRICTIONPLIMITLEGUY 
+// Prototype for Fortran procedure BFRICTIONPLIMITLEGUY ...
+//
+void FORTRAN_NAME( BFRICTIONPLIMITLEGUY ,bfrictionplimitleguy )(
+      CHFp_FRA1(alpha)
+      ,CHFp_CONST_FRA(u)
+      ,CHFp_CONST_FRA1(p)
+      ,CHFp_CONST_REAL(a)
+      ,CHFp_CONST_REAL(n)
+      ,CHFp_BOX(box) );
+
+#define FORT_BFRICTIONPLIMITLEGUY FORTRAN_NAME( inlineBFRICTIONPLIMITLEGUY, inlineBFRICTIONPLIMITLEGUY)
+#define FORTNT_BFRICTIONPLIMITLEGUY FORTRAN_NAME( BFRICTIONPLIMITLEGUY, bfrictionplimitleguy)
+
+inline void FORTRAN_NAME(inlineBFRICTIONPLIMITLEGUY, inlineBFRICTIONPLIMITLEGUY)(
+      CHFp_FRA1(alpha)
+      ,CHFp_CONST_FRA(u)
+      ,CHFp_CONST_FRA1(p)
+      ,CHFp_CONST_REAL(a)
+      ,CHFp_CONST_REAL(n)
+      ,CHFp_BOX(box) )
+{
+ CH_TIMELEAF("FORT_BFRICTIONPLIMITLEGUY");
+ FORTRAN_NAME( BFRICTIONPLIMITLEGUY ,bfrictionplimitleguy )(
+      CHFt_FRA1(alpha)
+      ,CHFt_CONST_FRA(u)
+      ,CHFt_CONST_FRA1(p)
+      ,CHFt_CONST_REAL(a)
+      ,CHFt_CONST_REAL(n)
+      ,CHFt_BOX(box) );
+}
+#endif  // GUARDBFRICTIONPLIMITLEGUY 
+
+#ifndef GUARDBFRICTIONJOUGHIN 
+#define GUARDBFRICTIONJOUGHIN 
+// Prototype for Fortran procedure BFRICTIONJOUGHIN ...
+//
+void FORTRAN_NAME( BFRICTIONJOUGHIN ,bfrictionjoughin )(
+      CHFp_FRA1(alpha)
+      ,CHFp_CONST_FRA(u)
+      ,CHFp_CONST_REAL(ur)
+      ,CHFp_CONST_FRA1(N)
+      ,CHFp_CONST_REAL(Nr)
+      ,CHFp_CONST_REAL(m)
+      ,CHFp_BOX(box) );
+
+#define FORT_BFRICTIONJOUGHIN FORTRAN_NAME( inlineBFRICTIONJOUGHIN, inlineBFRICTIONJOUGHIN)
+#define FORTNT_BFRICTIONJOUGHIN FORTRAN_NAME( BFRICTIONJOUGHIN, bfrictionjoughin)
+
+inline void FORTRAN_NAME(inlineBFRICTIONJOUGHIN, inlineBFRICTIONJOUGHIN)(
+      CHFp_FRA1(alpha)
+      ,CHFp_CONST_FRA(u)
+      ,CHFp_CONST_REAL(ur)
+      ,CHFp_CONST_FRA1(N)
+      ,CHFp_CONST_REAL(Nr)
+      ,CHFp_CONST_REAL(m)
+      ,CHFp_BOX(box) )
+{
+ CH_TIMELEAF("FORT_BFRICTIONJOUGHIN");
+ FORTRAN_NAME( BFRICTIONJOUGHIN ,bfrictionjoughin )(
+      CHFt_FRA1(alpha)
+      ,CHFt_CONST_FRA(u)
+      ,CHFt_CONST_REAL(ur)
+      ,CHFt_CONST_FRA1(N)
+      ,CHFt_CONST_REAL(Nr)
+      ,CHFt_CONST_REAL(m)
+      ,CHFt_BOX(box) );
+}
+#endif  // GUARDBFRICTIONJOUGHIN 
+
+#ifndef GUARDBFRICTIONLEGUYEFFPRES 
+#define GUARDBFRICTIONLEGUYEFFPRES 
+// Prototype for Fortran procedure BFRICTIONLEGUYEFFPRES ...
+//
+void FORTRAN_NAME( BFRICTIONLEGUYEFFPRES ,bfrictionleguyeffpres )(
+      CHFp_FRA1(N)
+      ,CHFp_CONST_FRA1(hab)
+      ,CHFp_CONST_FRA1(h)
+      ,CHFp_CONST_REAL(p)
+      ,CHFp_CONST_REAL(rhog)
+      ,CHFp_BOX(box) );
+
+#define FORT_BFRICTIONLEGUYEFFPRES FORTRAN_NAME( inlineBFRICTIONLEGUYEFFPRES, inlineBFRICTIONLEGUYEFFPRES)
+#define FORTNT_BFRICTIONLEGUYEFFPRES FORTRAN_NAME( BFRICTIONLEGUYEFFPRES, bfrictionleguyeffpres)
+
+inline void FORTRAN_NAME(inlineBFRICTIONLEGUYEFFPRES, inlineBFRICTIONLEGUYEFFPRES)(
+      CHFp_FRA1(N)
+      ,CHFp_CONST_FRA1(hab)
+      ,CHFp_CONST_FRA1(h)
+      ,CHFp_CONST_REAL(p)
+      ,CHFp_CONST_REAL(rhog)
+      ,CHFp_BOX(box) )
+{
+ CH_TIMELEAF("FORT_BFRICTIONLEGUYEFFPRES");
+ FORTRAN_NAME( BFRICTIONLEGUYEFFPRES ,bfrictionleguyeffpres )(
+      CHFt_FRA1(N)
+      ,CHFt_CONST_FRA1(hab)
+      ,CHFt_CONST_FRA1(h)
+      ,CHFt_CONST_REAL(p)
+      ,CHFt_CONST_REAL(rhog)
+      ,CHFt_BOX(box) );
+}
+#endif  // GUARDBFRICTIONLEGUYEFFPRES 
+
+}
+
+#endif

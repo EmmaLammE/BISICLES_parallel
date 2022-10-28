@@ -1,0 +1,27 @@
+#
+# Makefile rules for compiling examples.
+#
+
+vpath %.f90 $(FC_SRC_DIR)
+# $(info in fortran, the vapth is $(FC_SRC_DIR))
+
+# $(EXE): $(OBJ)
+# ifeq ($(MKVERBOSE),TRUE)
+#	$(FC) $(FFLAGS) $(FFLAGS_EXTRA)  $^ $(OUTPUT_OPTION) $(LDFLAGS)
+# else
+#	@echo "Linking..."
+#	@$(FC) $(FFLAGS) $(FFLAGS_EXTRA)  $^ $(OUTPUT_OPTION) $(LDFLAGS)
+# endif
+
+build/%.o build/%.mod: fsrc/%.f90
+	$(info in fortran, start to build, verbose is $(MKVERBOSE))
+	@mkdir -p build
+	@mkdir -p include
+
+
+ifeq ($(MKVERBOSE),TRUE)
+	$(FC) $(FFLAGS) $(FFLAGS_EXTRA) -c  $< $(OUTPUT_OPTION)
+else
+	@echo "Building $<..."
+	@$(FC) $(FFLAGS) $(FFLAGS_EXTRA) -c  $< $(OUTPUT_OPTION)
+endif
