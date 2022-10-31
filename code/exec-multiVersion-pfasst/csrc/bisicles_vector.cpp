@@ -186,26 +186,17 @@ void BisiclesVector::SetHVector(BisiclesVector* src)
 }
 
 
-double *BisiclesVector::DataPtrGet(void)
-{
-   double *data = (double *)calloc(num_grid_points, sizeof(double));
-   return data;
-}
+// double *BisiclesVector::DataPtrGet(void)
+// {
+//    double *data = (double *)calloc(num_grid_points, sizeof(double));
+//    return data;
+// }
 
 double BisiclesVector::DataGet(void)
 {
    return data;
 }
 
-void BisiclesVector::DataPtrSetVal(double *y)
-{
-   data = *y;
-}
-
-void BisiclesVector::DataSetVal(double y)
-{
-   data = y;
-}
 
 void BisiclesVector::dHdtSetVal2All(double val,AmrIceHolderClass *c_AmrIceHolderPtr)
 {
@@ -270,11 +261,11 @@ double *BisiclesVector::GetHDataPtr(AmrIceHolderClass *c_AmrIceHolderPtr)
 
 }
 
-double BisiclesVector::DataNorm(void)
-{
-   cout<< "bisicles_vector.cpp abs data "<<abs(data)<< std::endl;
-   return abs(data);
-}
+// double BisiclesVector::DataNorm(void)
+// {
+//    cout<< "bisicles_vector.cpp abs data "<<abs(data)<< std::endl;
+//    return abs(data);
+// }
 
 double BisiclesVector::dHdtL2Norm(void)
 {
@@ -355,10 +346,6 @@ void BisiclesVector::defineMask(Vector<LevelData<FArrayBox>* > m_amrData, Vector
   }
 }
 
-void BisiclesVector::DataAxpy(double a, double x)
-{
-   data += a * x;
-}
 
 void BisiclesVector::dHdtAxpy(double a, BisiclesVector *x,AmrIceHolderClass *c_AmrIceHolderPtr)
 {
@@ -433,7 +420,6 @@ void BisiclesVector::HAxpy(double a, BisiclesVector *x,AmrIceHolderClass *c_AmrI
 
      }
    }
-   
 }
 
 void BisiclesVector::SaveSnapshot(AmrIceHolderClass *c_AmrIceHolderPtr)
@@ -443,9 +429,4 @@ void BisiclesVector::SaveSnapshot(AmrIceHolderClass *c_AmrIceHolderPtr)
    c_AmrIceHolderPtr->SetAmrIceState(iceState);
    amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
    amrObjHolderPtr->writePlotFile();
-}
-
-void BisiclesVector::DataPrint()
-{
-//   cout << data << '\n';
 }
