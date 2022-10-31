@@ -136,92 +136,20 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
 void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, BisiclesVector *y, double t,\
    int pfasst_level_index, BisiclesVector *f, double dt,int maxStep, AmrIceHolderClass *c_AmrIceHolderPtr)
-// void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, HypreVector *y, double t, int pfasst_level_index, HypreVector *f)
 
    {
-      // int level_index = PfasstToHypreLevelIndex(pfasst_level_index, hypre_solver->GetNumLevels());
-
-      // int nrows = hypre_solver->GetNumRows();
-      // double *f_values = (double *)malloc(nrows * sizeof(double));
-      // if (piece == 2){
-      //    hypre_solver->FEval(y->GetBoxValues(), t, level_index, &f_values);
-      // }
-      // else {
-      //    for (int i = 0; i < nrows; i++){
-      //       f_values[i] = 0.0;
-      //    }
-      // }
-      // f->SetBoxValues(f_values);
-
-
-    // f -> rhs, y -> lhs, dy/dt=f
-    // size of *f=72, f=8, *bisicles_dHdt=88, *y=72
-    // type of f=y=P14BisiclesVector, bisicles_dHdt=P18BisiclesdHdtSolver
-
-   	 //int nrows = sizeof(*y);
-       // cout << "bisicles_fortran.cpp 0000 row of bisicles_dHdt " << sizeof(*y) << std::endl;
-       // cout << "bisicles_fortran.cpp 0000 col of y " << sizeof(*y[0])/sizeof(*y[0][0]) << std::endl;
-       // int num_of_rows = bisicles_dHdt->GetNumRows();
-       // Vector<LevelData<FArrayBox>* > crsedHdt=y->GetdHdtVector();
-       // type of crsedHdt=6VectorIP9LevelDataI9FArrayBoxEE
-       // cout<< "bisicles_fortran.cpp 666 &crsedHdt "<<&crsedHdt<< std::endl;
-       // int nrows = sizeof(*bisicles_dHdt);
-   	 // double *f_values = (double *)malloc(nrows * sizeof(double));
-   	 // double *dHdt_values = (double *)malloc(nrows * sizeof(double));
-
-       // call amrice obj, state vec from bisicles
-       // AmrIceHolderClass amrHolder;
-       // amrPtr=bisicles_dHdt->GetAmrIceState();
-       // try create a new amrice obj and call functions
-       // AmrIce *amrPtr;
-       // BisiclesdHdtSolver amrPtr;
-       // amrPtr->setParmParsePrefix("crse.");
-       // cout<< "bisicles_fortran.cpp 000 c_AmrIceHolderPtr "<<c_AmrIceHolderPtr<< std::endl;
-       // cout<< "bisicles_fortran.cpp 000 type of c_AmrIceHolderPtr "<<typeid(c_AmrIceHolderPtr).name()<< std::endl;
-       // cout<< "bisicles_fortran.cpp 000 c_AmrIceHolderPtr "<<amrHolderPtr<< std::endl;
-       AmrIce *amrObjHolderPtr;
-       amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
-       // double amr_dt=amrObjHolderPtr->dt();
-       // const Vector<Real>& amr_dx=amrObjHolderPtr->amrDx();
-       // int amr_finest_level=amrObjHolderPtr->finestLevel();
-       // const Vector<DisjointBoxLayout>& grid_size=amrObjHolderPtr->grids();
-       // cout<< "from f_eval: amr_dt "<<amr_dt<< std::endl; // dt=1e20
-       // cout<< "from f_eval: amr_finest_level "<<amr_finest_level<< std::endl; // finest level=0
-       // cout<< "from f_eval: grid_size "<<grid_size[0]<< std::endl;
-      // typedef std::vector<Real> Amr_dx;
-      // for (Amr_dx::size_type i=0; i<amr_dx.size(); ++i){
-      // for (int i=0;i<amr_dx.size(); ++i){
-      //   std::cout<<"i "<<i<<": " << *&amr_dx[i] << std::endl;
-      // }
-
+      AmrIce *amrObjHolderPtr;
+      amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
       IceSheetState *iceStatePtr;
       IceSheetState iceState;
       iceStatePtr=y->GetIceStatePtr();
       iceState=y->GetIceState();
 
 
-      Vector<LevelData<FArrayBox>*> H_old = iceState.ice_thickness;
-      // iceState=*amrStateHolderPtr;
-      // IceSheetState icestatetemp=*amrStateHolderPtr;
-      // Vector<LevelData<FArrayBox>* > ice_thick=iceState.ice_thickness;
-      // cout<< "from f_eval: ice_thick "<<ice_thick<< std::endl; 
-
+      // Vector<LevelData<FArrayBox>*> H_old = iceState.ice_thickness;
       Vector<LevelData<FArrayBox>* > dHdtVect;
-      // cout<< "from f_eval: H vector "<<H<< std::endl; 
-
       Vector<LevelData<FArrayBox>* > *dHdtVectPtr=c_AmrIceHolderPtr->GetAmrdHdtPtr();
       Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH(); // double check with Dan
       Vector<LevelData<FArrayBox>* > H=y->GetHVector(); // this H is the same as H_old
@@ -233,65 +161,9 @@ void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, BisiclesVector *y, d
       amrObjHolderPtr->setState(iceState,false); // double check with Dan: dHdtVect & H new every time step?
       reshape(dHdtVect,constH);
 
-      // Real test_min=0;
-      // int nlvl=H.size();
-      // for (int lvl=0; lvl < nlvl; lvl++)
-      // {
-      //   LevelData<FArrayBox>& ldf = *H[lvl];
-      //   DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-      //   DataIterator dit = ldf.dataIterator();
-      //   for (dit.reset(); dit.ok(); ++dit) 
-      //   {
-      //     const Box& box = dbl[dit()];
-      //     FArrayBox& fab = ldf[dit()];
-      //     test_min=fab.norm(box,1);
-      //     cout<< "from bisicles_fortran: before f_eval norm of H "<<test_min << std::endl;
-      //   }
-      // }
-
       amrObjHolderPtr->compute_dHdt(dHdtVect,constH,dt, true); // dHdtVect is updated after this
 
-      // for (int lvl=0; lvl < nlvl; lvl++)
-      // {
-      //   LevelData<FArrayBox>& ldf = *dHdtVect[lvl];
-      //   DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-      //   DataIterator dit = ldf.dataIterator();
-      //   for (dit.reset(); dit.ok(); ++dit) 
-      //   {
-      //     const Box& box = dbl[dit()];
-      //     FArrayBox& fab = ldf[dit()];
-      //     test_min=fab.norm(box,1);
-      //     cout<< "from bisicles_fortran: after f_eval norm of dHdt "<<test_min << std::endl;
-      //   }
-      // }
-
-      // LevelData<FArrayBox>& ldf = *dHdtVect[0];
-
-      // cout<< "from f_eval: after compute H min of array box "<<test_min<< std::endl;
-      // cout<< "from f_eval: after compute dHdt "<<dHdtVect[0]<< std::endl;
-      // amrObjHolderPtr->run(iceState.time, maxStep);
-      // amrObjHolderPtr->getState(iceState);
-
-
-       // bisicles_dHdt->FEval(t, pfasst_level_index, &rhs, &dHdtVect);
-       f->SetdHdtVector(dHdtVect,c_AmrIceHolderPtr);
-
-      // MayDay::Abort("------------------------------- stop here --------------------------------------");
-
-       // free(dHdtVect);
-       // f->SetIceState();
-       // bisicles_dHdt->FEval(y->DataPtrGet(), t, pfasst_level_index, &f_values);
-       // f->DataPtrSetVal(f_values);
-       // AmrIceHolderPtr.SetAmrIceState(amrObjectCrsePtr);
-       // bisicles_dHdt->computedHdt(amrObjectCrse->DataPtrGet(),crsedHdtVect,crseH);
-
-       // cout<< "from f_eval: dt "<<dt<< std::endl;
-
-   	 // for (int i=0; i<nrows; i++){
-   	 // 	//(*dHdt_values)[i] = crsedHdtVect[i];
-   	 // 	// f_values[i]=amrObjectCrse.compute_dHdt(crsedHdtVect[i],crseH,crseDt, false);
-   	 // }
-
+      f->SetdHdtVector(dHdtVect,c_AmrIceHolderPtr);
 
    }
 
