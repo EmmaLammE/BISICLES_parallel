@@ -460,7 +460,7 @@ void BisiclesVector::PrintHL2norm(void)
        FArrayBox& fab = ldf[dit()];
        test_min=fab.norm(box,1);
        // cout<< " ------------------- eprint() ....................... "<< std::endl;
-       cout<< "                       eprint sum of H vector  "<<test_min<< std::endl;
+       // cout<< "                       eprint sum of H vector  "<<test_min<< std::endl;
       } 
   }
 // MayDay::Abort("------------------------------- stop here --------------------------------------");

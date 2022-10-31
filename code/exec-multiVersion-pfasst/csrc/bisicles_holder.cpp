@@ -11,7 +11,7 @@ void AmrIceHolderClass::SetAmrIceObjPtr(AmrIce *amrObjectCrsePtr)
 	// amrObjectCrsePtr->setParmParsePrefix("fine");
 	amrObjHolderPtr=amrObjectCrsePtr;
 
-	cout << "bisicles_pfasst.cpp 0000 amrHolderPtr " << amrObjHolderPtr << std::endl;
+	// cout << "bisicles_pfasst.cpp 0000 amrHolderPtr " << amrObjHolderPtr << std::endl;
 }
 
 AmrIce *AmrIceHolderClass::GetAmrIceObjPtr(void)

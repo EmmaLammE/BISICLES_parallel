@@ -1026,19 +1026,6 @@ int main(int argc, char* argv[]) {
     Real fineDt = maxTime/numFineIntervals;
 
 
-    // for (int i=0; i<crseStateVect.size(); i++)
-    //   {
-    //     crseStateVect[i].time = crseDt*i;
-    //   }
-
-    // for (int i=0; i<fineStateVect.size(); i++)
-    //   {
-    //     fineStateVect[i].time = fineDt*i;
-    //     cout<< "driver.cpp type of numFineIntervals "<<fineStateVect.size()<<" fineDt "<<fineDt << " i "<<i<< std::endl;
-    //   }    
-
-      cout<< "initial crseDt "<<crseDt<< std::endl;
-
     // ----------------------------------------------- //
     // ------------ create pfasst object ------------- //
     // ----------------------------------------------- //
@@ -1050,34 +1037,33 @@ int main(int argc, char* argv[]) {
     ppfasst.get("USE_PF", USE_PF);
     ppfasst.get("PF_VERBOSE", PF_VERBOSE);
     ppfasst.get("pf_plot_prefix", pf_plot_prefix);
+
+    ParmParse pcrse("crse.amr");
+    string crse_plot_prefix;
+    pcrse.get("plot_prefix",crse_plot_prefix);
+
     if (USE_PF){
+      cout<<"\n..............Updating crse-grained using PFASST................\n";
+      cout<<"  PFASST objects passing in: crse grids and objects\n";
+      cout<<"  results saved as: "<<crse_plot_prefix<<"...";
+      cout<< "  dt passed in: "<<crseDt<<", max T passed in: "<<maxTime<<", max steps passed in:"<<maxStep<< endl;
+
       AmrIceHolderClass AmrIceHolderPtr;
       Pf_Bisicles_setHolders(&amrObjectCrse,&AmrIceHolderPtr,crseH,crseVel);
       ParmParse ppcrseamr("crse.amr");
       Vector<int> ancells(3); 
       ppcrseamr.getarr("num_cells", ancells, 0, ancells.size());
-      cout<< "driver.cpp num of cell "<<ancells<< std::endl;
+      cout<< "  num of cell passed in: "<<ancells<<"\n\n\n";
       int num_of_grids=ancells[0]*ancells[1];
-      cout<< "driver size of crsedHdtVect "<<crsedHdtVect[0].size()<< std::endl;
       reshape(crsedHdtVect[0],crseH);
-      cout<< "driver size of crsedHdtVect "<<crsedHdtVect[0].size()<< std::endl;
-      
-      
 
-      // cout<< "driver.cpp type of  crsedHdtVect "<<typeid(crsedHdtVect).name()<< std::endl;
-
-
-      // numCrseIntervals=10 - num of time steps, crseStateVect.size()=11 - time intervals+1
       Vector<LevelData<FArrayBox>* > ice_thick=crseStateVect[1].ice_thickness;
-      // cout<< "driver.cpp  crseH "<<crseH<< std::endl;
-      // cout<< "driver.cpp type of numCrseIntervals "<<numCrseIntervals<<" crseDt "<<crseDt<<" num_of_grids "<<num_of_grids << std::endl;
       Pf_Main(&AmrIceHolderPtr,numCrseIntervals,crseDt,maxTime,maxStep,num_of_grids,\
         pf_plot_prefix[0],PF_VERBOSE);
-      // MayDay::Abort("------------------------------- stop here --------------------------------------");
-
-
+ 
     } else {
-    pout() << "crse-grained update" << endl;
+    cout<<"\nUpdating crse-grained using serial................\n";
+    cout<<"  results saved as: "<<crse_plot_prefix<<"...\n";
     
     // now do each crse-grained timestep
     for (int i=0; i<numCrseIntervals; i++)
@@ -1100,17 +1086,15 @@ int main(int argc, char* argv[]) {
         amrObjectCrse.getState(crseStateVect[i+1]);
       }
     }
-          MayDay::Abort("------------------------------- stop here --------------------------------------");
 
 
-
-    pout() << "fine-grained update" << endl;
+    ParmParse pfine("fine.amr");
+    string fine_plot_prefix;
+    pfine.get("plot_prefix",fine_plot_prefix);
+    cout<<"\n..............Updating fine-grained using serial................\n";
+    cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
     pout() << endl;
 
-    // cout << "000000000 type of findH " << typeid(fineH).name() << std::endl;
-    //Pf_ChangeDataStructure(*fineH,fineStateVect.size());
-    // Pf_AssignValue(*fineH,fineStateVect.size());
-    // cout<< "driver.cpp type of numFineIntervals "<<numFineIntervals<<" fineDt "<<fineDt <<" max T "<< maxTime<< std::endl;
     // now do each fine-grained timestep
     for (int i=0; i<numFineIntervals; i++) 
       {
@@ -1123,10 +1107,6 @@ int main(int argc, char* argv[]) {
         // reshape dH/dt and then call computeDhDt
         reshape(finedHdtVect[i],fineH);
         amrObjectFine.compute_dHdt(finedHdtVect[i],fineH,fineDt, false);        
-        
-
-        // pass in fine dHdt vect to FEval in pfasst
-        //Pf_AssignRHS(finedHdtVect[i],fineH,fineDt);
 
         // now advance ice sheet
         amrObjectFine.run(fineStateVect[i+1].time, maxStep);
@@ -1137,23 +1117,7 @@ int main(int argc, char* argv[]) {
 
       }    
 
-      //   const Vector<LevelData<FArrayBox>* > fineVel = amrObjectFine.amrVelocity();
-      //   reshapeAndFill(fineVelVect[i+1], fineVel);
-
-      //   // reshape dH/dt and then call computeDhDt
-      //   reshape(finedHdtVect[i],fineH);
-      //   amrObjectFine.compute_dHdt(finedHdtVect[i],fineH,fineDt, false);    
-
-      //   // rhs=dHdt -> pfasst  
-      //   // retrieve state  
-      //   // binding, same name as FEVal
         
-      // }    
-        
-        
-        
-    // replaces this call
-    //amrObjectFine.run(maxTime, maxStep);
 
     
     // clean up

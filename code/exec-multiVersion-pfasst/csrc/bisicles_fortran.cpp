@@ -136,9 +136,9 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
    void PfasstBisiclesSaveResults(BisiclesVector *bisicles_vector, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
-      cout<< "bisicles_fortran.cpp  before save snapshot bisicles_vectors ID "<<bisicles_vector<< std::endl;
+      // cout<< "bisicles_fortran.cpp  before save snapshot bisicles_vectors ID "<<bisicles_vector<< std::endl;
       Vector<LevelData<FArrayBox>* > HVector_print=bisicles_vector->GetHVector();
-      cout<< "bisicles_fortran.cpp  before save snapshot HVector size "<<HVector_print.size()<< std::endl;
+      // cout<< "bisicles_fortran.cpp  before save snapshot HVector size "<<HVector_print.size()<< std::endl;
       bisicles_vector->SaveSnapshot(c_AmrIceHolderPtr);
       // AmrIce *amrObjHolderPtr;
       // IceSheetState iceState;

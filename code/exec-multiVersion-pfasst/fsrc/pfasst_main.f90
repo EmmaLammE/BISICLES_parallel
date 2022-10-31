@@ -88,7 +88,8 @@ contains
      call PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
     !> PfasstBisiclesInit=allocate lev_shape+ulevel+factory+sweeper+level_set_size+pf_setup
     !> ----- end of initialize the vectors & solvers for later, including params change -----
-    print *, 'pfasst_main.f90 0000 grid size from bisicles to pfasst pf%levels(2)%lev_shape ',pf%levels(2)%lev_shape
+    !print *, 'pfasst_main.f90 0000 grid size from bisicles to pfasstpf%levels(2)%lev_shape ',pf%levels(2)%lev_shape 
+    print *, 'check if temporal params are passed in correctly:'
     print *, 'pfasst_main.f90 0000 T final ',Tfin
     print *, 'pfasst_main.f90 0000 dt ',dt
     print *, 'pfasst_main.f90 0000 nsteps ',nsteps
@@ -111,7 +112,7 @@ contains
     level_index = 1
     !> Set the initial condition
     call bvf%create_single(y_0_base, level_index, lev_shape(level_index,:))
-    print *,'y_end create single '
+    !print *,'y_end create single '
     call bvf%create_single(y_end_base, level_index, lev_shape(level_index,:))
     y_0 = cast_as_bisicles_vector(y_0_base)
     y_end = cast_as_bisicles_vector(y_end_base)
@@ -120,7 +121,7 @@ contains
     y_0_IC = 1.0_pfdp
     y_end_IC = 10.7_pfdp
     !call BisiclesAssignIC(pf,y_0,y_end,y_0_IC,y_end_IC)
-    print *,'y_end assign single '
+    !print *,'y_end assign single '
     call y_end%setval(1000.0_pfdp)
     call y_0%setval(1000.0_pfdp)
     !call y_0%copy(y_end)

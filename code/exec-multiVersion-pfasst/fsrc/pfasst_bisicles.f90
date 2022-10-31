@@ -133,8 +133,8 @@ contains
     pf%cptr_AmrIceHolder=AmrIceHolderPtr
     cptr_AmrIceHolder=AmrIceHolderPtr
     !print *,'nsteps after changed ',nsteps
-    print *,'pfasst_bisicles.f90 pf%cptr_AmrIceHolder ', pf%cptr_AmrIceHolder
-    print *,'pfasst_bisicles.f90 pf%c_test_ptr ', pf_bisicles%c_test_ptr
+    !print *,'pfasst_bisicles.f90 pf%cptr_AmrIceHolder ', pf%cptr_AmrIceHolder
+    !print *,'pfasst_bisicles.f90 pf%c_test_ptr ', pf_bisicles%c_test_ptr
     ! up till here, amr pointer is successfully assigned to pf_bisicles
     !call ABORT
   
