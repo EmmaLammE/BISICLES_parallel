@@ -18,4 +18,4 @@ Before compiling, please make sure the followings are installed and set:
 - [`GNUMakefile`](#GNUMakefile): the only thing needs to be reset is the path of PFASST `LIBPFASST` (I think).
 
 ## Some other notes ##
-If nothing is changed, the current codes will run 2 test: parallel and serial. Parallel one uses the objects and states of the `crse` settings in `inputs.test`, and Serial one uses that of the `fine` settings. The results are stored in the same folder as `pf_....` and `ref_....`.
+If nothing is changed, the current codes will run 2 test: parallel and serial. Parallel one uses the objects and states of the `crse` settings in `inputs.test`, and Serial one uses that of the `fine` settings. The results are stored in the same folder in the name of `pf_....` and `ref_....`.
