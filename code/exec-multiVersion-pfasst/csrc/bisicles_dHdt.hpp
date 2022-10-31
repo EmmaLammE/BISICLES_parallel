@@ -14,10 +14,6 @@ class BisiclesdHdtSolver : public ChomboStruct, public AmrIceHolderClass{
 
    public:
       
-      // AmrIce amrObjectCrse;
-      // Vector<Vector<LevelData<FArrayBox>* > > crsedHdtVect;
-      // Vector<LevelData<FArrayBox>* > crseH;
-
 
       BisiclesdHdtSolver(MPI_Comm in_comm = MPI_COMM_WORLD, int num_grid_points=16,\
                          AmrIceHolderClass *c_AmrIceHolderPtr=nullptr);
@@ -28,11 +24,6 @@ class BisiclesdHdtSolver : public ChomboStruct, public AmrIceHolderClass{
       void FEval(double t, int level_index, \
                  Vector<LevelData<FArrayBox>* > *rhs, \
                  Vector<LevelData<FArrayBox>* > *dHdtVect);
-      // void ComputedHdt(AmrIce *amrObjectCrse,Vector<Vector<LevelData<FArrayBox>* > > crsedHdtVect,\
-      //    Vector<LevelData<FArrayBox>* > crseH);
-      // AmrIce getBisiclesObjPtr();
-      // void AmrIceHolder(AmrIce *amrObjectCrsePtr);
-
    };
 
 

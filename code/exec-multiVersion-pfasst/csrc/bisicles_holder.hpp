@@ -27,8 +27,6 @@ public:
 	// AmrIce object;
 	void SetAmrIceObjPtr(AmrIce *amrObjectCrsePtr);
 	AmrIce *GetAmrIceObjPtr(void);
-	// void SetAmrIceObj(AmrIce amrObjectCrsePtr);
-	// AmrIce GetAmrIceObj(void);
 
 	// AmrIce ice state
 	void SetAmrIceStatePtr(IceSheetState *amrStateHolderPtr);

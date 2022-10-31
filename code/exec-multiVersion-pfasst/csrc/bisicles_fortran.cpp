@@ -1,5 +1,4 @@
 #include "bisicles_fortran.hpp"
-// #include "cencap.hpp"
 #include "bisicles_vector.hpp"
 #include "bisicles_holder.hpp"
 #include "AmrIce.H"
@@ -47,13 +46,6 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
       *bisicles_vector = new BisiclesVector(num_grid_points,c_AmrIceHolderPtr);
-      // double intialization_factor = -1;
-      // bisicles_vector->HAxpy(intialization_factor,bisicles_vector,c_AmrIceHolderPtr);
-      // c_AmrIceHolderPtr=0x7ff7bfefb7c8
-      // cout<< "bisicles_fortran.cpp vector init c_AmrIceHolderPtr "<<c_AmrIceHolderPtr<< std::endl;
-      // cout<< "5555 bisicles_fortran.cpp 000 created bisicles_vector "<<bisicles_vector<< std::endl;
-      // Vector<LevelData<FArrayBox>* > *crsedHdt=(*bisicles_vector)->GetVectorPtr();
-      // cout<< "bisicles_fortran.cpp 666 get vector ptr crsedHdt "<<crsedHdt<< std::endl;
 
    }
 
@@ -67,27 +59,19 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
    void BisiclesVectorSetVal(BisiclesVector *bisicles_vector, double y, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
-      // bisicles_vector->DataSetVal(y); double y
-      // Vector<LevelData<FArrayBox>* > *AmrdHdtPtr=c_AmrIceHolderPtr->GetAmrdHdtPtr();
-      // bisicles_vector->dHdtSetVal2All(y,c_AmrIceHolderPtr);
       bisicles_vector->HSetVal2All(y,c_AmrIceHolderPtr);
-      // Vector<LevelData<FArrayBox>* > updated_vector=bisicles_vector->dHdtVector;
 
    }
 
    void BisiclesVectorCopy(BisiclesVector *dest, BisiclesVector *src, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
-      // dest->DataSetVal(src->DataGet());
-      // dest->SetdHdtVector(src->GetdHdtVector());
       dest->SetHVector(src);
    }
 
    double *BisiclesVectorPack(BisiclesVector *bisicles_vector,int num_grid_points, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
-      // return bisicles_vector->DataGet();
-      // return bisicles_vector->GetdHdtDataPtr();
       cout<< "bisicles_fortran.cpp packing............................"<< std::endl;
       return bisicles_vector->GetHDataPtr(c_AmrIceHolderPtr);
    }
@@ -95,9 +79,6 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
    void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, double y, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
-      // bisicles_vector->DataSetVal(y);
-      // double check with Dan
-      // bisicles_vector->dHdtSetVal2All(y,c_AmrIceHolderPtr);
       cout<< "bisicles_fortran.cpp unpacking............................"<< std::endl;
       bisicles_vector->HSetVal2All(y,c_AmrIceHolderPtr);
    }
@@ -106,23 +87,17 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
    double BisiclesVectorNorm(BisiclesVector *bisicles_vector, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
-      // return bisicles_vector->DataNorm();
-      // return bisicles_vector->dHdtL2Norm();
       return bisicles_vector->HL2Norm();
    }
 
    void BisiclesVectorAxpy(BisiclesVector *y, double a, BisiclesVector *x, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
-      // y->DataAxpy(a, x->DataGet());
-      // y->dHdtAxpy(a,x,c_AmrIceHolderPtr);
-      // cout<< "bisicles_fortran.cpp  before axpy y "<<y<<" x "<<x<< std::endl;
       y->HAxpy(a,x,c_AmrIceHolderPtr);
    }
 
    void BisiclesVectorPrint(BisiclesVector *bisicles_vector)
    {
-      // bisicles_vector->DataPrint();
       bisicles_vector->PrintHL2norm();
    }
 
@@ -136,25 +111,8 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
    void PfasstBisiclesSaveResults(BisiclesVector *bisicles_vector, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
-      // cout<< "bisicles_fortran.cpp  before save snapshot bisicles_vectors ID "<<bisicles_vector<< std::endl;
       Vector<LevelData<FArrayBox>* > HVector_print=bisicles_vector->GetHVector();
-      // cout<< "bisicles_fortran.cpp  before save snapshot HVector size "<<HVector_print.size()<< std::endl;
       bisicles_vector->SaveSnapshot(c_AmrIceHolderPtr);
-      // AmrIce *amrObjHolderPtr;
-      // IceSheetState iceState;
-
-      
-      // amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
-      // iceState=bisicles_vector->GetIceState();
-      // Vector<LevelData<FArrayBox>* > H=bisicles_vector->GetHVector(); 
-
-      // reshapeAndFill(iceState.ice_thickness, H);
-
-      // c_AmrIceHolderPtr->SetAmrIceState(iceState);
-
-      // // amrObjHolder=c_AmrIceHolderPtr->GetAmrIceObj();
-
-      // amrObjHolderPtr->writePlotFile();
       cout<< "-------------------------------------- done saving pfasst_bisicles results ----------------------------------------- "<< std::endl;
    }
 
@@ -169,14 +127,12 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
       // carefull about the pfasst_level_index, check if level_index=num_of_total_levels-pfasst_level_index
       int level_index = pfasst_level_index;
       *bisicles_dHdt = new BisiclesdHdtSolver(newcomm,num_grid_points,c_AmrIceHolderPtr);
-      // cout<< "bisicles_fortran.cpp solver init c_AmrIceHolderPtr "<<c_AmrIceHolderPtr<< std::endl;
     }
 
     void BisiclesVectorSetHIC(BisiclesVector *bisicles_vector,AmrIceHolderClass *c_AmrIceHolderPtr)
     {
       Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
       cout<< "bisicles_fortran.cpp done assign H IC size of H "<<constH.size()<< std::endl;
-      // bisicles_vector->SetHVector(constH);
     }
 
 

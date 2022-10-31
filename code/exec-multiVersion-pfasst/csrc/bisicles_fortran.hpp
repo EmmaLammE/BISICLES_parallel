@@ -1,13 +1,9 @@
 #ifndef BISICLES_FORTRAN_HPP
 #define BISICLES_FORTRAN_HPP
 
-// #include "cencap.hpp"
 #include "bisicles_vector.hpp"
-// #include "hypre_vector.hpp"
-// #include "hypre_solver.hpp"
 #include "bisicles_dHdt.hpp"
 #include "bisicles_holder.hpp"
-// #include <new>
 
 
 extern "C"
