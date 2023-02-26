@@ -127,7 +127,7 @@ contains
 
        print *,'pfasst_bisicles.f90 pf '
        pf_bisicles => cast_as_pf_bisicles_t(pf)
-       pf_bisicles%c_test_ptr=AmrIceHolderPtr
+!       pf_bisicles%c_test_ptr=AmrIceHolderPtr
 
     
     pf%cptr_AmrIceHolder=AmrIceHolderPtr
