@@ -10,7 +10,6 @@ using namespace std;
 
 class BisiclesdHdtSolver : public ChomboStruct, public AmrIceHolderClass{
    protected:
-      ;
 
    public:
       
@@ -28,3 +27,4 @@ class BisiclesdHdtSolver : public ChomboStruct, public AmrIceHolderClass{
 
 
 #endif
+
