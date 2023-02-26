@@ -388,6 +388,12 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
            
       // for now, just do simple cell-to-face averaging
       // (may want to go back to PPM at some point)
+      {
+        // just in case, do an exchange here
+        // cast away const-ness just for the exchange
+        LevelData<FArrayBox>& nonConstH = *(const_cast<LevelData<FArrayBox>*>(&currentH));
+        nonConstH.exchange();
+      }
       CellToEdge(currentH,*faceH[lev]);
     }
   // dhDt is just div(faceH*faceVel) + thicknessSources
@@ -512,7 +518,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
                  Real a_cur_time, bool a_recalculateVelocity)
 {
   // to maximize code reuse, pass an empty velocity vector in to the
-  // oher setState 
+  // other setState 
   Vector<LevelData<FArrayBox>* > velocity;
   setState(a_thicknessVect, velocity, a_cur_time, a_recalculateVelocity);
 }
