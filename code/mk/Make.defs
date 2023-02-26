@@ -1,3 +1,31 @@
+# a bunch of common defs for the various BISICLES make files
+MACHINE := $(shell uname)
+UNAMEM := $(shell uname -m)
+UNAMEN := $(shell uname -n)
+WHO := $(shell whoami)
+THIS_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+
+#see if there is a host specific file.
+HOST_DEFS := $(THIS_DIR)/Make.defs.$(UNAMEN)
+
+#NERSC_HOST is more useful than UNAMEN on NERSC hosts....
+ifneq ($(NERSC_HOST),)
+HOST_DEFS := $(THIS_DIR)/Make.defs.$(NERSC_HOST)
+endif
+
+$(info HOST_DEFS=$(HOST_DEFS))
+ifneq ($(wildcard $(HOST_DEFS)), )
+$(info including $(HOST_DEFS) )
+include $(HOST_DEFS)
+else
+NONE_DEFS=$(THIS_DIR)/Make.defs.none
+$(info NONE_DEFS=$(NONE_DEFS))
+ifneq ($(wildcard $(NONE_DEFS)), )
+$(info including $(NONE_DEFS) )
+include $(NONE_DEFS)
+endif
+endif
+
 #-*- Mode: Makefile -*- 
 # linking
 FC = mpifort # mpif90
@@ -5,7 +33,7 @@ CC = mpicc
 # CXX = mpixx
 LD = $(FC)
 AR=ar rcs
-FFLAGS = -Ibuild -Jinclude -cpp -ffree-line-length-none -fallow-argument-mismatch
+FFLAGS = -I$(LIBPFASST)/build -I$(LIBPFASST)/include -cpp -ffree-line-length-none -fallow-argument-mismatch
 
 DEBUG ?= TRUE
 ifeq ($(DEBUG),TRUE)
@@ -61,26 +89,6 @@ LibNames := AMRElliptic AMRTimeDependent AMRTools BoxTools BaseTools
 XTRACPPFLAGS :=-I$(THIS_DIR)/../src -I$(THIS_DIR)/../util 
 include $(CHOMBO_HOME)/mk/Make.example
 
-#see if there is a host specific file.
-HOST_DEFS := $(THIS_DIR)/Make.defs.$(UNAMEN)
-
-#NERSC_HOST is more useful than UNAMEN on NERSC hosts....
-ifneq ($(NERSC_HOST),)
-HOST_DEFS := $(THIS_DIR)/Make.defs.$(NERSC_HOST)
-endif
-
-$(info HOST_DEFS=$(HOST_DEFS))
-ifneq ($(wildcard $(HOST_DEFS)), )
-$(info including $(HOST_DEFS) )
-include $(HOST_DEFS)
-else
-NONE_DEFS=$(THIS_DIR)/Make.defs.none
-$(info NONE_DEFS=$(NONE_DEFS))
-ifneq ($(wildcard $(NONE_DEFS)), )
-$(info including $(NONE_DEFS) )
-include $(NONE_DEFS)
-endif
-endif
 
 #if PYTHON_INC was not defined, try to work it out from PYTHON_VERSION
 ifeq ($(PYTHON_INC),)
@@ -111,7 +119,7 @@ CPPFLAGS :=$(PYTHON_INC) -DHAVE_PYTHON	$(CPPFLAGS)
 LIBFLAGS+=$(PYTHON_LIBS) 
 endif
 
-SVN_REV=$(shell cd $(BISICLES_BRANCH) ; svnversion -n)
+#SVN_REV=$(shell cd $(BISICLES_BRANCH) ; svnversion -n)
 ifeq ($(SVN_REV),)
 SVN_REV := unknown
 SVN_REP := unknown
