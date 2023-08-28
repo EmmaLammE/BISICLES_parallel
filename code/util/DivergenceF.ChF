@@ -41,9 +41,9 @@ c ::: local variables
       one_on_dx = one/dx
 
       do comp = 0, CHF_NCOMP[div]-1
-
+c          print *,"ndivcomp ",ndivcomp
          CHF_AUTOMULTIDO[gridInt; i]
-
+c             print *,"  i1:",i1,", i0:",i0,", uEdge ", uEdge(CHF_OFFSETIX[i; +c2fHi], comp)
             div(CHF_AUTOIX[i], comp) = div(CHF_AUTOIX[i], comp)
      &        + one_on_dx * 
      &        ( uEdge(CHF_OFFSETIX[i; +c2fHi], comp)

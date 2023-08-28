@@ -1,14 +1,10 @@
 # -*- Mode: Makefile -*- 
-
-####################
-# User-set variables
-####################
-# PFASST include directory
-#LIBPFASST = /Users/emmaliu/internship2022/installs/PFASST_design
+LIBPFASST = /Users/emmaliu/packages/PFASST_icesheet
 USE_PFASST = TRUE
 FC_COMPILE = mpifort #gfortran -O3
-#LIBGFORTRAN = /usr/local/lib/gcc/11
-
+LIBGFORTRAN = /opt/homebrew/lib/gcc/13
+# LIBOMP = /opt/homebrew/opt/libomp
+# LIBLLVM = /opt/homebrew/opt/llvm
 
 ### This makefile produces an executable for each 
 ### name in the `ebase' variable
@@ -16,23 +12,33 @@ ebase := driver
 src_dirs = fsrc
 src_dirs += csrc
 
+#all:  libBisicles2d.Linux.64.g++.gfortran.DEBUG.a libbike 
+#driver:  libBisicles2d.Linux.64.g++.gfortran.DEBUG.a libbike 
 all: clean libbike driver $(if $(USE_PFASST), clean libbike driver pfasst)
 driver: clean libbike
-
 
 .NOTPARALLEL: all
 
 include ../mk/Make.defs
 FFLAGS  += -I$(LIBPFASST)/include
 FFLAGS  += -I$(LIBPFASST)/build 
-FFLAGS  += -I./include
-#LDFLAGS += -lstdc++ -lmpi_mpifh -lgcc -lquadmath
-LDFLAGS += -lstdc++  -lgcc 
-LDFLAGS +=  -L$(LIBPFASST)/lib -lpfasst 
-#XTRALDFLAGS += -lquadmath
+FFLAGS  += -I/include
+LDFLAGS += -lstdc++ -lmpi_mpifh -lquadmath 
+LDFLAGS += -L/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/13/gcc/aarch64-apple-darwin22/13 -lgcc
+LDFLAGS +=  -L$(LIBPFASST)/lib -lpfasst
+LDFLAGS += "-Wl,-no_compact_unwind"
+# LDFLAGS += -L$(LIBLLVM)/lib
+# CPPFLAGS+= -I$(LIBLLVM)/include -fopenmp
+# LDFLAGS += -L$(LIBOMP)/lib -fopenmp
+# CPPFLAGS+= -I$(LIBOMP)/include
+
 FFLAGS  += -ffree-line-length-none
-#include .depend
-#include $(LIBPFASST)/.depend
+include .depend
+include $(LIBPFASST)/.depend
+# LIBFLAGS  +=  -L$(LIBBISICLE)/d/2d.Darwin.64.mpicxx.mpifort.DEBUG.MPI/
+# include d/2d.Darwin.64.mpicxx.mpifort.DEBUG.MPI/bisicles_vector.d
+# CFLAGS += -Wall -g
+
 
 
 tttt: tttt.txt
@@ -46,42 +52,16 @@ libbike:
 libclean:
 	cd ../lib; $(MAKE) realclean
 
+#LIBFLAGS := -L../lib/ -lBisicles$(config)  $(LIBFLAGS)
 LIBFLAGS := -L../lib/ -lBisicles$(config)  $(LIBFLAGS) -L$(LIBPFASST)/lib -lpfasst -L$(LIBGFORTRAN) -lgfortran
 LIBFLAGS += -I$(LIBPFASST)/build -I$(LIBPFASST)/include -I/include
-LIBFLAGS += -lstdc++ $(LIBPFASST)/lib/libpfasst.a -lquadmath -ldl -lmpichfort -lmpich
-
-# add specific dependencies for the stuff in fsrc, because it needs to be built in order
-driver: clean libbike ../lib/libBisicles$(config).a myStuff
-
-
-#build stuff in fsrc specially because it needs to be built in order
-myStuff:
-	$(MAKE) o/$(config)/a_probin.o
-	$(MAKE) o/$(config)/b_encap.o
-	$(MAKE) o/$(config)/c_level.o
-	$(MAKE) o/$(config)/comm.o
-	$(MAKE) o/$(config)/d_sweeper.o
-	$(MAKE) o/$(config)/e_hooks.o
-	$(MAKE) o/$(config)/pfasst_bisicles.o
-	$(MAKE) o/$(config)/pfasst_main.o
+LIBFLAGS += -lstdc++ $(LIBPFASST)/lib/libpfasst.a
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+driver: clean libbike ../lib/libBisicles$(config).a 
 
 alltest: libbike ../lib/libBisicles$(config).a 
-
 
 #include Makefile.fortran
 pfasst: 
@@ -90,5 +70,3 @@ pfasst:
 
 
 .PHONY: all lib libbike libclean alltest
-
-

@@ -10,7 +10,7 @@ module pfasst_main
 contains
 
   !!! still working on it
-  subroutine Pf_Main(AmrIceHolderPtr,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles,pf_plot_prefix,PF_VERBOSE) bind(c, name="Pf_Main")
+  subroutine Pf_Main(AmrIceHolderPtr,pf_comm,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles,pf_num_procs_per_time,pf_plot_prefix,PF_VERBOSE) bind(c, name="Pf_Main")
     use pfasst             !< contains all neccessary mods for pfasst rountines. pfasst/src/pfasst.f90
     use pf_mod_dtype
     use pf_mod_mpi
@@ -25,11 +25,14 @@ contains
     use pfasst_bisicles
 
     type(c_ptr),value :: AmrIceHolderPtr
+    ! type(c_ptr),value :: pf_commPtr
+    integer(c_int), value :: pf_comm
     integer(c_int), value :: crse_nsteps
     real(c_double), value :: dt_bisicles
     real(c_double), value :: Tfin_bisicles
     integer(c_int), value :: maxStep_bisicles
     integer(c_int), value :: numGridPointsBisicles
+    integer(c_int), value :: pf_num_procs_per_time
     character(kind=c_char), intent(IN) :: pf_plot_prefix(:)
     logical(c_bool), value :: PF_VERBOSE
 
@@ -50,6 +53,8 @@ contains
     integer ::  ierror
     integer :: nproc, rank, error
     integer :: space_comm, time_comm, space_color, time_color
+    type(pf_comm_t) :: pf_time_comm      !<  the communicator (here it is mpi)
+    integer :: f_comm
 
     real(c_double) :: norm
     real(pfdp), pointer :: v(:)
@@ -65,48 +70,53 @@ contains
 
 
     ! check size
-    nproc = 2
-    call mpi_comm_size(MPI_COMM_WORLD, nproc, error)
-    call mpi_comm_rank(MPI_COMM_WORLD, rank,  error)
-
+    ! nproc = 2
 
     !> Read problem parameters
     call probin_init(pf_fname)
 
-    call create_simple_communicators(nspace, ntime, space_comm, time_comm, space_color, time_color, space_dim)
+    call create_simple_communicators(nspace, ntime, pf_comm, space_comm, time_comm, space_color, time_color, space_dim)
+    ! f_comm = MPI_Comm_c2f(pf_commPtr)
+    ! print *,'MPI_COMM_WORLD ',MPI_COMM_WORLD
+    ! print *,'time communicator in pfasst ',pf_comm,', pf mpi time comm ',time_comm,', pf mpi space comm ',nspace
+    call mpi_comm_size(pf_comm, nproc, error)
+    call mpi_comm_rank(pf_comm, rank,  error)
+    print *, 'time communicator in pfasst, num of procs for one time step ',nproc, ', rank ', rank
 
     !>  Set up communicaton
     call pf_mpi_create(comm, time_comm)
-    print *, '-------------- done assigning mpi communicator from bisicles to pfasst ---------------'
+    ! print *, '-------------- done assigning mpi communicator from bisicles to pfasst ---------------'
 
     !>  Create the pfasst structure
     call pf_pfasst_create(pf, comm, fname=pf_fname) !< o
-    print *, '--------------------------- done creating pfasst obj ---------------------------------'
-
+    ! print *, '--------------------------- done creating pfasst obj ---------------------------------'
 
     !> ----- initialize the vectors & solvers for later, not initial condition of setting values -----
      call PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
-    !> PfasstBisiclesInit=allocate lev_shape+ulevel+factory+sweeper+level_set_size+pf_setup
+    !  print *, 'after pfasst init'
+    !  call pf%levels(pf%state%finest_level)%Q(1)%eprint()
+     !> PfasstBisiclesInit=allocate lev_shape+ulevel+factory+sweeper+level_set_size+pf_setup
     !> ----- end of initialize the vectors & solvers for later, including params change -----
     !print *, 'pfasst_main.f90 0000 grid size from bisicles to pfasstpf%levels(2)%lev_shape ',pf%levels(2)%lev_shape 
-    print *, 'check if temporal params are passed in correctly:'
-    print *, 'pfasst_main.f90 0000 T final ',Tfin
-    print *, 'pfasst_main.f90 0000 dt ',dt
-    print *, 'pfasst_main.f90 0000 nsteps ',nsteps
+    ! print *, 'check if temporal params are passed in correctly:'
+    ! print *, 'pfasst_main.f90 0000 T final ',Tfin
+    ! print *, 'pfasst_main.f90 0000 dt ',dt
+    ! print *, 'pfasst_main.f90 0000 nsteps ',nsteps
 
     !>  Output run parameters
     if (PF_VERBOSE) then
-      call print_loc_options(pf)
+      call print_loc_options(pf, pf_comm)
       ! check if num of time steps assigned correctly
 
-      print *, '--------------------------- done print out ------------------------------------------'
+      ! print *, '--------------------------- done print out ------------------------------------------'
     end if
 
     
     !>  Add some hooks for output
     call pf_add_hook(pf, -1, PF_POST_ITERATION, echo_error)
-    print *, '--------------------------- done pf adding hooks -------------------------------------'
-   
+    ! print *, '--------------------------- done pf adding hooks -------------------------------------'
+    ! print *, 'after adding hooks'
+    ! call pf%levels(pf%state%finest_level)%Q(1)%eprint()
 
     !> setup initial condition
     level_index = 1
@@ -141,9 +151,12 @@ contains
     s = cast_as_my_sweeper_t(pf%levels(level_index)%ulevel%sweeper)
     !call s%f_eval(y_0, t, level_index, y_end, z_c_ptr)
     !call Initialize_H(y_0) ! NEED TO BE FIXED
-    
-    print *, '--------------------------- done setting up IC --------------------------------------'
 
+    print *, "Bisicles Disjoint Boxes in current PFASST temporal processor:"
+    call y_0%eprintLevelDataBox(y_0)
+    
+    print *, '--------------------------- Start pfasst run --------------------------------------'
+    ! call PfasstBisiclesPrintAmr(y_0,pf%cptr_AmrIceHolder)
     !> run pfasst
     call pf_pfasst_run(pf, y_0, dt, Tfin, nsteps,y_end)
 

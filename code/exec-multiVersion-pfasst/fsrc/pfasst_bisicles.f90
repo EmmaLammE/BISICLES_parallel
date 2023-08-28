@@ -43,6 +43,7 @@ contains
     type(pf_comm_t) :: comm
     type(my_sweeper_t) :: sw_finest, sw_lev
     type(my_level_t) :: my_lev
+    class(pf_level_t),  pointer :: lev
 
     integer :: l, l_finest   !  loop variable over levels
     integer :: n, m
@@ -64,7 +65,8 @@ contains
 
     !> Loop over levels and set some level specific parameters
     allocate(lev_shape(pf%nlevels,1))
-
+    ! print *, 'in pfasst bisicles init'
+    ! call pf%levels(pf%state%finest_level)%Q(1)%eprint()
     do l = 1, pf%nlevels
        lev_shape(l,1) = num_grid_points
        !lev_shape(l,2) = AmrIceHolderPtr
@@ -83,18 +85,22 @@ contains
                          l, &
                          lev_shape(l,1), &
                          cptr_AmrIceHolder)
-
+      !  print *, 'after bisicles solver init'
+      !  call pf%levels(pf%state%finest_level)%Q(1)%eprint()
        !>  Set the size of the data on this level (here just one)
        call pf_level_set_size(pf,l,lev_shape(l,:)) ! shape_in=1, meaning grid size=1
        ! check if grid size is assigned correctly
        ! print *, 'pfasst_main.f90 0000 grid size from bisicles to pfasst ',pf%levels(l)%lev_shape
     end do
-
     !>  Set up some pfasst stuff
     ! level = 1 -> tauQ=8; level = 2 -> tauQ=16, no third level???
+    ! print *, 'before pfasst set up'
+    ! call pf%levels(pf%nlevels)%Q(1)%eprint()
     call pf_pfasst_setup(pf)
-    print *, '--------------------------- done pf additional setup ---------------------------------'
-
+    ! print *, '--------------------------- done pf additional setup ---------------------------------'
+    ! lev => pf%levels(2)
+    ! print *, 'after pfasst set up, tauQ allocated ',allocated(pf%levels(2)%tauQ),'  print Q(1)'
+    ! call pf%levels(pf%nlevels)%Q(1)%eprint()
 
   end subroutine PfasstBisiclesInit
 
@@ -125,7 +131,7 @@ contains
     num_grid_points=numGridPointsBisicles
 
 
-       print *,'pfasst_bisicles.f90 pf '
+      !  print *,'pfasst_bisicles.f90 pf '
        pf_bisicles => cast_as_pf_bisicles_t(pf)
 !       pf_bisicles%c_test_ptr=AmrIceHolderPtr
 
@@ -210,4 +216,14 @@ contains
   !end function cast_as_pf_bisicles_t
   
   
+
+  subroutine PfasstBisiclesPrintAmr(y, AmrIceHolderPtr) 
+    type(bisicles_vector_encap), allocatable:: y
+    type(c_ptr), intent(in)          :: AmrIceHolderPtr
+
+    call PfasstPrintAmr(y%c_encap_ptr,AmrIceHolderPtr)
+
+
+  end subroutine PfasstBisiclesPrintAmr
+
 end module pfasst_bisicles

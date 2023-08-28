@@ -129,10 +129,10 @@ void reshape(Vector<LevelData<FArrayBox>* >& a_dest,
     }
 
   // if a_dest was defined, it needs to be at least as big as src
-  CH_assert(a_dest.size() >= a_src.size());
+  CH_assert(a_dest.size() >= a_src.size()); // check if dest size >= src size
   // if a_dest size > a_src size, do we need to resize, or can we just
   // delete finer levels (assume the latter for now)
-  
+  // cout<<"in reshape in sundial, asrc size "<<a_src.size()<<", adest size "<<a_dest.size()<<endl;
   for (int lev=0; lev<a_src.size(); lev++)
     {
       // eventually can be clever and not reshape level 0, just do a copy
@@ -163,8 +163,9 @@ void reshape(LevelData<FArrayBox>& a_dest,
   const DisjointBoxLayout& grids = a_src.getBoxes();
   IntVect ghostVect = a_src.ghostVect();
   int nComp = a_src.nComp();
-
+  // cout<<"  a_src.getBoxes "<<a_src.getBoxes()<<endl;
   a_dest.define(grids, nComp, ghostVect);
+  // cout<<", a_dest box "<<a_dest.getBoxes()<<endl;
 
 }
 

@@ -53,6 +53,12 @@ end type my_sweeper_t
         type(c_ptr), value :: c_AmrIceHolderPtr
     end subroutine BisiclesSolverFEval
 
+    subroutine PfasstPrintAmr(y,c_AmrIceHolderPtr) bind(c, name="PfasstPrintAmr")
+      use iso_c_binding
+      type(c_ptr), value :: y
+      type(c_ptr), value :: c_AmrIceHolderPtr
+   end subroutine PfasstPrintAmr
+
 
   end interface
 
@@ -140,6 +146,7 @@ contains
     !  call exit(0)
     !end select
     !print *, 'c_sweeper.f90 000000 c_AmrIceHolderPtr', c_AmrIceHolderPtr
+    ! call PfasstPrintAmr(y_encap%c_encap_ptr,c_AmrIceHolderPtr)
     call BisiclesSolverFEval(this%c_bisicles_solver_ptr,y_encap%c_encap_ptr, t, level_index, f_encap%c_encap_ptr, dt, maxStep,c_AmrIceHolderPtr)
 
   end subroutine f_eval

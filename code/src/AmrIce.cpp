@@ -1129,6 +1129,7 @@ AmrIce::initialize()
     IntVect hiVect(D_DECL(domLoIndex[0]+ancells[0]-1, 
                           domLoIndex[1]+ancells[1]-1, 
                           domLoIndex[2]+ancells[2]-1));
+    // cout<<"initializing domain... domLoIndex: "<<domLoIndex[0]<<", "<<domLoIndex[1]<<endl;
 #if BISICLES_Z == BISICLES_LAYERED
     {
       int nLayers = ancells[2];
@@ -2089,6 +2090,7 @@ AmrIce::timeStep(Real a_dt)
   m_time += a_dt;
   m_cur_step += 1;
   // compute new ice velocity field
+  // cout<<"solve vel "<<m_evolve_velocity<<endl;
   if (m_evolve_velocity )
     {
       if (s_verbosity > 3) 
@@ -2306,8 +2308,8 @@ AmrIce::computeThicknessFluxes(Vector<LevelData<FluxBox>* >& a_vectFluxes,
             {
               Box faceBox(gridBox);
               faceBox.surroundingNodes(dir);
-              flux[dir].copy(faceH[dir], faceBox);
-              flux[dir].mult(faceVel[dir], faceBox, 0, 0, 1);
+              flux[dir].copy(faceH[dir], faceBox); // copy faceH into flux and facebox?
+              flux[dir].mult(faceVel[dir], faceBox, 0, 0, 1); //
             }
         }
     } // end loop over levels

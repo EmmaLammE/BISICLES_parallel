@@ -18,6 +18,7 @@ protected:
 	Vector<LevelData<FArrayBox>* > dHdtHolder;
 	Vector<LevelData<FArrayBox>* > *HHolderPtr;
 	Vector<LevelData<FArrayBox>* > HHolder;
+	Vector<LevelData<FArrayBox>* > HHolderBackup;
 	int num_of_levels;
 	// Vector<int> m_num_cells;
 
@@ -44,7 +45,9 @@ public:
 	void SetAmrHPtr(Vector<LevelData<FArrayBox>* > *HHolderPtr);
 	Vector<LevelData<FArrayBox>* > *GetAmrHPtr(void);
 	void SetAmrH(Vector<LevelData<FArrayBox>* > HHolder);
+	void SetAmrHBackup(Vector<LevelData<FArrayBox>* > HHolder); // copy by value not pointer for H just in case
 	Vector<LevelData<FArrayBox>* > GetAmrH(void);
+	Vector<LevelData<FArrayBox>* > GetAmrHBackup(void);
 
 	// AmrIce set up max num of levels
 	void SetAmrNumLvl(int max_num_lvl);

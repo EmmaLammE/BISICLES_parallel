@@ -349,7 +349,7 @@ AmrIce::newTimeStep(Real a_dt)
 // compute estimate of dH/dt at the current time
 void
 AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
-                     Vector<LevelData<FArrayBox>* >& a_H, 
+                     Vector<LevelData<FArrayBox>* >& a_H, // this is constH in bisicles_fortran
                      Real a_dt, bool a_recomputeVelocity)
 {
   if (a_recomputeVelocity)
@@ -357,24 +357,26 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
       solveVelocityField();
     }
 
+  Real test_norm=0;
+  int nlvl=a_dHdt.size();
+
   // volumeThicknessSource is used in the semi-implicit scheme
   setToZero(m_volumeThicknessSource);
   
   Vector<LevelData<FluxBox>* > faceH(a_dHdt.size(), NULL);
-  Vector<LevelData<FluxBox>* > vectFluxes(a_dHdt.size(), NULL);  
+  Vector<LevelData<FluxBox>* > vectFluxes(a_dHdt.size(), NULL); 
   for (int lev=0; lev<faceH.size(); lev++)
     {
 
       // allocate storage
-
-      const LevelData<FArrayBox>& currentH = *a_H[lev];
-      const DisjointBoxLayout& levelGrids = currentH.getBoxes();      
+      const LevelData<FArrayBox>& currentH = *a_H[lev]; // a_H is passed in correctly
+      const DisjointBoxLayout& levelGrids = currentH.getBoxes(); // 
       faceH[lev] = new LevelData<FluxBox>(levelGrids, 1, IntVect::Zero);
       // vectFluxes needs to have a ghost cell to ensure that
       // the Copier works correctly (it's a bit complicated)
       vectFluxes[lev] = new LevelData<FluxBox>(levelGrids, 1, IntVect::Unit);
 
-      
+ 
       LevelData<FArrayBox>& levelSTS = *m_surfaceThicknessSource[lev];
       LevelData<FArrayBox>& levelBTS = *m_basalThicknessSource[lev];
       LevelData<FArrayBox>& levelVTS = *m_volumeThicknessSource[lev];
@@ -385,22 +387,41 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
       
       // set basal thickness source
       m_basalFluxPtr->surfaceThicknessFlux(levelBTS, *this, lev, a_dt);
-           
+      
       // for now, just do simple cell-to-face averaging
       // (may want to go back to PPM at some point)
-      {
+      // {
+      LevelData<FArrayBox>& nonConstH = *(const_cast<LevelData<FArrayBox>*>(&currentH));
+      // ensure that ghost cells for thickness  are filled in
+      if (lev > 0)
+        {         
+          int nGhost = nonConstH.ghostVect()[0];
+          PiecewiseLinearFillPatch thicknessFiller(levelGrids, 
+                                                   m_amrGrids[lev-1],
+                                                   1, 
+                                                   m_amrDomains[lev-1],
+                                                   m_refinement_ratios[lev-1],
+                                                   nGhost);
+          
+          // // since we're not subcycling, don't need to interpolate in time
+          Real time_interp_coeff = 0.0;
+          thicknessFiller.fillInterp(nonConstH,
+                                     *a_H[lev-1],
+                                     *a_H[lev-1],
+                                     time_interp_coeff,
+                                     0, 0, 1);
+        }
         // just in case, do an exchange here
         // cast away const-ness just for the exchange
-        LevelData<FArrayBox>& nonConstH = *(const_cast<LevelData<FArrayBox>*>(&currentH));
-        nonConstH.exchange();
-      }
+        nonConstH.exchange(); // what does this line do? periodic BC for ghost cells to exchange values on two ends of domain
+      // }
       CellToEdge(currentH,*faceH[lev]);
     }
   // dhDt is just div(faceH*faceVel) + thicknessSources
 
   // we already have a function to compute thicknessFluxes (faceH*faceVel)
   computeThicknessFluxes(vectFluxes, faceH, m_faceVelAdvection);
-
+  
   // now compute divergence
   for (int lev=0; lev <= finestTimestepLevel() ; lev++)
     {
@@ -412,28 +433,29 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
       const RealVect& dx = levelCoords.dx();              
       
       DataIterator dit = levelGrids.dataIterator();          
-
+      
       for (dit.begin(); dit.ok(); ++dit)
         {
           const Box& gridBox = levelGrids[dit];
-          FArrayBox& dHdt = levelDhDt[dit];
+          FArrayBox& dHdt = levelDhDt[dit]; // levelDhDt copied the pointer in a_dHdt
           FluxBox& thisFlux = levelFlux[dit];
           dHdt.setVal(0.0);
           
           // loop over directions and increment with div(F)
-          for (int dir=0; dir<SpaceDim; dir++)
-            {
+          for (int dir=0; dir<SpaceDim; dir++) // spacedim = 2 for 2d
+            {          
               // use the divergence from 
               // Chombo/example/fourthOrderMappedGrids/util/DivergenceF.ChF
+              // ^ that's old dir. New dir is in bisicles /code/util/DivergenceF.ChF
               FORT_DIVERGENCE(CHF_CONST_FRA(thisFlux[dir]),
                               CHF_FRA(dHdt),
                               CHF_BOX(gridBox),
-                              CHF_CONST_REAL(dx[dir]),
+                              CHF_CONST_REAL(dx[dir]), // dx = 5000 for level 0
                               CHF_INT(dir));
               
               
             } // end loop over directions
-          
+   
 	  levelDivThckFlux[dit].copy(dHdt);
 
 
@@ -483,7 +505,7 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
 
         } // end loop over boxes
     } // end loop over levels
-      
+
 
   // clean up local storage
   for (int lev=0; lev<vectFluxes.size(); lev++)
@@ -542,25 +564,38 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   CH_TIME("AmrIce::setState");
 
   if (s_verbosity > 3)
-    {
+  {
       pout() << "AmrIce::setState" << endl;
-    }
+  }
 
 
   // first, reset time
   if (s_verbosity > 3)
-    {
+  {
       pout() << "resetting solution time from " << m_time
              << "  to " << a_cur_time << endl;
-    }
+  }
   m_time = a_cur_time;
   
   // it's convenient to pull out the grids here
   Vector<DisjointBoxLayout> new_amrGrids(a_thicknessVect.size());
   for (int lev=0; lev<new_amrGrids.size(); lev++)
-    {
+  {
       new_amrGrids[lev] = a_thicknessVect[lev]->getBoxes();
-    }
+  }
+
+  // cout<<"2 in set state, ice thickness:\n";
+  // for (int lvl=0; lvl < a_thicknessVect.size(); lvl++)
+  // {
+  //     LevelData<FArrayBox>& ldf = *a_thicknessVect[lvl];
+  //     DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+  //     cout<<"  a_thick: "<<dbl<<endl;
+  // }
+  // for (int lvl=0; lvl < a_thicknessVect.size(); lvl++)
+  // {
+  //     DisjointBoxLayout dbl = new_amrGrids[lvl];
+  //     cout<<"  new_amrGrids: "<<dbl<<endl;
+  // }
 
 
   /// begin code lifted from AmrIce::regrid
@@ -569,10 +604,12 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   // assume that we'll always have the same level 0
   int lbase = 0;
   for (int lev=lbase+1; lev< new_amrGrids.size(); ++lev)
-    {
+  {
       const DisjointBoxLayout oldDBL = m_amrGrids[lev];
       gridsSame &= oldDBL.sameBoxes(new_amrGrids[lev]);
-    }
+  }
+  
+  // cout<<"2 amr ice new time step gridsame: "<<gridsSame<<endl;
 
 
   // first do level 0 because it's the simplest (and because
@@ -580,13 +617,14 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   
   /// overwrite thickness...
   LevelData<FArrayBox>& thisLevelH = m_vect_coordSys[0]->getH();
-  
+  // int finest_level = this->finestLevel();
+  // cout<<"finest level "<<finest_level<<endl;
   DataIterator dit=new_amrGrids[0].dataIterator();
   for (dit.begin(); dit.ok(); ++dit)
-    {
-      thisLevelH[dit].copy((*a_thicknessVect[0])[dit]);
-    }
-
+  {
+      thisLevelH[dit].copy((*a_thicknessVect[0])[dit]); // copy a_thick to this level H
+  }
+  
   /// recompute geometry
   {
     LevelSigmaCS* crseCoords = NULL;
@@ -596,7 +634,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   
   /// overwrite velocity if needed
   if (a_velocityVect.size() > 0)
-    {
+  {
       CH_assert(m_velocity[0]->getBoxes() == a_velocityVect[0]->getBoxes());
 
       
@@ -605,14 +643,17 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
         {
           (*m_velocity[0])[dit].copy((*a_velocityVect[0])[dit]);
         }      
-    }
+  }
   
   // now loop through levels and redefine if necessary
   // this is more complicated than level 0 because we might have changed
   // grids
   
+  // cout<<"1 amr ice new time step: "<<new_amrGrids.size()<<endl;
+  // new_amrGrids.size() is corret
   for (int lev=lbase+1; lev< new_amrGrids.size(); ++lev)
-    {
+  {
+      // cout<<" lev # "<<lev<<endl;
       const DisjointBoxLayout oldDBL = m_amrGrids[lev];
       
       m_amrGrids[lev] = new_amrGrids[lev];
@@ -640,6 +681,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
 #if BISICLES_Z == BISICLES_LAYERED
         m_vect_coordSys[lev]->setFaceSigma(auxCoordSys->getFaceSigma());
 #endif		
+        
         LevelSigmaCS* crsePtr = &(*m_vect_coordSys[lev-1]);
         int refRatio = m_refinement_ratios[lev-1];
         
@@ -649,13 +691,13 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
                                 m_time,  crsePtr,refRatio ) );
         
         if (!interpolate_zb)
-          {
+        {
             // need to re-apply accumulated bedrock (GIA). Could be optional?
             for (DataIterator dit(newDBL); dit.ok(); ++dit)
               {
                 m_vect_coordSys[lev]->getTopography()[dit] += (*m_deltaTopography[lev])[dit];
               }
-          }
+        }
         
         {
           //interpolate thickness & (maybe) topography
@@ -677,25 +719,25 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
                                                  m_regrid_thickness_interpolation_method);
         }
 
-
+        
         LevelData<FArrayBox>& thisLevelH = m_vect_coordSys[lev]->getH();
         LevelData<FArrayBox>& thisLevelB = m_vect_coordSys[lev]->getTopography();
-		
+       
         // overwrite interpolated fields in valid regions with such valid old data as there is
         // ** this is where we replace interpolated old thickness with one that
         // we've passed in.  Do this fab-by-fab to maintain ghost cells
         DataIterator dit=new_amrGrids[lev].dataIterator();
         for (dit.begin(); dit.ok(); ++dit)
-          {
+        {
             thisLevelH[dit].copy((*a_thicknessVect[lev])[dit]);
-          }
+        }
         
         if (oldDBL.isClosed())
-          {	              
+        {	              
             const LevelData<FArrayBox>& oldLevelB = oldCoordSys->getTopography();
             oldLevelB.copyTo(thisLevelB);
-          }
-        
+        }
+       
         //Defer to m_thicknessIBCPtr for boundary values - 
         //interpolation won't cut the mustard because it only fills
         //ghost cells overlying the valid regions.
@@ -711,7 +753,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
           int refRatio = (lev > 0)?m_refinement_ratios[lev-1]:-1;
           m_vect_coordSys[lev]->recomputeGeometry(crseCoords,refRatio);
         }
-      }
+      } // end of LevelSigmaCS regrid
 
       // regrid other prognostic fields
       // (DFM 7/15/22) -- we may want to pass these in
@@ -721,11 +763,11 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
       m_iceFrac[lev] = destructiveRegrid( m_iceFrac[lev], newDBL, m_iceFrac[lev-1],	m_refinement_ratios[lev-1]);
       // if we're not passing in a velocity, treat this like a regular regrid
       if (a_velocityVect.size() == 0)
-        {
+      {
           m_velocity[lev] = destructiveRegrid( m_velocity[lev], newDBL,  m_velocity[lev-1], m_refinement_ratios[lev-1]);
-        }
+      }
       else
-        {
+      {
           // reshape and copy velocity. It is an error here if the velocity and thickness
           // aren't defined on the same grids
           CH_assert(a_velocityVect[lev]->getBoxes() == a_thicknessVect[lev]->getBoxes());
@@ -739,7 +781,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
             {
               (*m_velocity[lev])[dit].copy(newVel[dit]);
             }
-        } // end if we're passing in a velocity
+      } // end if we're passing in a velocity
           
       // DFM (7/15/22) -- I don't think this is relevant in this context...
       // if we're passing in a velocity field, they should be properly set, and
@@ -778,8 +820,8 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
       m_A_valid = false;
       
       // no need to regrid, just reallocate
-      if (!gridsSame)
-        {
+      if (!gridsSame) // grid is same
+      {
           if (m_velBasalC[lev] != NULL)
             {
               delete m_velBasalC[lev];
@@ -886,18 +928,20 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
           m_layerSFaceSVel[lev] = new LevelData<FArrayBox>
             (newDBL, SpaceDim*(m_nLayers + 1), IntVect::Unit);
           
-	} // end if !gridsSame  
+	    } // end if !gridsSame  
       
-    } // end loop over currently defined levels
+  } // end loop over currently defined levels
 
   
   // now ensure that any remaining levels are null pointers
   // (in case of de-refinement)
   // unnecessary if gridsSame
   if (!gridsSame)
-    {
+  {
       for (int lev = a_thicknessVect.size(); lev < m_old_thickness.size(); lev++)
         {
+          // cout<<"2 amr ice new time step: "<<a_thicknessVect.size()<<endl;
+          // MayDay::Error("--------------- stop ----------------n");
           if (m_old_thickness[lev] != NULL) 
             {
               delete m_old_thickness[lev];
@@ -1009,7 +1053,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
                 }
             }
         } // end loop over levels to determine covered levels
-    }  // end stuff we don't have to do if gridsSame
+  }  // end stuff we don't have to do if gridsSame
   
   // tempearture depends on internal energy
   updateTemperature();
@@ -1025,7 +1069,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   //applyCalvingCriterion(CalvingModel::PostRegrid);
 
   if (m_evolve_velocity)
-    {
+  {
       //velocity solver needs to be re-defined
       if (!gridsSame)
         {
@@ -1037,13 +1081,26 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
         {
           solveVelocityField(true, m_velocitySolveInitialResidualNorm);
         }
-    }
+  }
   else
-    {
-      CH_assert(m_evolve_velocity);
-      MayDay::Error("AmrIce::regrid() not implemented for !m_evolve_velocity");
-    }
+  {
+    //velocity solver needs to be re-defined
+      if (!gridsSame)
+        {
+          defineSolver();
+        }
+      // CH_assert(m_evolve_velocity);
+      // MayDay::Error("AmrIce::regrid() not implemented for !m_evolve_velocity"); // ask Dan
+  }
   
+  // up until here, a_thick levels are correct
+  // cout<<"6 in set state, ice thickness:\n";
+  //       for (int lvl=0; lvl < a_thicknessVect.size(); lvl++)
+  // {
+  //           LevelData<FArrayBox>& ldf = *a_thicknessVect[lvl];
+  //           DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+  //           cout<<"  a_thick: "<<dbl<<endl;
+  // }
   // end code lifted from AmrIce::regrid
 
   
@@ -1061,11 +1118,33 @@ void
 AmrIce::setState(IceSheetState& a_iceState,
                  bool a_recalculateVelocity)
 {
+  // cout<<"1 in set state, ice thickness:\n";
+  // for (int lvl=0; lvl < a_iceState.ice_thickness.size(); lvl++)
+  // {
+  //     LevelData<FArrayBox>& ldf = *a_iceState.ice_thickness[lvl];
+  //     DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+  //     cout<<"  dbl: "<<dbl<<endl;
+  // }
   // for now, just use existing function
   setState(a_iceState.ice_thickness,
            a_iceState.ice_velocity,
            a_iceState.time,
-           a_recalculateVelocity);  
+           a_recalculateVelocity);  // a_iceState.ice_thickness is correct after set state
+  // cout<<"in set state, ice thickness:\n";
+  // for (int lvl=0; lvl < a_iceState.ice_thickness.size(); lvl++)
+  //       {
+  //         LevelData<FArrayBox>& ldf = *a_iceState.ice_thickness[lvl];
+  //         DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+  //         DataIterator dit = ldf.dataIterator();
+  //         for (dit.reset(); dit.ok(); ++dit) 
+  //           {
+  //           const Box& box = dbl[dit()];
+  //           FArrayBox& fab = ldf[dit()];
+  //           cout<<box<<endl;
+  //           // test_norm=fab.norm(box,1);
+  //           // cout<<"   "<<test_norm<<endl;
+  //           } 
+        // }
 
 }
 

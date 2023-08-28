@@ -34,8 +34,9 @@
 
     !Tfin = 1.0
     !nsteps = 32
-    nspace = 1
-    ntime = 1
+    nspace = 1 ! num of space processors
+    ntime = 1 ! num of time processors
+    nproc_per_time = 1
     space_dim = 2
 
 

@@ -32,6 +32,7 @@ module encap
       procedure :: unpack => bisicles_vector_unpack
       procedure :: axpy => bisicles_vector_axpy
       procedure :: eprint => bisicles_vector_eprint
+      procedure :: eprintLevelDataBox => bisicles_vector_eprintLevelDataBox
       procedure :: getval
       procedure :: savesnap
    end type bisicles_vector_encap
@@ -97,10 +98,15 @@ module encap
         type(c_ptr), value :: c_AmrIceHolderPtr
       end subroutine BisiclesVectorAxpy
     
-      subroutine BisiclesVectorPrint(x) bind(c, name="BisiclesVectorPrint")
+      subroutine BisiclesVectorL2Print(x) bind(c, name="BisiclesVectorL2Print")
         use iso_c_binding
         type(c_ptr), value :: x
-      end subroutine BisiclesVectorPrint
+      end subroutine BisiclesVectorL2Print
+
+      subroutine BisiclesVectorLevelDataBox(x,y) bind(c, name="BisiclesVectorLevelDataBox")
+         use iso_c_binding
+         type(c_ptr), value :: x,y
+       end subroutine BisiclesVectorLevelDataBox
 
       function BisiclesVectorGetVal(x, c_AmrIceHolderPtr) result(val) bind(c, name="BisiclesVectorGetVal")
         use iso_c_binding
@@ -114,6 +120,11 @@ module encap
           type(c_ptr), value :: y
           type(c_ptr), value :: c_AmrIceHolderPtr
       end subroutine PfasstBisiclesSaveResults
+
+      integer function MPI_Comm_c2f(c_handle) bind(C, name="PfasstBisicles_MPI_Comm_c2f")
+         use iso_c_binding
+         type(c_ptr), value :: c_handle
+      end function
 
    end interface
 
@@ -260,6 +271,7 @@ contains
     integer,     intent(in   ), optional :: flags
     real(c_double) :: norm
     ! call BisiclesVectorNorm(this%c_encap_ptr, norm)
+   !  print *,'     ... in bisicles vector norm'
     norm = BisiclesVectorNorm(this%c_encap_ptr, cptr_AmrIceHolder)
   end function bisicles_vector_norm
 
@@ -289,8 +301,19 @@ contains
     class(bisicles_vector_encap), intent(inout) :: this
     integer,           intent(in   ), optional :: flags
     !  Print the  value
-    call BisiclesVectorPrint(this%c_encap_ptr)
+    call BisiclesVectorL2Print(this%c_encap_ptr)
   end subroutine bisicles_vector_eprint
+
+  subroutine bisicles_vector_eprintLevelDataBox(this,x,flags)
+   class(bisicles_vector_encap), intent(inout) :: this
+   class(pf_encap_t), intent(in) :: x ! array to be printed
+   integer,           intent(in   ), optional :: flags
+   !  Print the  value
+   select type(x)
+    type is (bisicles_vector_encap)
+      call BisiclesVectorLevelDataBox(this%c_encap_ptr,x%c_encap_ptr)
+   end select
+  end subroutine bisicles_vector_eprintLevelDataBox
 
   function getval(this) result(val)
      class(bisicles_vector_encap), intent(inout) :: this

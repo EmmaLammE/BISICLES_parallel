@@ -1,0 +1,117 @@
+      subroutine BOXGHOSTBC(
+     &           state
+     &           ,istatelo0,istatelo1
+     &           ,istatehi0,istatehi1
+     &           ,nstatecomp
+     &           ,neumfac
+     &           ,ineumfaclo0,ineumfaclo1
+     &           ,ineumfachi0,ineumfachi1
+     &           ,nneumfaccomp
+     &           ,dircfac
+     &           ,idircfaclo0,idircfaclo1
+     &           ,idircfachi0,idircfachi1
+     &           ,ndircfaccomp
+     &           ,inhmval
+     &           ,iinhmvallo0,iinhmvallo1
+     &           ,iinhmvalhi0,iinhmvalhi1
+     &           ,ninhmvalcomp
+     &           ,ifaceboxlo0,ifaceboxlo1
+     &           ,ifaceboxhi0,ifaceboxhi1
+     &           ,iinteriorBoxlo0,iinteriorBoxlo1
+     &           ,iinteriorBoxhi0,iinteriorBoxhi1
+     &           ,idir
+     &           ,side
+     &           ,dx
+     &           ,startcomp
+     &           ,endcomp
+     &           )
+      implicit none
+      integer*8 ch_flops
+      COMMON/ch_timer/ ch_flops
+      integer CHF_ID(0:5,0:5)
+      data CHF_ID/ 1,0,0,0,0,0 ,0,1,0,0,0,0 ,0,0,1,0,0,0 ,0,0,0,1,0,0 ,0
+     &,0,0,0,1,0 ,0,0,0,0,0,1 /
+      integer nstatecomp
+      integer istatelo0,istatelo1
+      integer istatehi0,istatehi1
+      REAL*8 state(
+     &           istatelo0:istatehi0,
+     &           istatelo1:istatehi1,
+     &           0:nstatecomp-1)
+      integer nneumfaccomp
+      integer ineumfaclo0,ineumfaclo1
+      integer ineumfachi0,ineumfachi1
+      REAL*8 neumfac(
+     &           ineumfaclo0:ineumfachi0,
+     &           ineumfaclo1:ineumfachi1,
+     &           0:nneumfaccomp-1)
+      integer ndircfaccomp
+      integer idircfaclo0,idircfaclo1
+      integer idircfachi0,idircfachi1
+      REAL*8 dircfac(
+     &           idircfaclo0:idircfachi0,
+     &           idircfaclo1:idircfachi1,
+     &           0:ndircfaccomp-1)
+      integer ninhmvalcomp
+      integer iinhmvallo0,iinhmvallo1
+      integer iinhmvalhi0,iinhmvalhi1
+      REAL*8 inhmval(
+     &           iinhmvallo0:iinhmvalhi0,
+     &           iinhmvallo1:iinhmvalhi1,
+     &           0:ninhmvalcomp-1)
+      integer ifaceboxlo0,ifaceboxlo1
+      integer ifaceboxhi0,ifaceboxhi1
+      integer iinteriorBoxlo0,iinteriorBoxlo1
+      integer iinteriorBoxhi0,iinteriorBoxhi1
+      integer idir
+      integer side
+      REAL*8 dx
+      integer startcomp
+      integer endcomp
+      REAL*8 nfac, dfac, ival, sval,denom,numer
+      integer ncomp,nc
+      integer ii0,ii1, i0,i1
+      integer steplength
+      ncomp = nstatecomp
+      if(ncomp .ne. nneumfaccomp) then
+          call MAYDAYERROR()
+      endif
+      if(ncomp .ne. ndircfaccomp) then
+          call MAYDAYERROR()
+      endif
+      if(ncomp .ne. ninhmvalcomp) then
+          call MAYDAYERROR()
+      endif
+      if((side .ne. -1).and.(side.ne.1)) then
+          call MAYDAYERROR()
+      endif
+      do nc = startcomp, endcomp
+      do i1 = ifaceboxlo1,ifaceboxhi1
+      do i0 = ifaceboxlo0,ifaceboxhi0
+         if (side.eq.-1) then
+            ii0 = CHF_ID(0,idir)*(i0-iinteriorBoxlo0)
+            steplength = -CHF_ID(0,idir)*ii0
+            ii1 = CHF_ID(1,idir)*(i1-iinteriorBoxlo1)
+            steplength = steplength - CHF_ID(1,idir)*ii1
+         else if (side.eq.1) then
+            ii0 = CHF_ID(0,idir)*(i0-iinteriorBoxhi0)
+            steplength = CHF_ID(0,idir)*ii0
+            ii1 = CHF_ID(1,idir)*(i1-iinteriorBoxhi1)
+            steplength = steplength + CHF_ID(1,idir)*i1
+          endif
+         nfac = neumfac(i0,i1,nc)
+         dfac = dircfac(i0,i1,nc)
+         ival = inhmval(i0,i1,nc)
+         sval = state(i0-ii0,i1-ii1,nc)
+         denom = ((0.500d0)*dfac + side*nfac/dx)/steplength
+         numer = ival - sval*((steplength-(0.500d0))*dfac -
+     &                        side*nfac/dx)/(steplength)
+         if(abs(denom).lt. 1.0e-9) then
+            call MAYDAYERROR()
+         endif
+         state(i0,i1,nc) = numer/denom
+      enddo
+      enddo
+      enddo
+      return
+      end

@@ -66,6 +66,7 @@
 #include "bisicles_fortran.hpp"
 #include "bisicles_holder.hpp"
 #include "pfasst_bisicles_setup.hpp"
+// #include <windows.h>
 // #include "bisicles_vector.hpp"
 
 
@@ -87,33 +88,22 @@ enum basalFrictionTypes {constantBeta = 0,
  */
 int main(int argc, char* argv[]) {
   
-  int ierr = 0;
-
+int ierr = 0;
+int rank, number_procs;
+int new_space_rank, new_space_size, new_time_rank, new_time_size;
 #ifdef CH_USE_PETSC
   ierr = PetscInitialize(&argc, &argv,PETSC_NULL,PETSC_NULL); CHKERRQ(ierr);
 #else
-#ifdef CH_MPI
-  // cout << "000000000 MPI_COMM_WORLD " << typeid(MPI_COMM_WORLD).name() << std::endl;
-  MPI_Init(&argc, &argv);
-#endif 
+  #ifdef CH_MPI
+    // MPI_Comm sub_comm;
+    MPI_Init(&argc, &argv);
+  #endif 
 #endif // end petsc conditional
 
-  FineInterp::s_default_boundary_limit_type = 0;
+FineInterp::s_default_boundary_limit_type = 0;
 
-  { // Begin nested scope
+{ 
 
-#ifdef CH_MPI
-    MPI_Barrier(Chombo_MPI::comm);
-#endif
-    int rank, number_procs;
-#ifdef CH_MPI
-    MPI_Comm_rank(Chombo_MPI::comm, &rank);
-    MPI_Comm_size(Chombo_MPI::comm, &number_procs);
-#else
-    rank=0;
-    number_procs=1;
-#endif
-    
     if(argc < 2) 
       { std::cerr << " usage: " << argv[0] << " <input_file>\n"; exit(0); }
     char* in_file = argv[1];
@@ -122,10 +112,66 @@ int main(int argc, char* argv[]) {
     //FileMangler(in_file,in_file_mangled.c_str());
     //ParmParse pp(argc-2,argv+2,NULL,in_file_mangled.c_str());
 
-    
-
-    
+  
     ParmParse pp(argc-2,argv+2,NULL,in_file);
+    ParmParse ppfasst("pf");
+    bool USE_PF;
+    int num_time_procs;
+    ppfasst.get("USE_PF", USE_PF);  
+    ppfasst.get("num_time_procs", num_time_procs); 
+    // SYSTEM_INFO siSysInfo;
+    // GetSystemInfo(&siSysInfo); 
+    // int num_hardware_cores = siSysInfo.dwNumberOfProcessors;
+    
+    // Begin nested scope
+    #ifdef CH_MPI
+        MPI_Comm pf_comm; 
+        MPI_Comm sub_comm; 
+        if (USE_PF){
+        // global mpi
+        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &number_procs);
+        if(number_procs<num_time_procs){
+          cout<<"The number of time processor greater than total mpi processor. Number of time processor input: ",
+                num_time_procs,". Number of total processor: ",number_procs;
+          MayDay::Error("Please check your input file and args for mpirun. Stop here.");
+        // else if(num_hardware_cores<number_procs){
+        //   cout<<"The number of total processor greater than maximum allowed processor on this device. Number of total processor input: ",
+        //         number_procs,". Number of maximum processor on this device: ",num_hardware_cores;
+        //   MayDay::Error("Please check your input file and args for mpirun. Stop here.");
+        // }
+        }
+        cout << "Hello from main process " << rank << " out of " << number_procs << " processes in the main communicator." <<endl;
+        // split mpi into space mpi
+        int space_color = round(rank%num_time_procs);
+        MPI_Comm_split(MPI_COMM_WORLD, space_color, rank, &Chombo_MPI::comm); // make sure what key should put in here
+        MPI_Comm_rank(Chombo_MPI::comm, &new_space_rank); // Get the rank in the new communicator
+        MPI_Comm_size(Chombo_MPI::comm, &new_space_size); // Get the size of the new communicator
+        // split mpi into time mpi
+        int time_color = round(rank/num_time_procs);
+        MPI_Comm_split(MPI_COMM_WORLD, time_color, rank, &pf_comm);
+        MPI_Comm_rank(pf_comm, &new_time_rank); // Get the rank in the new communicator
+        MPI_Comm_size(pf_comm, &new_time_size); // Get the size of the new communicator
+        cout << "   Hello from space process " << new_space_rank << " out of " << new_space_size << " processes in the space communicator." <<endl;
+        cout << "   Hello from time process " << new_time_rank << " out of " << new_time_size << " processes in the time communicator." <<endl;
+        // should be correct, but double check if each time processor has the same num of bisicles processors
+        if(new_time_size*new_space_size != number_procs){
+            MayDay::Error("The number of time and space processors doesn't match the total number of processors. Stop here.");
+        }
+        }
+        else{
+        MPI_Barrier(Chombo_MPI::comm);
+        MPI_Comm_rank(Chombo_MPI::comm, &rank);
+        MPI_Comm_size(Chombo_MPI::comm, &number_procs);
+        }
+    #else
+          rank=0;
+          number_procs=1;
+    #endif 
+
+
+
     ParmParse pp2("main");
 
     std::string poutBaseName = "pout";
@@ -139,7 +185,6 @@ int main(int argc, char* argv[]) {
     Vector<Real> domSize(SpaceDim);
     pp2.getarr("domain_size", domSize, 0, SpaceDim);
     domainSize = RealVect(D_DECL(domSize[0], domSize[1], domSize[2]));
-
 
     // AmrIce amrPtr;
     // amrPtr.setParmParsePrefix("crse.");
@@ -992,8 +1037,35 @@ int main(int argc, char* argv[]) {
     
 
     // initialize each time interval from initial time
-    Vector<LevelData<FArrayBox>* > crseH;
-    amrObjectCrse.amrThickness(crseH);
+    // Vector<LevelData<FArrayBox>* > crseH;
+    // amrObjectCrse.amrThickness(crseH);
+    ParmParse ppcrse("crse"); int crselevel=0;
+    ppcrse.get("amr.maxLevel", crselevel);
+    Vector<LevelData<FArrayBox>* > crseH(crselevel+1, NULL);
+    for (int lvl=0; lvl<crselevel+1;lvl++)
+      {
+        const DisjointBoxLayout& current_grid_size=amrObjectCrse.grids(lvl);
+        crseH[lvl] = new LevelData<FArrayBox>(current_grid_size,1,IntVect::Zero); 
+        DataIterator dit = (*crseH[lvl]).dataIterator();
+        for (dit.begin(); dit.ok(); ++dit)
+        {
+          (*crseH[lvl])[dit].setVal(1000.0);
+        }
+      }
+  //   cout<<"in driver\n";
+  //   for (int lvl=0; lvl < crseH.size(); lvl++)
+  //  {
+  //    cout<<"      bisicles... level "<<lvl<<endl;
+  //    LevelData<FArrayBox>& ldf = *crseH[lvl];
+  //    DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+  //    DataIterator dit = ldf.dataIterator();
+  //    for (dit.reset(); dit.ok(); ++dit) 
+  //     {
+  //      const Box& box = dbl[dit()];
+  //      FArrayBox& fab = ldf[dit()];
+  //      cout<<"      bisicles... box "<<box<<endl;
+  //     }
+  //  }
     const Vector<LevelData<FArrayBox>* >& crseVel = amrObjectCrse.amrVelocity();
     for (int i=0; i<numCrseIntervals; i++)
       {
@@ -1005,6 +1077,20 @@ int main(int argc, char* argv[]) {
     // initialize each time interval from initial time
     Vector<LevelData<FArrayBox>* > fineH;
     amrObjectFine.amrThickness(fineH);
+    // ParmParse ppfine("fine"); int finelevel=0;
+    // ppfine.get("amr.maxLevel", finelevel);
+    // Vector<LevelData<FArrayBox>* > fineH(finelevel+1, NULL);
+    // for (int lvl=0; lvl<finelevel+1;lvl++)
+    //   {
+    //     const DisjointBoxLayout& current_grid_size=amrObjectFine.grids(lvl);
+    //     fineH[lvl] = new LevelData<FArrayBox>(current_grid_size,1,IntVect::Zero); 
+    //     DataIterator dit = (*fineH[lvl]).dataIterator();
+    //     for (dit.begin(); dit.ok(); ++dit)
+    //     {
+    //       (*fineH[lvl])[dit].setVal(1000.0);
+    //     }
+    //   }
+
     const Vector<LevelData<FArrayBox>* >& fineVel = amrObjectFine.amrVelocity();    
     for (int i=0; i<numFineIntervals; i++)
       {
@@ -1018,6 +1104,14 @@ int main(int argc, char* argv[]) {
     //Real startTime;
     pp2.get("maxTime", maxTime);
     pp2.get("maxStep", maxStep);
+    // for (int i=0; i<numCrseIntervals; i++)
+    // {
+    //     crseStateVect[i].time = maxTime;
+    // }
+    // for (int i=0; i<numFineIntervals; i++)
+    // {
+    //     fineStateVect[i].time = maxTime;
+    // }
 
     // assume we're starting at t=0 for now
     // maxTime *= 100;
@@ -1030,13 +1124,15 @@ int main(int argc, char* argv[]) {
     // ------------ create pfasst object ------------- //
     // ----------------------------------------------- //
     // pfasst setup
-    ParmParse ppfasst("pf");
-    bool USE_PF;
+    // ParmParse ppfasst("pf");
+    // bool USE_PF;
     bool PF_VERBOSE;
     string pf_plot_prefix;
-    ppfasst.get("USE_PF", USE_PF);
+    int pf_num_procs_per_time;
+    // ppfasst.get("USE_PF", USE_PF);
     ppfasst.get("PF_VERBOSE", PF_VERBOSE);
     ppfasst.get("pf_plot_prefix", pf_plot_prefix);
+    ppfasst.get("pf_num_procs_per_time", pf_num_procs_per_time);
 
     ParmParse pcrse("crse.amr");
     string crse_plot_prefix;
@@ -1044,22 +1140,26 @@ int main(int argc, char* argv[]) {
 
     if (USE_PF){
       cout<<"\n..............Updating crse-grained using PFASST................\n";
-      cout<<"  PFASST objects passing in: crse grids and objects\n";
+      cout<<"  PFASST objects passing in from: crse grids and objects\n";
       cout<<"  results saved as: "<<crse_plot_prefix<<"...";
-      cout<< "  dt passed in: "<<crseDt<<", max T passed in: "<<maxTime<<", max steps passed in:"<<maxStep<< endl;
+      // cout<< "  dt passed in: "<<crseDt<<", max T passed in: "<<maxTime<<", max steps passed in:"<<maxStep<< endl;
 
       AmrIceHolderClass AmrIceHolderPtr;
-      Pf_Bisicles_setHolders(&amrObjectCrse,&AmrIceHolderPtr,crseH,crseVel);
+      MPI_Fint pf_comm_world = MPI_Comm_c2f(pf_comm);
+      // cout<<"mpi comm in bisicles "<<pf_comm_world<<endl;
+      Pf_Bisicles_setHolders(&amrObjectCrse,&AmrIceHolderPtr,crseH,crseVel); // pass amrObjectCrse to AmrIceHolderPt, pretty sure is right
+      // crseH is correctly initialized on every level
+
       ParmParse ppcrseamr("crse.amr");
       Vector<int> ancells(3); 
       ppcrseamr.getarr("num_cells", ancells, 0, ancells.size());
-      cout<< "  num of cell passed in: "<<ancells<<"\n\n\n";
+      // cout<< "  num of cell passed in: "<<ancells<<"\n\n\n";
       int num_of_grids=ancells[0]*ancells[1];
       reshape(crsedHdtVect[0],crseH);
-
+      // cout<<"num of levels in crseH: "<<crseH.size()<<endl;
       Vector<LevelData<FArrayBox>* > ice_thick=crseStateVect[1].ice_thickness;
-      Pf_Main(&AmrIceHolderPtr,numCrseIntervals,crseDt,maxTime,maxStep,num_of_grids,\
-        pf_plot_prefix[0],PF_VERBOSE);
+      Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,num_of_grids,\
+        pf_num_procs_per_time,pf_plot_prefix[0],PF_VERBOSE);
  
     } else {
     cout<<"\nUpdating crse-grained using serial................\n";
@@ -1077,10 +1177,26 @@ int main(int argc, char* argv[]) {
 
         // reshape dH/dt and then call computeDhDt
         reshape(crsedHdtVect[i],crseH);
-        amrObjectCrse.compute_dHdt(crsedHdtVect[i],crseH,crseDt, false);
+        amrObjectCrse.compute_dHdt(crsedHdtVect[i],crseH,crseDt, recalculateVelocity);
         
+        Real test_min=0;
+        int nlvl=crseH.size();
+        for (int lvl=0; lvl < nlvl; lvl++)
+        {
+          LevelData<FArrayBox>& ldf = *crseH[lvl];
+          DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+          DataIterator dit = ldf.dataIterator();
+          for (dit.reset(); dit.ok(); ++dit) 
+            {
+            const Box& box = dbl[dit()];
+            FArrayBox& fab = ldf[dit()];
+            test_min=fab.norm(box,1);
+            cout<<"   "<<test_min<<endl;
+            } 
+        }
+
         // now advance ice sheet
-        amrObjectCrse.run(crseStateVect[i+1].time, maxStep);
+        amrObjectCrse.run(maxTime, maxStep);
 
         // now retrieve state and store
         amrObjectCrse.getState(crseStateVect[i+1]);
@@ -1096,26 +1212,29 @@ int main(int argc, char* argv[]) {
     pout() << endl;
 
     // now do each fine-grained timestep
-    for (int i=0; i<numFineIntervals; i++) 
-      {
-        // first, set state
-        bool recalculateVelocity = true;
-        //amrObjectFine.setState(fineHVect[i], fineTimeVect[i], recalculateVelocity);
-        recalculateVelocity = false;
-        amrObjectFine.setState(fineStateVect[i],recalculateVelocity); 
-        
-        // reshape dH/dt and then call computeDhDt
-        reshape(finedHdtVect[i],fineH);
-        amrObjectFine.compute_dHdt(finedHdtVect[i],fineH,fineDt, false);        
+    amrObjectFine.run(maxTime, maxStep);
+    // don's really need the time interval loop, the loop is for illustration
+    // for (int i=0; i<numFineIntervals; i++) 
+    //   {
+    //     // first, set state
+    //     bool recalculateVelocity = true;
+    //     //amrObjectFine.setState(fineHVect[i], fineTimeVect[i], recalculateVelocity);
+    //     recalculateVelocity = false;
+    //     amrObjectFine.setState(fineStateVect[i],recalculateVelocity); 
 
-        // now advance ice sheet
-        amrObjectFine.run(fineStateVect[i+1].time, maxStep);
+    //     // reshape dH/dt and then call computeDhDt
+    //     reshape(finedHdtVect[i],fineH); // fineH
+    //     amrObjectFine.compute_dHdt(finedHdtVect[i],fineH,fineDt, false);    // fineH     
 
-        // now retrieve state and store
-        amrObjectFine.getState(fineStateVect[i+1]);
-        cout << "loop # " << i << std::endl;
+    //     // now advance ice sheet
+    //     cout<<"time "<<fineStateVect[i+1].time<<endl;
+    //     // amrObjectFine.run(maxTime, maxStep);
 
-      }    
+    //     // now retrieve state and store
+    //     amrObjectFine.getState(fineStateVect[i+1]);
+    //     cout << "loop # " << i << std::endl;
+
+    //   }    
 
         
 

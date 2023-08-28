@@ -22,7 +22,7 @@ contains
     !> Get the solution at the end of this step
     y_end => cast_as_bisicles_vector(pf%levels(level_index)%qend)
 
-    !>  compute the exact solution
+    !>  compute the exact solution in sweeper.f90, it's a user defined solution, currently set as zero
     call exact(pf%state%t0+pf%state%dt, yexact)
     !>  compute error
     maxerr = abs(y_end%getval() - yexact)

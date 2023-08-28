@@ -51,14 +51,19 @@ class BisiclesVector: public ChomboStruct, public AmrIceHolderClass{
       void dHdtSetVal2All(double val,AmrIceHolderClass *c_AmrIceHolderPtr);
       void HSetVal2All(double val,AmrIceHolderClass *c_AmrIceHolderPtr);
       double *GetdHdtDataPtr(void);
-      double *GetHDataPtr(AmrIceHolderClass *c_AmrIceHolderPtr);
+      Vector<LevelData<FArrayBox>* >* GetHDataPtr(AmrIceHolderClass *c_AmrIceHolderPtr);
       double dHdtL2Norm(void);
       double HL2Norm(void);
       void dHdtAxpy(double a, BisiclesVector *x,AmrIceHolderClass *c_AmrIceHolderPtr);
       void HAxpy(double a, BisiclesVector *x,AmrIceHolderClass *c_AmrIceHolderPtr);
       void defineMask(Vector<LevelData<FArrayBox>* > m_amrData, Vector<int> refRatio);
       void PrintHL2norm(void);
+      void PrintL2norm(Vector<LevelData<FArrayBox>* > Vect2Print);
       void SaveSnapshot(AmrIceHolderClass *c_AmrIceHolderPtr);
+      void PrintLevelData(Vector<LevelData<FArrayBox>* > level_data_to_print);
+      void PFPrintLevelData(BisiclesVector *x);
+      void PrintAllFArray(Vector<LevelData<FArrayBox>* > level_data_to_print);
+      void PrintAllFluxBox(Vector<LevelData<FluxBox>* > level_data_to_print);
 };
 
 #endif

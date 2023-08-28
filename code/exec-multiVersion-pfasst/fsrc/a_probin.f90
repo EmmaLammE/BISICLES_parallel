@@ -4,19 +4,22 @@
 !>  Module for reading parameters for the problem  y'=lam1*y+lam2*y
 module probin
   use pfasst
+  use pf_mod_mpi
+  use omp_lib
 
   !  The namlist for local variables
   real(pfdp), save :: dt     ! time step
   real(pfdp), save :: Tfin   ! Final time
   integer, save :: nsteps    ! number of time steps
   integer, save :: num_grid_points, nspace, ntime, space_dim
+  integer, save :: nproc_per_time ! num of processors for each time step, this is for bisicles spatial mpi
 
   character(len=128), save :: pfasst_nml  ! file for reading pfasst parameters
   type(c_ptr), save :: cptr_AmrIceHolder
   integer, save :: maxStep     ! num of max time step to run
 
   !namelist /params/  dt, Tfin, nsteps, num_grid_points,pfasst_nml,cptr_AmrIceHolder
-  namelist /params/  pfasst_nml, nspace, ntime, space_dim
+  namelist /params/  pfasst_nml, nspace, ntime, nproc_per_time, space_dim
 
 contains
   
@@ -40,7 +43,8 @@ contains
     !> set defaults
     !nsteps  = -1
     nspace = 1
-    ntime = nproc
+    ntime = 1 !nproc
+    nproc_per_time = 1
     space_dim = 2
 
     !dt      = 0.01_pfdp
@@ -74,16 +78,24 @@ contains
   end subroutine probin_init
 
   !>  Subroutine to output run parameters 
-  subroutine print_loc_options(pf, un_opt)
+  subroutine print_loc_options(pf,pf_comm, un_opt)
     type(pf_pfasst_t), intent(inout)           :: pf   
+    integer, intent(in) :: pf_comm
     integer,           intent(in   ), optional :: un_opt
     integer :: un = 6
+
+    integer :: num_time_procs, rank_time_procs,num_global_procs, error
 
     if (pf%rank /= 0) return
     if (present(un_opt)) un = un_opt
 
     !>  Output the PFASST options with the LibPFASST routine
     call pf_print_options(pf,un_opt=un)
+
+    call mpi_comm_rank(pf_comm, rank_time_procs,  error)
+    call mpi_comm_size(pf_comm, num_time_procs,  error)
+    call mpi_comm_size(MPI_COMM_WORLD, num_global_procs,  error)
+    nspace = num_global_procs/num_time_procs
 
     !  Print out the local parameters
     write(un,*) '=================================================='
@@ -94,11 +106,8 @@ contains
     !write(un,*) 'Dt:     ', Dt, '! Time step size'
     !write(un,*) 'Tfin:   ', Tfin,   '! Final time of run'  
     write(un,*) 'num spatial procs per temporal proc:   ',   nspace
-    write(un,*) 'num temporal procs:   ',   ntime  
+    write(un,*) 'num temporal procs:   ',   num_time_procs, ', rank ',rank_time_procs
     write(un,*) 'Number of spacial dimensions:   ', space_dim
-
-
-
     write(un,*) 'PFASST parameters read from input file ', pfasst_nml
     write(un,*) '=================================================='
   end subroutine print_loc_options
