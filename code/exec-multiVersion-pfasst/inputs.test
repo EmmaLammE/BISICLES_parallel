@@ -38,7 +38,7 @@ main.numCrseIntervals = 6
 
 crse.amr.maxLevel = 0   # finest level allowed in simulation
 crse.amr.ref_ratio = 2 2 2 2 2 2 2
-crse.amr.num_cells = 0032 0032 16   #number of cells in base grid
+crse.amr.num_cells = 0128 0128 16   #number of cells in base grid
 
 
 crse.amr.is_periodic = 1 1 1    # 1 if domain is periodic 
@@ -97,7 +97,7 @@ main.numFineIntervals = 12 # time interval
 
 fine.amr.maxLevel = 0   # finest level allowed in simulation, 0: one level of grid, 1: 2 levels of grid etc
 fine.amr.ref_ratio = 2 2 2 2 2 2 2
-fine.amr.num_cells = 0032 0032 16   #number of cells in base grid
+fine.amr.num_cells = 0064 0064 16   #number of cells in base grid
 
 
 fine.amr.is_periodic = 1 1 1    # 1 if domain is periodic 
@@ -156,7 +156,7 @@ pf.USE_PF = TRUE
 pf.PF_VERBOSE = TRUE
 pf.pf_plot_prefix = pf_
 pf.pf_num_procs_per_time = 10
-pf.num_time_procs = 4
+pf.num_time_procs = 1
 
 
 

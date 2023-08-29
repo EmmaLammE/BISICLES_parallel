@@ -34,3 +34,5 @@
 
 # data
 *.hdf5
+*.json
+*.dat

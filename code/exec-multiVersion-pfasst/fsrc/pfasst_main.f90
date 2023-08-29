@@ -61,7 +61,9 @@ contains
     type(my_sweeper_t) :: s
     real(pfdp) :: t, y_0_IC, y_end_IC
     type(c_ptr) :: z_c_ptr
-    real :: pf_start_time, pf_finish_time
+    real :: pf_start_time, pf_finish_time, elapse_time, elapse_time_max,elapse_time_min,elapse_time_sum, elapse_time_mean
+    real :: elapse_time_per_repeat, elapse_time_per_repeat_max, elapse_time_per_repeat_min, elapse_time_per_repeat_sum
+    integer :: i, num_repeat_pf_run
 
     !> first initialize mpi
     !> Initialize MPI
@@ -103,7 +105,7 @@ contains
     ! print *, 'pfasst_main.f90 0000 T final ',Tfin
     ! print *, 'pfasst_main.f90 0000 dt ',dt
     ! print *, 'pfasst_main.f90 0000 nsteps ',nsteps
-     print *,'5 pf%comm%nproc ', pf%comm%nproc
+    !  print *,'5 pf%comm%nproc ', pf%comm%nproc
     !>  Output run parameters
     if (PF_VERBOSE) then
       call print_loc_options(pf, pf_comm_fromBisicles)
@@ -118,7 +120,7 @@ contains
     ! print *, '--------------------------- done pf adding hooks -------------------------------------'
     ! print *, 'after adding hooks'
     ! call pf%levels(pf%state%finest_level)%Q(1)%eprint()
-    print *,'6 pf%comm%nproc ', pf%comm%nproc
+    ! print *,'6 pf%comm%nproc ', pf%comm%nproc
     !> setup initial condition
     level_index = 1
     !> Set the initial condition
@@ -160,12 +162,35 @@ contains
     ! call PfasstBisiclesPrintAmr(y_0,pf%cptr_AmrIceHolder)
     !> run pfasst
     print *,"Start pfasst timing..."
-    call cpu_time(pf_start_time)
-    ! do i = 1,100 ! for 
-    call pf_pfasst_run(pf, y_0, dt, Tfin, nsteps,y_end)
-    ! enddo
-    call cpu_time(pf_finish_time)
-    print '("Time for pfasst run = ",f6.3," seconds.")',pf_finish_time-pf_start_time
+    num_repeat_pf_run = 100
+    elapse_time_per_repeat_sum = 0
+    elapse_time_per_repeat_max = 0
+    elapse_time_per_repeat_min = 1e8
+    do i = 1,num_repeat_pf_run
+      call cpu_time(pf_start_time)
+      !> pfasst run
+      call pf_pfasst_run(pf, y_0, dt, Tfin, nsteps,y_end)
+      !> end pfasst run
+      call cpu_time(pf_finish_time)
+      elapse_time_per_repeat = pf_finish_time-pf_start_time
+      elapse_time_per_repeat_sum = elapse_time_per_repeat_sum + elapse_time_per_repeat
+      if(elapse_time_per_repeat>elapse_time_per_repeat_max) then
+        elapse_time_per_repeat_max = elapse_time_per_repeat
+      end if
+      if (elapse_time_per_repeat<elapse_time_per_repeat_min) then
+        elapse_time_per_repeat_min = elapse_time_per_repeat
+      end if
+    enddo
+    elapse_time = elapse_time_per_repeat_sum/num_repeat_pf_run
+    print '("Averaged time for pfasst run on rank "I0" = ",f6.3," seconds for "I0" repeats.")',rank,elapse_time,num_repeat_pf_run
+
+    !> calculate average time of pf run
+    call MPI_REDUCE(elapse_time_per_repeat_max,elapse_time_max,1,MPI_REAL,mpi_max,0,pf_comm_fromBisicles,ierror) ! compute mpi global sum and put to root processor 0
+    call MPI_REDUCE(elapse_time_per_repeat_min,elapse_time_min,1,MPI_REAL,mpi_min,0,pf_comm_fromBisicles,ierror) ! compute mpi global sum and put to root processor 0
+    call MPI_REDUCE(elapse_time,elapse_time_sum,1,MPI_REAL,mpi_sum,0,pf_comm_fromBisicles,ierror) ! compute mpi global sum and put to root processor 0
+    if(pf%rank==0) then
+      print '("Global average run time = ",f6.3,", max = ",f6.3,", min = ",f6.3," seconds.")',elapse_time_sum/nproc,elapse_time_max,elapse_time_min
+    end if
 
     !> save the results
     call pfasst_bisicles_save_results(pf, AmrIceHolderPtr)
