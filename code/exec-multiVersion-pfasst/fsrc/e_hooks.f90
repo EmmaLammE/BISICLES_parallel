@@ -28,9 +28,9 @@ contains
     maxerr = abs(y_end%getval() - yexact)
     residual=pf%levels(level_index)%residual
     
-    print '("error: step: ",i3.3," iter: ",i4.3," level: ",i2.2," error: ",es14.7," res: ",es18.10e4)', &
-         pf%state%step+1, pf%state%iter,level_index, maxerr,residual
-    call flush(6)
+    ! print '("error: step: ",i3.3," iter: ",i4.3," level: ",i2.2," error: ",es14.7," res: ",es18.10e4)', &
+    !      pf%state%step+1, pf%state%iter,level_index, maxerr,residual
+    ! call flush(6)
   end subroutine echo_error
 
 

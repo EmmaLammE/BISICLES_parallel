@@ -303,7 +303,7 @@ Vector<LevelData<FArrayBox>* >* BisiclesVector::GetHDataPtr(AmrIceHolderClass *c
    }
    // allocate the vector for H and store the pointers in value
    double *values = (double *)calloc(total_num_grid_points, sizeof(double));
-   cout<<"       in packing HVector "<<HVector<<endl;
+   // cout<<"       in packing HVector "<<HVector<<endl;
    return &HVector;
    // Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
       // cout<<"-- 3 bis_vec:\n";

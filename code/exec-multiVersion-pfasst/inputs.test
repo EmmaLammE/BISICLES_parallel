@@ -34,7 +34,7 @@ CalvingModel.type = NoCalvingModel
 #  CRSE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numCrseIntervals = 10
+main.numCrseIntervals = 6
 
 crse.amr.maxLevel = 0   # finest level allowed in simulation
 crse.amr.ref_ratio = 2 2 2 2 2 2 2
@@ -156,7 +156,7 @@ pf.USE_PF = TRUE
 pf.PF_VERBOSE = TRUE
 pf.pf_plot_prefix = pf_
 pf.pf_num_procs_per_time = 10
-pf.num_time_procs = 3
+pf.num_time_procs = 4
 
 
 

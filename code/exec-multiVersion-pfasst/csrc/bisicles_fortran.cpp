@@ -96,7 +96,7 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
 Vector<LevelData<FArrayBox>* >* BisiclesVectorPack(BisiclesVector *bisicles_vector,int num_grid_points, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
-      cout<< "bisicles_fortran.cpp packing............................"<< std::endl;
+      // cout<< "bisicles_fortran.cpp packing............................"<< std::endl;
       // return bisicles_vector->GetHDataPtr(c_AmrIceHolderPtr);
       return bisicles_vector->GetHDataPtr(c_AmrIceHolderPtr);
    }
@@ -104,7 +104,7 @@ Vector<LevelData<FArrayBox>* >* BisiclesVectorPack(BisiclesVector *bisicles_vect
    void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, double y, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
-      cout<< "bisicles_fortran.cpp unpacking............................"<< std::endl;
+      // cout<< "bisicles_fortran.cpp unpacking............................"<< std::endl;
       bisicles_vector->HSetVal2All(y,c_AmrIceHolderPtr);
    }
 

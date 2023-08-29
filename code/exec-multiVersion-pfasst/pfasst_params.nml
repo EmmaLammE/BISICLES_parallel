@@ -8,7 +8,7 @@
     !> nlevels=3 & nnodes=2,3,5  => 8th order in time
     nlevels  = 2   !  must be set. default is 3
 
-    niters = 20   !  default is 5
+    niters = 10   !  default is 5
     nnodes =    2  3 ! sdc nodes, default is 2 3 5
 
     nsweeps_pred= 1 1 

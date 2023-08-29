@@ -66,6 +66,8 @@
 #include "bisicles_fortran.hpp"
 #include "bisicles_holder.hpp"
 #include "pfasst_bisicles_setup.hpp"
+#include <chrono>
+using namespace std::chrono;
 // #include <windows.h>
 // #include "bisicles_vector.hpp"
 
@@ -136,11 +138,6 @@ FineInterp::s_default_boundary_limit_type = 0;
           cout<<"The number of time processor greater than total mpi processor. Number of time processor input: ",
                 num_time_procs,". Number of total processor: ",number_procs;
           MayDay::Error("Please check your input file and args for mpirun. Stop here.");
-        // else if(num_hardware_cores<number_procs){
-        //   cout<<"The number of total processor greater than maximum allowed processor on this device. Number of total processor input: ",
-        //         number_procs,". Number of maximum processor on this device: ",num_hardware_cores;
-        //   MayDay::Error("Please check your input file and args for mpirun. Stop here.");
-        // }
         }
         cout << "Hello from main process " << rank << " out of " << number_procs << " processes in the main communicator." <<endl;
         // split mpi into space mpi
@@ -155,6 +152,7 @@ FineInterp::s_default_boundary_limit_type = 0;
         MPI_Comm_size(pf_comm, &new_time_size); // Get the size of the new communicator
         cout << "   Hello from space process " << new_space_rank << " out of " << new_space_size << " processes in the space communicator." <<endl;
         cout << "   Hello from time process " << new_time_rank << " out of " << new_time_size << " processes in the time communicator." <<endl;
+        // cout<<"Chombo_MPI::comm "<<Chombo_MPI::comm<<endl;
         // should be correct, but double check if each time processor has the same num of bisicles processors
         if(new_time_size*new_space_size != number_procs){
             MayDay::Error("The number of time and space processors doesn't match the total number of processors. Stop here.");
@@ -169,7 +167,7 @@ FineInterp::s_default_boundary_limit_type = 0;
           rank=0;
           number_procs=1;
     #endif 
-
+    // MayDay::Error("Stop here.");
 
 
     ParmParse pp2("main");
@@ -1212,7 +1210,12 @@ FineInterp::s_default_boundary_limit_type = 0;
     pout() << endl;
 
     // now do each fine-grained timestep
+    auto start = high_resolution_clock::now();
     amrObjectFine.run(maxTime, maxStep);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    cout << "Time taken by serial run: "
+         << duration.count()/1e6<< " seconds" << endl;
     // don's really need the time interval loop, the loop is for illustration
     // for (int i=0; i<numFineIntervals; i++) 
     //   {
