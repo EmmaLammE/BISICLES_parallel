@@ -38,7 +38,7 @@ main.numCrseIntervals = 6
 
 crse.amr.maxLevel = 0   # finest level allowed in simulation
 crse.amr.ref_ratio = 2 2 2 2 2 2 2
-crse.amr.num_cells = 0128 0128 16   #number of cells in base grid
+crse.amr.num_cells = 0064 0064 16   #number of cells in base grid
 
 
 crse.amr.is_periodic = 1 1 1    # 1 if domain is periodic 
