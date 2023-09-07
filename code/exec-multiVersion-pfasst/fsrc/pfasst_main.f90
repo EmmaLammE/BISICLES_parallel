@@ -162,7 +162,7 @@ contains
     ! call PfasstBisiclesPrintAmr(y_0,pf%cptr_AmrIceHolder)
     !> run pfasst
     print *,"Start pfasst timing..."
-    num_repeat_pf_run = 100
+    num_repeat_pf_run = 1
     elapse_time_per_repeat_sum = 0
     elapse_time_per_repeat_max = 0
     elapse_time_per_repeat_min = 1e8

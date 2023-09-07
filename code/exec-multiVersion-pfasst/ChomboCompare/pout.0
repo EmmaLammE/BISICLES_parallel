@@ -1,11 +1,11 @@
 numCrseStart 0
-exact Filename = ./../pf_amr1_nt4_notComputeVel_surfFlux0.petsc.000000.2d.hdf5
-computed Filename = ./../pf_amr1_np4_nt10_notComputeVel_surfFlux0.petsc.000000.2d.hdf5
-error Filename = compareOut_pf_ref_np4_grid32.hdf5
+exact Filename = ./../data_amr_test/amr1_notComputeVel/old_results_not_sure_correct/ref_amr1_notComputeVel_surfFlux0.petsc.000008.2d.hdf5
+computed Filename = ./../data_amr_test/amr1_notComputeVel/old_results_not_sure_correct/pf_amr1_nt8_notComputeVel_surfFlux0.petsc.000000.2d.hdf5
+error Filename = compareOut_pf_ref_np1_grid32.hdf5
 error, step 0: L1, L2, Max, sum
-thickness: 2.5600e+13, 1.6000e+08, 1.0280e+03, -2.5600e+13
+thickness: 4.7429e+07, 3.0088e+03, 6.5338e-01, -1.0863e+07
 
 Vector NSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEEE: 24 bytes (0 Mb)
 ---------------------------------
 Total Unfreed : 24 bytes (0 Mb)
-peak memory usage: 491674 bytes (0 Mb)
+peak memory usage: 1174266 bytes (1 Mb)

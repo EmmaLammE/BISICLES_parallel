@@ -8,19 +8,19 @@ compare.sameSize = 1
 compare.isTimeDep = 0
 
 #name of file for "exact" solution (single-level fine-resolution solution)
-# compare.exactRoot = ./../data_amr_test/amr1/pf_amr1_nt100_notcomputeVel_surfFlux10.petsc.000000.2d.hdf5
-compare.exactRoot = ./../pf_amr1_nt4_notComputeVel_surfFlux0.petsc.000000.2d.hdf5
+# compare.exactRoot = ./../data_amr_test/amr1_notComputeVel/old_results_not_sure_correct/ref_amr1_np1_nt1000_notComputeVel_surfFlux0.010000.2d.hdf5
+compare.exactRoot = ./../data_amr_test/amr1_notComputeVel/old_results_not_sure_correct/ref_amr1_notComputeVel_surfFlux0.petsc.000008.2d.hdf5
 
 #name of file containing "computed" solution (which may be AMR )
-compare.computedRoot = ./../pf_amr1_np4_nt10_notComputeVel_surfFlux0.petsc.000000.2d.hdf5
-# compare.computedRoot = ./../data_amr_test/amr1/ref_amr1_nt90_notcomputeVel_surfFlux102.petsc.000003.2d.hdf5
+#compare.computedRoot = ./../data_amr_test/amr1_notComputeVel/old_results_not_sure_correct/pf_amr0_np1_nt100_notComputeVel_surfFlux0.000000.2d.hdf5
+compare.computedRoot = ./../data_amr_test/amr1_notComputeVel/old_results_not_sure_correct/pf_amr1_nt8_notComputeVel_surfFlux0.petsc.000000.2d.hdf5
 
 
 
 #name of file into which to write error plotfile
 # compare.errorRoot = ./../data_amr_test/amr1/compareResults/compareOut_pf_pf_nt17_grid32.hdf5
 # compare.errorRoot = ./../data_amr_test/amr1/compareResults/compareOut_ref_ref_nt90_grid32.hdf5
-compare.errorRoot = compareOut_pf_ref_np4_grid32.hdf5
+compare.errorRoot = compareOut_pf_ref_np1_grid32.hdf5
 
 #dump out a plotfile of the error?
 compare.doPlots = 1

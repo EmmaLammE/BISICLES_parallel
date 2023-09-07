@@ -253,6 +253,8 @@ contains
     integer :: num_grid_points
     z_c_ptr = BisiclesVectorPack(this%c_encap_ptr,num_grid_points, cptr_AmrIceHolder)
     call c_f_pointer(z_c_ptr, z_ptr, [this%vector_size])
+    print *,'size of z_ptr ', size(z_ptr)
+    print *,'size of z ', size(z)
     z = z_ptr
   end subroutine bisicles_vector_pack
 

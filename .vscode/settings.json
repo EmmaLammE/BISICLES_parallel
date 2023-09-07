@@ -25,6 +25,7 @@
         "locale": "cpp",
         "memory": "cpp",
         "tuple": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "ConstitutiveRelationF.C": "cpp"
     }
 }

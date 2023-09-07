@@ -2090,7 +2090,7 @@ AmrIce::timeStep(Real a_dt)
   m_time += a_dt;
   m_cur_step += 1;
   // compute new ice velocity field
-  // cout<<"solve vel "<<m_evolve_velocity<<endl;
+  cout<<"solve vel "<<m_evolve_velocity<<endl;
   if (m_evolve_velocity )
     {
       if (s_verbosity > 3) 
