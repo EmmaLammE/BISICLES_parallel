@@ -34,11 +34,11 @@ CalvingModel.type = NoCalvingModel
 #  CRSE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numCrseIntervals = 6
+main.numCrseIntervals = 64
 
 crse.amr.maxLevel = 0   # finest level allowed in simulation
 crse.amr.ref_ratio = 2 2 2 2 2 2 2
-crse.amr.num_cells = 0064 0064 16   #number of cells in base grid
+crse.amr.num_cells = 0256 0256 16   #number of cells in base grid
 
 
 crse.amr.is_periodic = 1 1 1    # 1 if domain is periodic 
@@ -65,7 +65,7 @@ crse.amr.blockFactor = 4           # block factor used in grid generation
 crse.amr.fill_ratio = 0.8          # how efficient are the grids
 crse.amr.nestingRadius = 3         # proper nesting radius required
 crse.amr.tags_grow = 2             # amount to buffer tags
-crse.amr.max_box_size = 16         # largest box length allowed
+crse.amr.max_box_size = 32         # largest box length allowed
 #crse.amr.tagging_val = .0001       # min undivided grad(vel) resulting in tagging
 
 crse.amr.tag_on_laplacian_velocity = 1
@@ -132,7 +132,7 @@ fine.amr.tag_on_laplacian_velocity = 1
 fine.amr.lap_vel_tagging_val = 75
 #fine.amr.lap_vel_tagging_val = 1
 
-#initial guess 
+#initial guess
 fine.amr.do_initial_velocity_guess = 1
 fine.amr.do_initial_velocity_solve = 1
 fine.amr.initial_velocity_guess_type = 1 # linear PDE
@@ -156,7 +156,7 @@ pf.USE_PF = TRUE
 pf.PF_VERBOSE = TRUE
 pf.pf_plot_prefix = pf_
 pf.pf_num_procs_per_time = 10
-pf.num_time_procs = 1
+pf.num_time_procs = 4
 
 
 

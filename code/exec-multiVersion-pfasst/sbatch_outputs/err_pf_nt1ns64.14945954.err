@@ -1,0 +1,4 @@
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+slurmstepd: error: *** STEP 14945954.0 ON nid005487 CANCELLED AT 2023-09-05T15:54:10 DUE TO TIME LIMIT ***
+slurmstepd: error: *** JOB 14945954 ON nid005487 CANCELLED AT 2023-09-05T15:54:10 DUE TO TIME LIMIT ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.

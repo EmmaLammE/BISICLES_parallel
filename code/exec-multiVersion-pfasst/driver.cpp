@@ -1125,18 +1125,17 @@ FineInterp::s_default_boundary_limit_type = 0;
     // ParmParse ppfasst("pf");
     // bool USE_PF;
     bool PF_VERBOSE;
-    string pf_plot_prefix;
     int pf_num_procs_per_time;
     // ppfasst.get("USE_PF", USE_PF);
     ppfasst.get("PF_VERBOSE", PF_VERBOSE);
-    ppfasst.get("pf_plot_prefix", pf_plot_prefix);
     ppfasst.get("pf_num_procs_per_time", pf_num_procs_per_time);
-
     ParmParse pcrse("crse.amr");
     string crse_plot_prefix;
     pcrse.get("plot_prefix",crse_plot_prefix);
 
     if (USE_PF){
+      string pf_plot_prefix;
+      ppfasst.get("pf_plot_prefix", pf_plot_prefix);
       cout<<"\n..............Updating crse-grained using PFASST................\n";
       cout<<"  PFASST objects passing in from: crse grids and objects\n";
       cout<<"  results saved as: "<<crse_plot_prefix<<"...";
@@ -1156,9 +1155,13 @@ FineInterp::s_default_boundary_limit_type = 0;
       reshape(crsedHdtVect[0],crseH);
       // cout<<"num of levels in crseH: "<<crseH.size()<<endl;
       Vector<LevelData<FArrayBox>* > ice_thick=crseStateVect[1].ice_thickness;
+      auto start = high_resolution_clock::now();
       Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,num_of_grids,\
-        pf_num_procs_per_time,pf_plot_prefix[0],PF_VERBOSE);
- 
+        pf_num_procs_per_time,PF_VERBOSE);
+      auto stop = high_resolution_clock::now();
+      auto duration = duration_cast<microseconds>(stop - start);
+      cout << "Total time taken by pfasst run: "
+          << duration.count()/1e6<< " seconds" << endl;
     } else {
     cout<<"\nUpdating crse-grained using serial................\n";
     cout<<"  results saved as: "<<crse_plot_prefix<<"...\n";

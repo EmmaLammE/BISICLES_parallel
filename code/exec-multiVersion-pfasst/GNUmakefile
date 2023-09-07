@@ -1,8 +1,11 @@
 # -*- Mode: Makefile -*- 
-LIBPFASST = /Users/emmaliu/packages/PFASST_icesheet
+LIBPFASST = /global/homes/e/emmaliu/PFASST_icesheet
 USE_PFASST = TRUE
-FC_COMPILE = mpifort #gfortran -O3
-LIBGFORTRAN = /opt/homebrew/lib/gcc/13
+MPI = TRUE
+HDF5 = TRUE
+USE_PETSC=FALSE
+FC_COMPILE = gfortran -O3 #mpifort #
+LIBGFORTRAN = /opt/cray/pe/gcc/11.2.0/snos/lib64 -lmpifort#/opt/homebrew/lib/gcc/13
 # LIBOMP = /opt/homebrew/opt/libomp
 # LIBLLVM = /opt/homebrew/opt/llvm
 
@@ -22,11 +25,13 @@ driver: clean libbike
 include ../mk/Make.defs
 FFLAGS  += -I$(LIBPFASST)/include
 FFLAGS  += -I$(LIBPFASST)/build 
-FFLAGS  += -I/include
-LDFLAGS += -lstdc++ -lmpi_mpifh -lquadmath 
-LDFLAGS += -L/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/13/gcc/aarch64-apple-darwin22/13 -lgcc
-LDFLAGS +=  -L$(LIBPFASST)/lib -lpfasst
-LDFLAGS += "-Wl,-no_compact_unwind"
+# FFLAGS  += -I/include
+LDFLAGS += -lstdc++ -lquadmath #-lmpi_mpifh #
+# LDFLAGS += -L/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/13/gcc/aarch64-apple-darwin22/13 -lgcc
+LDFLAGS +=  -L$(LIBPFASST)/lib -lpfasst -lmpi
+LDFLAGS += "-Wl,--copy-dt-needed-entries"
+# LDFLAGS += "-Wl,--fno-underscore"
+# LDFLAGS += "-Wl,-no_compact_unwind"
 # LDFLAGS += -L$(LIBLLVM)/lib
 # CPPFLAGS+= -I$(LIBLLVM)/include -fopenmp
 # LDFLAGS += -L$(LIBOMP)/lib -fopenmp

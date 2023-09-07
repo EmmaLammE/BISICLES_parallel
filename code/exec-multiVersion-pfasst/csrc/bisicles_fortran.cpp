@@ -243,14 +243,14 @@ void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, BisiclesVector *y, d
 
       // cout<<"H norm 2: ";
       // y->PrintL2norm(H);
-      // cout<<"constH norm 2: ";
-      // y->PrintL2norm(constH);
+      cout<<"constH norm 2: ";
+      y->PrintL2norm(constH);
 
       reshapeAndFill(iceState.ice_thickness, H); // H is from y vector in pfasst, should not change this line 
       // reshapeAndFill(iceState.ice_velocity, velo); 
       // cout<<constH<<endl;
       bool recalculateVelocity = false;
-      // cout<<"printing all entries in H \n";
+      cout<<"printing all entries in H \n";
       // y->PrintAllEntries(H);
       amrObjHolderPtr->setState(iceState,recalculateVelocity); // constH is updated after setState
       // cout<<"constH norm 2 after set state: ";

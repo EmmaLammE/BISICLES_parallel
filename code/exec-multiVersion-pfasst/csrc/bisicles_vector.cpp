@@ -296,6 +296,8 @@ Vector<LevelData<FArrayBox>* >* BisiclesVector::GetHDataPtr(AmrIceHolderClass *c
 
      for (lit.begin(); lit.ok(); ++lit)
      {
+       const Box& box = dbl[lit()];
+      //  cout<<"       in packing HVector, box "<<box<<endl;
        const Box& thisBox = current_grid_size.get(lit());
        num_of_grid_points_vec[lvl] += thisBox.numPts();
       }
@@ -303,7 +305,7 @@ Vector<LevelData<FArrayBox>* >* BisiclesVector::GetHDataPtr(AmrIceHolderClass *c
    }
    // allocate the vector for H and store the pointers in value
    double *values = (double *)calloc(total_num_grid_points, sizeof(double));
-   // cout<<"       in packing HVector "<<HVector<<endl;
+   // cout<<"       in packing HVector, size"<<HVector<<HVector.size()<<endl;
    return &HVector;
    // Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
       // cout<<"-- 3 bis_vec:\n";
@@ -577,7 +579,7 @@ void BisiclesVector::PrintAllFArray(Vector<LevelData<FArrayBox>* > level_data_to
       {
        const Box& box = dbl[dit()];
        FArrayBox& fab = ldf[dit()];
-       fab.printAll(box);
+      //  fab.printAll(box);
       } 
    }
 }
@@ -596,7 +598,7 @@ void BisiclesVector::PrintAllFluxBox(Vector<LevelData<FluxBox>* > level_data_to_
         FluxBox& thisFlux = ldf[dit];
         FArrayBox& thisFluxArrayBox = thisFlux.getFlux(0); // for now only check 0 direction
         const Box& thisFluxBox = thisFlux.box();
-        thisFluxArrayBox.printAll(thisFluxBox);
+      //   thisFluxArrayBox.printAll(thisFluxBox);
       } 
    }
 }
