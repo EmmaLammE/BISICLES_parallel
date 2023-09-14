@@ -17,6 +17,7 @@ extern "C"
                           AmrIceHolderClass *c_AmrIceHolderPtr);
    void BisiclesVectorCopy(BisiclesVector *dest, BisiclesVector *src, \
                           AmrIceHolderClass *c_AmrIceHolderPtr);
+   int BisiclesCurrentVectorSize(BisiclesVector *bisicles_vector);
    Real* BisiclesVectorPack(BisiclesVector *bisicles_vector,\
                           AmrIceHolderClass *c_AmrIceHolderPtr, int level_id);
    void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, Real* flattened_array, \

@@ -36,7 +36,7 @@ CalvingModel.type = NoCalvingModel
 
 main.numCrseIntervals = 10
 
-crse.amr.maxLevel = 0   # finest level allowed in simulation
+crse.amr.maxLevel = 1   # finest level allowed in simulation
 crse.amr.ref_ratio = 2 2 2 2 2 2 2
 crse.amr.num_cells = 0032 0032 16   #number of cells in base grid
 

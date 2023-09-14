@@ -69,6 +69,12 @@ module encap
          type(c_ptr), value :: c_AmrIceHolderPtr
       end subroutine BisiclesVectorCopy
    
+      function BisiclesCurrentVectorSize(x) result(vector_size) bind(c, name="BisiclesCurrentVectorSize")
+         use iso_c_binding
+         type(c_ptr), value :: x ! vector to be packed
+         integer(c_int) :: vector_size
+      end function
+      
       function BisiclesVectorPack(x,c_AmrIceHolderPtr,level_id) result(z) bind(c, name="BisiclesVectorPack")
          use iso_c_binding
          type(c_ptr), value :: x ! vector to be packed
@@ -253,18 +259,22 @@ contains
     real(pfdp), pointer :: z_ptr(:)
     type(c_ptr) :: z_ptr_test
     type(c_ptr) :: z_c_ptr
-    integer :: num_grid_points, level_id,i
+    integer(c_int) :: num_grid_points
+    integer :: level_id
 
    !  do level_id = 1, 1
-    ! EL - packing should be correct now
+    ! EL - packing should be correct now, without amr
       z_c_ptr = BisiclesVectorPack(this%c_encap_ptr,cptr_AmrIceHolder,level_id)
-      call c_f_pointer(z_c_ptr, z_ptr, [this%vector_size]) ! convert z_c_ptr to z_ptr
+      num_grid_points = BisiclesCurrentVectorSize(this%c_encap_ptr)
+      call c_f_pointer(z_c_ptr, z_ptr, [num_grid_points]) ! convert z_c_ptr to z_ptr
    !  end do
-      ! print *,'z_c_ptr ',z_c_ptr
+      ! print *,'in packing num_grid_points ',num_grid_points,", size of z ",size(z_ptr)
+      
       ! do i = 1,1024
       ! print *,'size of z_ptr ',i,z_ptr(i)
       ! end do
     z = z_ptr
+   !  print *, size(z)
   end subroutine bisicles_vector_pack
 
   !> Subroutine to unpack  after receiving
@@ -274,7 +284,7 @@ contains
      integer,     intent(in   ), optional :: flags
      real(pfdp), target :: z2(size(z))
      type(c_ptr) :: z_c_ptr
-      ! print *, "before unpacking z in ",z
+      ! print *, "before unpacking z in ",size(z)
      z2 = z
      z_c_ptr = c_loc(z2(1))
      

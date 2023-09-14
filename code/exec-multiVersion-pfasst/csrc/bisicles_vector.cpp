@@ -287,7 +287,7 @@ void BisiclesVector::HSetVal2All(double val,AmrIceHolderClass *c_AmrIceHolderPtr
      }
    }
 
-   // setting some specific entries for testing packing/unpacking
+   // setting some specific entries for packing/unpacking testing
    // int count=0;
    // for (int lvl=0; lvl < HVector.size(); lvl++)
    // {
