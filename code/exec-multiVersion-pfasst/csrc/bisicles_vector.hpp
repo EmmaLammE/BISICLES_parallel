@@ -39,7 +39,7 @@ class BisiclesVector: public ChomboStruct, public AmrIceHolderClass{
       //int GetNumRows(void);
       Vector<LevelData<FArrayBox>* > GetdHdtVector(void);
       Vector<LevelData<FArrayBox>* > *GetdHdtVectorPtr(void);
-      Vector<LevelData<FArrayBox>* > GetHVector(void);
+      const Vector<LevelData<FArrayBox>* >& GetHVector(void) const;
       Vector<LevelData<FArrayBox>* > *GetHVectorPtr(void);
       IceSheetState GetIceState(void);
       IceSheetState *GetIceStatePtr(void);
@@ -51,7 +51,7 @@ class BisiclesVector: public ChomboStruct, public AmrIceHolderClass{
       void dHdtSetVal2All(double val,AmrIceHolderClass *c_AmrIceHolderPtr);
       void HSetVal2All(double val,AmrIceHolderClass *c_AmrIceHolderPtr);
       double *GetdHdtDataPtr(void);
-      Vector<LevelData<FArrayBox>* >* GetHDataPtr(AmrIceHolderClass *c_AmrIceHolderPtr);
+      Vector<LevelData<FArrayBox>* >* GetHDataPtr(void);
       double dHdtL2Norm(void);
       double HL2Norm(void);
       void dHdtAxpy(double a, BisiclesVector *x,AmrIceHolderClass *c_AmrIceHolderPtr);

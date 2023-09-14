@@ -17,9 +17,9 @@ extern "C"
                           AmrIceHolderClass *c_AmrIceHolderPtr);
    void BisiclesVectorCopy(BisiclesVector *dest, BisiclesVector *src, \
                           AmrIceHolderClass *c_AmrIceHolderPtr);
-   Vector<LevelData<FArrayBox>* >* BisiclesVectorPack(BisiclesVector *bisicles_vector,int num_grid_points, \
-                          AmrIceHolderClass *c_AmrIceHolderPtr);
-   void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, double y, \
+   Real* BisiclesVectorPack(BisiclesVector *bisicles_vector,\
+                          AmrIceHolderClass *c_AmrIceHolderPtr, int level_id);
+   void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, Real* flattened_array, \
                           AmrIceHolderClass *c_AmrIceHolderPtr);
    double BisiclesVectorNorm(BisiclesVector *bisicles_vector, \
                           AmrIceHolderClass *c_AmrIceHolderPtr);
@@ -41,7 +41,7 @@ extern "C"
 
    // void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, HypreVector *y, double t, int pfasst_level_index, HypreVector *f);
    void BisiclesSolverFEval(BisiclesdHdtSolver *BisiclesdHdtSolver, BisiclesVector *y, double t, \
-      int pfasst_level_index, BisiclesVector *f, double dt,int maxStep, AmrIceHolderClass *c_AmrIceHolderPtr);
+      int pfasst_level_index, BisiclesVector *f, double dt,int maxStep,bool evolve_velocity, AmrIceHolderClass *c_AmrIceHolderPtr);
 
    void PfasstBisiclesSaveResults(BisiclesVector *bisicles_vector, \
                           AmrIceHolderClass *c_AmrIceHolderPtr);

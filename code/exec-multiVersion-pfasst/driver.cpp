@@ -1134,7 +1134,9 @@ FineInterp::s_default_boundary_limit_type = 0;
 
     ParmParse pcrse("crse.amr");
     string crse_plot_prefix;
+    bool pf_evolve_velocity;
     pcrse.get("plot_prefix",crse_plot_prefix);
+    pcrse.get("evolve_velocity",pf_evolve_velocity);
 
     if (USE_PF){
       cout<<"\n..............Updating crse-grained using PFASST................\n";
@@ -1156,8 +1158,8 @@ FineInterp::s_default_boundary_limit_type = 0;
       reshape(crsedHdtVect[0],crseH);
       // cout<<"num of levels in crseH: "<<crseH.size()<<endl;
       Vector<LevelData<FArrayBox>* > ice_thick=crseStateVect[1].ice_thickness;
-      Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,num_of_grids,\
-        pf_num_procs_per_time,pf_plot_prefix[0],PF_VERBOSE);
+      Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,pf_evolve_velocity,\
+      num_of_grids,pf_num_procs_per_time,pf_plot_prefix[0],PF_VERBOSE);
  
     } else {
     cout<<"\nUpdating crse-grained using serial................\n";

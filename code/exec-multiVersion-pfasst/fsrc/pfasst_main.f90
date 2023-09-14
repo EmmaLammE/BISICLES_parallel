@@ -10,7 +10,7 @@ module pfasst_main
 contains
 
   !!! still working on it
-  subroutine Pf_Main(AmrIceHolderPtr,pf_comm_fromBisicles,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles,pf_num_procs_per_time,pf_plot_prefix,PF_VERBOSE) bind(c, name="Pf_Main")
+  subroutine Pf_Main(AmrIceHolderPtr,pf_comm_fromBisicles,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,evolve_velocity_bisicles,numGridPointsBisicles,pf_num_procs_per_time,pf_plot_prefix,PF_VERBOSE) bind(c, name="Pf_Main")
     use pfasst             !< contains all neccessary mods for pfasst rountines. pfasst/src/pfasst.f90
     use pf_mod_dtype
     use pf_mod_mpi
@@ -35,14 +35,17 @@ contains
     integer(c_int), value :: pf_num_procs_per_time
     character(kind=c_char), intent(IN) :: pf_plot_prefix(:)
     logical(c_bool), value :: PF_VERBOSE
+    logical(c_bool), value :: evolve_velocity_bisicles
 
     !> local vars
     type(pf_pfasst_t), target      :: pf           !<  the main pfasst structure
     type(pf_comm_t)                :: comm         !<  the communicator (here it is mpi)
     type(bisicles_vector_encap), allocatable:: y_0       !<  the initial condition
     type(bisicles_vector_encap), allocatable:: y_end     !<  the solution at the final time
+    type(bisicles_vector_encap), allocatable:: y_test     !<  test solution 
     class(pf_encap_t), allocatable :: y_0_base
     class(pf_encap_t), allocatable :: y_end_base
+    class(pf_encap_t), allocatable :: y_test_base
     type(bisicles_vector_factory)           :: bvf !< bisicle_vector
     character(256)                 :: pf_fname     !<  file name for input of PFASST parameters
     class(pf_level_t),  pointer    :: lev          !<  Level to set up
@@ -89,13 +92,14 @@ contains
     !>  Set up communicaton
     call pf_mpi_create(comm, pf_comm_fromBisicles)
     ! print *, '-------------- done assigning mpi communicator from bisicles to pfasst ---------------'
-
+    ! print *, "after assigning mpi comm, comm%nproc ",comm%nproc
     !>  Create the pfasst structure
     call pf_pfasst_create(pf, comm, fname=pf_fname) !< o
+    ! print *, "after create pf obj, pf%comm%nproc ",pf%comm%nproc
     ! print *, '--------------------------- done creating pfasst obj ---------------------------------'
 
     !> ----- initialize the vectors & solvers for later, not initial condition of setting values -----
-     call PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
+     call PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,evolve_velocity_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
     !  print *, 'after pfasst init'
     !  call pf%levels(pf%state%finest_level)%Q(1)%eprint()
      !> PfasstBisiclesInit=allocate lev_shape+ulevel+factory+sweeper+level_set_size+pf_setup
@@ -127,8 +131,11 @@ contains
     call bvf%create_single(y_0_base, level_index, lev_shape(level_index,:))
     !print *,'y_end create single '
     call bvf%create_single(y_end_base, level_index, lev_shape(level_index,:))
+    call bvf%create_single(y_test_base, level_index, lev_shape(level_index,:))
+
     y_0 = cast_as_bisicles_vector(y_0_base)
     y_end = cast_as_bisicles_vector(y_end_base)
+    y_test = cast_as_bisicles_vector(y_test_base)
 
     !> intialize y_0 and y_end to some value
     y_0_IC = 1.0_pfdp
@@ -137,6 +144,13 @@ contains
     !print *,'y_end assign single '
     call y_end%setval(1000.0_pfdp)
     call y_0%setval(1000.0_pfdp)
+    ! packing test
+    ! allocate(v(num_grid_points))
+    ! call y_0%pack(v)
+    ! call y_test%unpack(v)
+    ! call y_test%eprint()
+    ! call exit(0)
+
     !call y_0%copy(y_end)
     !print *,'y_end axpy single '
     !call y_end%axpy(-1.0_pfdp, y_0)
@@ -182,14 +196,14 @@ contains
       end if
     enddo
     elapse_time = elapse_time_per_repeat_sum/num_repeat_pf_run
-    print '("Averaged time for pfasst run on rank "I0" = ",f6.3," seconds for "I0" repeats.")',rank,elapse_time,num_repeat_pf_run
+    print '("Averaged time for pfasst run on rank "I0" = ",f8.3," seconds for "I0" repeats.")',rank,elapse_time,num_repeat_pf_run
 
     !> calculate average time of pf run
     call MPI_REDUCE(elapse_time_per_repeat_max,elapse_time_max,1,MPI_REAL,mpi_max,0,pf_comm_fromBisicles,ierror) ! compute mpi global sum and put to root processor 0
     call MPI_REDUCE(elapse_time_per_repeat_min,elapse_time_min,1,MPI_REAL,mpi_min,0,pf_comm_fromBisicles,ierror) ! compute mpi global sum and put to root processor 0
     call MPI_REDUCE(elapse_time,elapse_time_sum,1,MPI_REAL,mpi_sum,0,pf_comm_fromBisicles,ierror) ! compute mpi global sum and put to root processor 0
     if(pf%rank==0) then
-      print '("Global average run time = ",f6.3,", max = ",f6.3,", min = ",f6.3," seconds.")',elapse_time_sum/nproc,elapse_time_max,elapse_time_min
+      print '("Global average run time = ",f8.4,", max = ",f8.3,", min = ",f8.3," seconds.")',elapse_time_sum/nproc,elapse_time_max,elapse_time_min
     end if
 
     !> save the results
@@ -197,7 +211,7 @@ contains
 
     
     !> Close mpi
-    !call mpi_finalize(ierror)
+    call mpi_finalize(ierror)
 
   end subroutine Pf_Main
 

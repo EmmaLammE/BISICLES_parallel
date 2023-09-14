@@ -1,7 +1,8 @@
-number_procs = 1, rank = 0
+number_procs = 2, rank = 0
 No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false
 AmrIce::initGrids
-Level 0: 1024 cells: ((0,0) (31,31) (0,0))[0] # 
+Level 0: 1024 cells: ((0,0) (15,15) (0,0))[0] # ((0,16) (15,31) (0,0))[0] # ((16,0) (31,15) (0,0))[0] # ((16,16) (31,31) (0,0))[0]
+
 
 AmrIce::initData
 AmrIce::computeA
@@ -13,54 +14,54 @@ IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
 JFNK initial residual norm = 2.52124e+07
 JFNK convergence metric = 2.52124e+07
       RelaxSolver:: initial Residual norm = 2.52124e+07
-      RelaxSolver:: iteration = 1 residual norm = 2.47016e-07, rate = 1.02068e+14
+      RelaxSolver:: iteration = 1 residual norm = 3.83654e-07, rate = 6.57163e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
 JFNK initial residual norm = 80709
 JFNK convergence metric = 80709
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 80709
-      RelaxSolver:: iteration = 1 residual norm = 1.18885e-09, rate = 6.78881e+13
+      RelaxSolver:: iteration = 1 residual norm = 1.78966e-09, rate = 4.50973e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 0 residual norm = 2360.74 rate = 34.188
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 2360.74
-      RelaxSolver:: iteration = 1 residual norm = 5.27744e-11, rate = 4.47326e+13
+      RelaxSolver:: iteration = 1 residual norm = 8.80285e-11, rate = 2.68179e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 1 residual norm = 164.141 rate = 14.3824
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 164.141
-      RelaxSolver:: iteration = 1 residual norm = 2.87952e-12, rate = 5.70029e+13
+      RelaxSolver:: iteration = 1 residual norm = 5.44728e-12, rate = 3.01327e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 2 residual norm = 21.7562 rate = 7.54457
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 21.7562
-      RelaxSolver:: iteration = 1 residual norm = 4.21033e-13, rate = 5.16734e+13
+      RelaxSolver:: iteration = 1 residual norm = 6.26307e-13, rate = 3.47373e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 3 residual norm = 3.23835 rate = 6.71829
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 3.23835
-      RelaxSolver:: iteration = 1 residual norm = 6.62988e-14, rate = 4.88448e+13
+      RelaxSolver:: iteration = 1 residual norm = 8.96645e-14, rate = 3.61163e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 4 residual norm = 0.489231 rate = 6.61928
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 0.489231
-      RelaxSolver:: iteration = 1 residual norm = 1.0194e-14, rate = 4.7992e+13
+      RelaxSolver:: iteration = 1 residual norm = 1.33838e-14, rate = 3.6554e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 5 residual norm = 0.0741212 rate = 6.60041
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 0.0741212
-      RelaxSolver:: iteration = 1 residual norm = 1.55613e-15, rate = 4.76318e+13
+      RelaxSolver:: iteration = 1 residual norm = 2.0186e-15, rate = 3.67191e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 6 residual norm = 0.0112385 rate = 6.59531
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 0.0112385
-      RelaxSolver:: iteration = 1 residual norm = 2.3544e-16, rate = 4.77338e+13
+      RelaxSolver:: iteration = 1 residual norm = 3.05405e-16, rate = 3.67985e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 7 residual norm = 0.00170444 rate = 6.59366
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 0.00170444
-      RelaxSolver:: iteration = 1 residual norm = 3.56817e-17, rate = 4.77677e+13
+      RelaxSolver:: iteration = 1 residual norm = 4.62871e-17, rate = 3.68231e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 8 residual norm = 0.00025852 rate = 6.59306
 JFNK final residual norm = 0.00025852
@@ -69,7 +70,9 @@ IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
 AmrIce::tagCellsInit
 AmrIce::tagCells
 AmrIce::tagCellsLevel 0
-   Level 1: 1536 cells: ((0,36) (31,59) (0,0))[0] # ((32,36) (63,59) (0,0))[0] # 
+   Level 1: 1536 cells: ((0,36) (15,47) (0,0))[0] # ((0,48) (15,59) (0,0))[0] # ((16,36) (31,47) (0,0))[0] # ((16,48) (31,59) (0,0))[0]
+((32,36) (47,47) (0,0))[0] # ((32,48) (47,59) (0,0))[0] # ((48,36) (63,47) (0,0))[0] # ((48,48) (63,59) (0,0))[0]
+
 
 AmrIce::initData
 AmrIce::computeA
@@ -81,55 +84,56 @@ JFNK initial residual norm = 2.87308e+06
 JFNK convergence metric = 2.87308e+06
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 2.87308e+06
-      RelaxSolver:: iteration = 1 residual norm = 0.470388, rate = 6.10789e+06
+      RelaxSolver:: iteration = 1 residual norm = 2.60173, rate = 1.1043e+06
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 0 residual norm = 287387 rate = 9.99723
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 287387
-      RelaxSolver:: iteration = 1 residual norm = 0.0376716, rate = 7.62875e+06
+      RelaxSolver:: iteration = 1 residual norm = 0.244771, rate = 1.17411e+06
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 1 residual norm = 25740 rate = 11.165
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 25740
-      RelaxSolver:: iteration = 1 residual norm = 0.111888, rate = 230051
+      RelaxSolver:: iteration = 1 residual norm = 0.652718, rate = 39435.2
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
- Picard iteration 2 residual norm = 2109.04 rate = 12.2046
+ Picard iteration 2 residual norm = 2109.28 rate = 12.2033
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
-      RelaxSolver:: initial Residual norm = 2109.04
-      RelaxSolver:: iteration = 1 residual norm = 0.0162954, rate = 129425
+      RelaxSolver:: initial Residual norm = 2109.28
+      RelaxSolver:: iteration = 1 residual norm = 0.0811054, rate = 26006.6
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
- Picard iteration 3 residual norm = 214.096 rate = 9.85091
+ Picard iteration 3 residual norm = 214.133 rate = 9.85034
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
-      RelaxSolver:: initial Residual norm = 214.096
-      RelaxSolver:: iteration = 1 residual norm = 0.00144393, rate = 148273
+      RelaxSolver:: initial Residual norm = 214.133
+      RelaxSolver:: iteration = 1 residual norm = 0.00684226, rate = 31295.6
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
- Picard iteration 4 residual norm = 27.6627 rate = 7.73953
+ Picard iteration 4 residual norm = 27.6651 rate = 7.74018
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
-      RelaxSolver:: initial Residual norm = 27.6627
-      RelaxSolver:: iteration = 1 residual norm = 0.000123136, rate = 224652
+      RelaxSolver:: initial Residual norm = 27.6651
+      RelaxSolver:: iteration = 1 residual norm = 0.000558385, rate = 49544.8
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
- Picard iteration 5 residual norm = 4.28326 rate = 6.45832
+ Picard iteration 5 residual norm = 4.28323 rate = 6.45893
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
-      RelaxSolver:: initial Residual norm = 4.28326
-      RelaxSolver:: iteration = 1 residual norm = 1.06795e-05, rate = 401073
+      RelaxSolver:: initial Residual norm = 4.28323
+      RelaxSolver:: iteration = 1 residual norm = 4.35882e-05, rate = 98265.7
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
- Picard iteration 6 residual norm = 0.729937 rate = 5.86799
+ Picard iteration 6 residual norm = 0.729903 rate = 5.86822
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
-      RelaxSolver:: initial Residual norm = 0.729937
-      RelaxSolver:: iteration = 1 residual norm = 1.06943e-06, rate = 682545
+      RelaxSolver:: initial Residual norm = 0.729903
+      RelaxSolver:: iteration = 1 residual norm = 3.08691e-06, rate = 236451
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
- Picard iteration 7 residual norm = 0.130641 rate = 5.58735
+ Picard iteration 7 residual norm = 0.130634 rate = 5.58738
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
-      RelaxSolver:: initial Residual norm = 0.130641
-      RelaxSolver:: iteration = 1 residual norm = 1.54092e-07, rate = 847810
+      RelaxSolver:: initial Residual norm = 0.130634
+      RelaxSolver:: iteration = 1 residual norm = 2.12019e-07, rate = 616145
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
- Picard iteration 8 residual norm = 0.0240994 rate = 5.42092
-JFNK final residual norm = 0.0240994
-JFNKSolver converged -- final norm(resid) = 0.0240994 after 9 iterations
+ Picard iteration 8 residual norm = 0.0240983 rate = 5.42089
+JFNK final residual norm = 0.0240983
+JFNKSolver converged -- final norm(resid) = 0.0240983 after 9 iterations
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
 AmrIce::initialize
 AmrIce::initGrids
-Level 0: 1024 cells: ((0,0) (31,31) (0,0))[0] # 
+Level 0: 1024 cells: ((0,0) (15,15) (0,0))[0] # ((0,16) (15,31) (0,0))[0] # ((16,0) (31,15) (0,0))[0] # ((16,16) (31,31) (0,0))[0]
+
 
 AmrIce::initData
 AmrIce::computeA
@@ -141,54 +145,54 @@ IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
 JFNK initial residual norm = 2.52124e+07
 JFNK convergence metric = 2.52124e+07
       RelaxSolver:: initial Residual norm = 2.52124e+07
-      RelaxSolver:: iteration = 1 residual norm = 2.47016e-07, rate = 1.02068e+14
+      RelaxSolver:: iteration = 1 residual norm = 3.83654e-07, rate = 6.57163e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
 JFNK initial residual norm = 80709
 JFNK convergence metric = 80709
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 80709
-      RelaxSolver:: iteration = 1 residual norm = 1.18885e-09, rate = 6.78881e+13
+      RelaxSolver:: iteration = 1 residual norm = 1.78966e-09, rate = 4.50973e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 0 residual norm = 2360.74 rate = 34.188
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 2360.74
-      RelaxSolver:: iteration = 1 residual norm = 5.27744e-11, rate = 4.47326e+13
+      RelaxSolver:: iteration = 1 residual norm = 8.80285e-11, rate = 2.68179e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 1 residual norm = 164.141 rate = 14.3824
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 164.141
-      RelaxSolver:: iteration = 1 residual norm = 2.87952e-12, rate = 5.70029e+13
+      RelaxSolver:: iteration = 1 residual norm = 5.44728e-12, rate = 3.01327e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 2 residual norm = 21.7562 rate = 7.54457
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 21.7562
-      RelaxSolver:: iteration = 1 residual norm = 4.21033e-13, rate = 5.16734e+13
+      RelaxSolver:: iteration = 1 residual norm = 6.26307e-13, rate = 3.47373e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 3 residual norm = 3.23835 rate = 6.71829
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 3.23835
-      RelaxSolver:: iteration = 1 residual norm = 6.62988e-14, rate = 4.88448e+13
+      RelaxSolver:: iteration = 1 residual norm = 8.96645e-14, rate = 3.61163e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 4 residual norm = 0.489231 rate = 6.61928
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 0.489231
-      RelaxSolver:: iteration = 1 residual norm = 1.0194e-14, rate = 4.7992e+13
+      RelaxSolver:: iteration = 1 residual norm = 1.33838e-14, rate = 3.6554e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 5 residual norm = 0.0741212 rate = 6.60041
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 0.0741212
-      RelaxSolver:: iteration = 1 residual norm = 1.55613e-15, rate = 4.76318e+13
+      RelaxSolver:: iteration = 1 residual norm = 2.0186e-15, rate = 3.67191e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 6 residual norm = 0.0112385 rate = 6.59531
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 0.0112385
-      RelaxSolver:: iteration = 1 residual norm = 2.3544e-16, rate = 4.77338e+13
+      RelaxSolver:: iteration = 1 residual norm = 3.05405e-16, rate = 3.67985e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 7 residual norm = 0.00170444 rate = 6.59366
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
       RelaxSolver:: initial Residual norm = 0.00170444
-      RelaxSolver:: iteration = 1 residual norm = 3.56817e-17, rate = 4.77677e+13
+      RelaxSolver:: iteration = 1 residual norm = 4.62871e-17, rate = 3.68231e+13
 IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
  Picard iteration 8 residual norm = 0.00025852 rate = 6.59306
 JFNK final residual norm = 0.00025852
@@ -197,6 +201,702 @@ IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
 AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
-resetting solution time from 0  to 7.09645e+08
+resetting solution time from 0  to -1AmrIce::setAmrIce::setState
+resetting solution time frAmrIce::setState
+resetAmrIce::setState
+resetting solutAmrIce::setState
+resetting solutiAmrIce::setState
+reseAmrIce::setState
+resetting solution time froAmrIce::setState
+resetting solution time from 0  to -1.41563e-07
 AmrIce::setState
-resetting solution time from 7.09645e+08  to 1.23457e+300
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIceAmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resettingAmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::writeAMRPlotFile
+AmrIce::~AmrIce()
+
+AmrIce::run -- max_time= 1, max_step = 10000
+AmrIce::computeInitialDt
+AmrIce::computeDt
+ting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to -1.41563e-07
+AmrIce::setState
+resetting solution time from -1.41563e-07  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::writeAMRPlotFile
+AmrIce::~AmrIce()
+
+AmrIce::run -- max_time= 1, max_step = 10000
+AmrIce::computeInitialDt
+AmrIce::computeDt

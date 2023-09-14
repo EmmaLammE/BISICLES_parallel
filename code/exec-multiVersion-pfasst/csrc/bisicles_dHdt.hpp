@@ -10,6 +10,7 @@ using namespace std;
 
 class BisiclesdHdtSolver : public ChomboStruct, public AmrIceHolderClass{
    protected:
+      bool envolve_velocity = false;
 
    public:
       
