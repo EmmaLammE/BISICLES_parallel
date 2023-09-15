@@ -1125,17 +1125,20 @@ FineInterp::s_default_boundary_limit_type = 0;
     // ParmParse ppfasst("pf");
     // bool USE_PF;
     bool PF_VERBOSE;
+    string pf_plot_prefix;
     int pf_num_procs_per_time;
     // ppfasst.get("USE_PF", USE_PF);
     ppfasst.get("PF_VERBOSE", PF_VERBOSE);
+    ppfasst.get("pf_plot_prefix", pf_plot_prefix);
     ppfasst.get("pf_num_procs_per_time", pf_num_procs_per_time);
+
     ParmParse pcrse("crse.amr");
     string crse_plot_prefix;
+    bool pf_evolve_velocity;
     pcrse.get("plot_prefix",crse_plot_prefix);
+    pcrse.get("evolve_velocity",pf_evolve_velocity);
 
     if (USE_PF){
-      string pf_plot_prefix;
-      ppfasst.get("pf_plot_prefix", pf_plot_prefix);
       cout<<"\n..............Updating crse-grained using PFASST................\n";
       cout<<"  PFASST objects passing in from: crse grids and objects\n";
       cout<<"  results saved as: "<<crse_plot_prefix<<"...";
@@ -1147,21 +1150,26 @@ FineInterp::s_default_boundary_limit_type = 0;
       Pf_Bisicles_setHolders(&amrObjectCrse,&AmrIceHolderPtr,crseH,crseVel); // pass amrObjectCrse to AmrIceHolderPt, pretty sure is right
       // crseH is correctly initialized on every level
 
+      // set up vector size (including all amr levels), i.e. total num of cells in all levels
       ParmParse ppcrseamr("crse.amr");
       Vector<int> ancells(3); 
-      ppcrseamr.getarr("num_cells", ancells, 0, ancells.size());
-      // cout<< "  num of cell passed in: "<<ancells<<"\n\n\n";
+      ppcrseamr.getarr("num_cells", ancells, 0, ancells.size());\
       int num_of_grids=ancells[0]*ancells[1];
+      int num_total_cells=0;
+      for (int lvl=0; lvl < crseH.size(); lvl++)
+      {
+         LevelData<FArrayBox>& ldf = *crseH[lvl];
+         DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+         DataIterator dit = ldf.dataIterator();
+         int num_cells_per_lvl = dbl.numCells();
+         num_total_cells += num_cells_per_lvl;
+      }
       reshape(crsedHdtVect[0],crseH);
       // cout<<"num of levels in crseH: "<<crseH.size()<<endl;
       Vector<LevelData<FArrayBox>* > ice_thick=crseStateVect[1].ice_thickness;
-      auto start = high_resolution_clock::now();
-      Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,num_of_grids,\
-        pf_num_procs_per_time,PF_VERBOSE);
-      auto stop = high_resolution_clock::now();
-      auto duration = duration_cast<microseconds>(stop - start);
-      cout << "Total time taken by pfasst run: "
-          << duration.count()/1e6<< " seconds" << endl;
+      Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,pf_evolve_velocity,\
+      num_total_cells,pf_num_procs_per_time,PF_VERBOSE);
+ 
     } else {
     cout<<"\nUpdating crse-grained using serial................\n";
     cout<<"  results saved as: "<<crse_plot_prefix<<"...\n";

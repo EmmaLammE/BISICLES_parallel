@@ -1,8 +1,6 @@
 !
 ! This file is part of LIBPFASST.
 !
-!> Level specification for Dahlquist example.
-!>     u_t = lam1*u + lam2*u
 module pf_my_level
   use encap
   use pf_mod_imex_sweeper_bisicles
@@ -10,7 +8,6 @@ module pf_my_level
 
   !>  extend the generic level type by defining transfer operators
   type, extends(pf_user_level_t) :: my_level_t
-    !type(c_ptr) :: cptr_AmrIceHolder
    contains
      procedure :: restrict
      procedure :: interpolate
@@ -32,13 +29,10 @@ contains
     class(bisicles_vector_encap), pointer :: y_f, y_c
 
     !>  Cast the abstract encap as my data type
-    !!!!!!!!!! commented out temporarily
     y_f => cast_as_bisicles_vector(f_vec)
     y_c => cast_as_bisicles_vector(c_vec)
 
     !> Here we use the identity map 
-    !!!!!!!!!! commented out temporarily   
-    !call y_f%setval(y_c%getval())
     call y_f%copy(y_c)
   end subroutine interpolate
 
@@ -53,18 +47,11 @@ contains
     class(bisicles_vector_encap), pointer :: y_f, y_c
 
     !>  Cast the abstract encap as my data type
-    !!!!!!!!!! commented out temporarily
     y_f => cast_as_bisicles_vector(f_vec)
     y_c => cast_as_bisicles_vector(c_vec)
 
     !> Here we use the identity map    
-    !!!!!!!!!! commented out temporarily
-    !print *, '                                      before level restrict y_f'
-    !call y_f%eprint()
-    !call y_c%setval(y_f%getval())
     call y_c%copy(y_f)
-    !print *, '                                      before level restrict y_f'
-    !call y_c%eprint()
   end subroutine restrict
 
 end module pf_my_level

@@ -17,7 +17,7 @@ module probin
   character(len=128), save :: pfasst_nml  ! file for reading pfasst parameters
   type(c_ptr), save :: cptr_AmrIceHolder
   integer, save :: maxStep     ! num of max time step to run
-
+  logical(c_bool), save :: evolve_velocity ! whether to compute velocity in compute_dHdt
   !namelist /params/  dt, Tfin, nsteps, num_grid_points,pfasst_nml,cptr_AmrIceHolder
   namelist /params/  pfasst_nml, nspace, ntime, nproc_per_time, space_dim
 
@@ -107,6 +107,7 @@ contains
     !write(un,*) 'Tfin:   ', Tfin,   '! Final time of run'  
     write(un,*) 'num spatial procs per temporal proc:   ',   nspace
     write(un,*) 'num temporal procs:   ',   num_time_procs, ', rank ',rank_time_procs
+    write(un,*) 'Compute velocity:   ',   evolve_velocity
     write(un,*) 'Number of spacial dimensions:   ', space_dim
     write(un,*) 'PFASST parameters read from input file ', pfasst_nml
     write(un,*) '=================================================='

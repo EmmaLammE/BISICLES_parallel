@@ -27,7 +27,7 @@ end type my_sweeper_t
 
 
   interface
-    subroutine BisiclesSolverInit(bisicles_solver_ptr, level_index, nx,c_AmrIceHolderPtr) bind(c, name="BisiclesSolverInit")
+    subroutine BisiclesSolverInit(bisicles_solver_ptr, level_index,nx,c_AmrIceHolderPtr) bind(c, name="BisiclesSolverInit")
         use iso_c_binding
         type(c_ptr) :: bisicles_solver_ptr
         integer, value :: nx, level_index
@@ -41,7 +41,7 @@ end type my_sweeper_t
      end subroutine BisiclesVectorSetHIC
 
 
-    subroutine BisiclesSolverFEval(bisicles_dHdt,y, t, level_index, f, dt,maxStep, c_AmrIceHolderPtr) bind(c, name="BisiclesSolverFEval")
+    subroutine BisiclesSolverFEval(bisicles_dHdt,y, t, level_index, f, dt,maxStep,evolve_velocity, c_AmrIceHolderPtr) bind(c, name="BisiclesSolverFEval")
         use iso_c_binding
         type(c_ptr), value :: bisicles_dHdt
         type(c_ptr), value :: y
@@ -50,6 +50,7 @@ end type my_sweeper_t
         type(c_ptr), value :: f
         real(c_double), value :: dt
         integer(c_int), value :: maxStep
+        logical(c_bool), value :: evolve_velocity
         type(c_ptr), value :: c_AmrIceHolderPtr
     end subroutine BisiclesSolverFEval
 
@@ -147,7 +148,7 @@ contains
     !end select
     !print *, 'c_sweeper.f90 000000 c_AmrIceHolderPtr', c_AmrIceHolderPtr
     ! call PfasstPrintAmr(y_encap%c_encap_ptr,c_AmrIceHolderPtr)
-    call BisiclesSolverFEval(this%c_bisicles_solver_ptr,y_encap%c_encap_ptr, t, level_index, f_encap%c_encap_ptr, dt, maxStep,c_AmrIceHolderPtr)
+    call BisiclesSolverFEval(this%c_bisicles_solver_ptr,y_encap%c_encap_ptr, t, level_index, f_encap%c_encap_ptr, dt, maxStep,evolve_velocity,c_AmrIceHolderPtr)
 
   end subroutine f_eval
 

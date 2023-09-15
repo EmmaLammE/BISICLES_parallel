@@ -69,18 +69,24 @@ module encap
          type(c_ptr), value :: c_AmrIceHolderPtr
       end subroutine BisiclesVectorCopy
    
-      function BisiclesVectorPack(x,num_grid_points, c_AmrIceHolderPtr) result(z) bind(c, name="BisiclesVectorPack")
+      function BisiclesCurrentVectorSize(x) result(vector_size) bind(c, name="BisiclesCurrentVectorSize")
          use iso_c_binding
-         type(c_ptr), value :: x
-         integer, value :: num_grid_points
+         type(c_ptr), value :: x ! vector to be packed
+         integer(c_int) :: vector_size
+      end function
+      
+      function BisiclesVectorPack(x,c_AmrIceHolderPtr,level_id) result(z) bind(c, name="BisiclesVectorPack")
+         use iso_c_binding
+         type(c_ptr), value :: x ! vector to be packed
          type(c_ptr), value :: c_AmrIceHolderPtr
-         type(c_ptr) :: z
+         type(c_ptr) :: z ! packed x is stored in z
+         integer, value :: level_id
       end function
  
       subroutine BisiclesVectorUnpack(x, z, c_AmrIceHolderPtr) bind(c, name="BisiclesVectorUnpack")
          use iso_c_binding
          type(c_ptr), value :: x
-         real(c_double), value :: z
+         type(c_ptr), value :: z
          type(c_ptr), value :: c_AmrIceHolderPtr
       end subroutine BisiclesVectorUnpack
     
@@ -154,11 +160,10 @@ contains
 
     select type(x)
     type is (bisicles_vector_encap)
-       !print *,'encap.f90 0000 calling BisiclesVectorCreate......................'
+      !  print *,'encap.f90 0000 calling BisiclesVectorCreate......................, num grid point ', num_grid_points
        call BisiclesVectorCreate(x%c_encap_ptr,num_grid_points, cptr_AmrIceHolder)
        !call BisiclesVectorAxpy(x%c_encap_ptr, intialization_factor, x%c_encap_ptr, cptr_AmrIceHolder)
        !print *, 'encap.f90 1111 finish BisiclesVectorCreate......................', x%c_encap_ptr
-       !> ASK DAN ABOUT VECTOR SIZE WHEN AMR IS ON!!!!
        x%vector_size = num_grid_points
     end select
   end subroutine bisicles_vector_create_single
@@ -186,7 +191,7 @@ contains
        do i = 1, n
            call BisiclesVectorCreate(x(i)%c_encap_ptr,num_grid_points, cptr_AmrIceHolder)
            !call BisiclesVectorAxpy(x(i)%c_encap_ptr, intialization_factor, x(i)%c_encap_ptr, cptr_AmrIceHolder)
-           x(i)%vector_size = num_grid_points
+           x%vector_size = num_grid_points
        end do
     end select
   end subroutine bisicles_vector_create_array
@@ -248,18 +253,28 @@ contains
 
   !> Subroutine to pack into a flat array for sending
   subroutine bisicles_vector_pack(this, z, flags)
-    class(bisicles_vector_encap), intent(in) :: this
+     class(bisicles_vector_encap), intent(in) :: this
     real(pfdp), intent(out) :: z(:)
     integer, intent(in), optional :: flags
     real(pfdp), pointer :: z_ptr(:)
+    type(c_ptr) :: z_ptr_test
     type(c_ptr) :: z_c_ptr
-    integer :: num_grid_points
-    z_c_ptr = BisiclesVectorPack(this%c_encap_ptr,num_grid_points, cptr_AmrIceHolder)
-    call c_f_pointer(z_c_ptr, z_ptr, [this%vector_size])
-   !  print *,'size of z_ptr ', size(z_ptr)
-   !  print *,'size of vector_size ', this%vector_size
-   !  print *,'size of z ', size(z)
+    integer(c_int) :: num_grid_points
+    integer :: level_id
+
+   !  do level_id = 1, 1
+    ! EL - packing should be correct now, without amr
+      z_c_ptr = BisiclesVectorPack(this%c_encap_ptr,cptr_AmrIceHolder,level_id)
+      num_grid_points = BisiclesCurrentVectorSize(this%c_encap_ptr)
+      call c_f_pointer(z_c_ptr, z_ptr, [num_grid_points]) ! convert z_c_ptr to z_ptr
+   !  end do
+      ! print *,'in packing num_grid_points ',num_grid_points,", size of z ",size(z_ptr)
+      
+      ! do i = 1,1024
+      ! print *,'size of z_ptr ',i,z_ptr(i)
+      ! end do
     z = z_ptr
+   !  print *, size(z)
   end subroutine bisicles_vector_pack
 
   !> Subroutine to unpack  after receiving
@@ -267,7 +282,13 @@ contains
      class(bisicles_vector_encap), intent(inout) :: this
      real(pfdp),     intent(in   ) :: z(:)
      integer,     intent(in   ), optional :: flags
-     call BisiclesVectorUnpack(this%c_encap_ptr, z(1), cptr_AmrIceHolder);
+     real(pfdp), target :: z2(size(z))
+     type(c_ptr) :: z_c_ptr
+      ! print *, "before unpacking z in ",size(z)
+     z2 = z
+     z_c_ptr = c_loc(z2(1))
+     
+     call BisiclesVectorUnpack(this%c_encap_ptr, z_c_ptr, cptr_AmrIceHolder);
   end subroutine bisicles_vector_unpack
 
   !> Subroutine to define the norm of the array (here the abs value)

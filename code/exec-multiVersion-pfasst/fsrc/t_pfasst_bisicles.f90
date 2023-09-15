@@ -30,7 +30,7 @@ module pfasst_bisicles
 
 contains
 
-  subroutine PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles, AmrIceHolderPtr) 
+  subroutine PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,evolve_velocity_bisicles,numGridPointsBisicles, AmrIceHolderPtr) 
     type(pf_pfasst_t), intent(inout) :: pf
     integer, allocatable, intent(inout) :: lev_shape(:,:)
     integer, intent(in)                        :: crse_nsteps
@@ -39,6 +39,7 @@ contains
     integer, intent(in)                        :: maxStep_bisicles
     integer, intent(in)                        :: numGridPointsBisicles
     type(c_ptr), intent(in)                 :: AmrIceHolderPtr
+    logical(c_bool), intent(in)               :: evolve_velocity_bisicles
     
     type(pf_comm_t) :: comm
     type(my_sweeper_t) :: sw_finest, sw_lev
@@ -61,7 +62,7 @@ contains
     call mpi_comm_rank(MPI_COMM_WORLD, rank,  error)
 
     !> first update the params from bisicles
-    call update_bisicles_params(pf,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
+    call update_bisicles_params(pf,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles,evolve_velocity_bisicles, AmrIceHolderPtr)
 
     !> Loop over levels and set some level specific parameters
     allocate(lev_shape(pf%nlevels,1))
@@ -83,8 +84,7 @@ contains
        sw_lev = cast_as_my_sweeper_t(pf%levels(l)%ulevel%sweeper)
        call BisiclesSolverInit(sw_lev%c_bisicles_solver_ptr, &
                          l, &
-                         lev_shape(l,1), &
-                         cptr_AmrIceHolder)
+                         lev_shape(l,1),cptr_AmrIceHolder)
       !  print *, 'after bisicles solver init'
       !  call pf%levels(pf%state%finest_level)%Q(1)%eprint()
        !>  Set the size of the data on this level (here just one)
@@ -107,7 +107,7 @@ contains
 
 
 
-  subroutine update_bisicles_params(pf,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
+  subroutine update_bisicles_params(pf,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles,evolve_velocity_bisicles, AmrIceHolderPtr)
     type(pf_pfasst_t), intent(inout)           :: pf  
     integer, intent(in)                        :: crse_nsteps
     real*8, intent(in)                        :: dt_bisicles
@@ -115,7 +115,7 @@ contains
     integer, intent(in)                        :: maxStep_bisicles
     integer, intent(in)                        :: numGridPointsBisicles
     type(c_ptr), intent(in)                 :: AmrIceHolderPtr
-
+    logical(c_bool), intent(in)              :: evolve_velocity_bisicles
     type(bisicles_holder_ptr), pointer           :: pf_bisicles
 
 
@@ -127,6 +127,7 @@ contains
     dt = dt_bisicles
     Tfin = Tfin_bisicles
     maxStep = maxStep_bisicles
+    evolve_velocity = evolve_velocity_bisicles
 
     num_grid_points=numGridPointsBisicles
 
@@ -138,6 +139,7 @@ contains
     
     pf%cptr_AmrIceHolder=AmrIceHolderPtr
     cptr_AmrIceHolder=AmrIceHolderPtr
+    ! pf%evolve_velocity = evolve_velocity
     !print *,'nsteps after changed ',nsteps
     !print *,'pfasst_bisicles.f90 pf%cptr_AmrIceHolder ', pf%cptr_AmrIceHolder
     !print *,'pfasst_bisicles.f90 pf%c_test_ptr ', pf_bisicles%c_test_ptr
@@ -166,7 +168,7 @@ contains
     y_encap => cast_as_bisicles_vector(lev%Q(snapshot_to_save))
     !print *, ' saving results... y_encap ID y_encap%c_encap_ptr,',y_encap%c_encap_ptr
     print *, '                    temp_level_to_save,snapshot_to_save',temp_level_to_save,snapshot_to_save
-    ! call y_encap%eprint()
+    call y_encap%eprint()
     
 
     call y_encap%savesnap()
