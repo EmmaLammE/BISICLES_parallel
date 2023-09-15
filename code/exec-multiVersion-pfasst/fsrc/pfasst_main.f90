@@ -144,6 +144,8 @@ contains
     !print *,'y_end assign single '
     call y_end%setval(1000.0_pfdp)
     call y_0%setval(1000.0_pfdp)
+    print *, "Bisicles Disjoint Boxes in current PFASST temporal processor:"
+    call y_0%eprintLevelDataBox(y_0)
     ! packing test
     ! call y_0%eprint()
     ! allocate(v(num_grid_points))
@@ -169,9 +171,6 @@ contains
     s = cast_as_my_sweeper_t(pf%levels(level_index)%ulevel%sweeper)
     !call s%f_eval(y_0, t, level_index, y_end, z_c_ptr)
     !call Initialize_H(y_0) ! NEED TO BE FIXED
-
-    print *, "Bisicles Disjoint Boxes in current PFASST temporal processor:"
-    call y_0%eprintLevelDataBox(y_0)
     
     print *, '--------------------------- Start pfasst run --------------------------------------'
     ! call PfasstBisiclesPrintAmr(y_0,pf%cptr_AmrIceHolder)

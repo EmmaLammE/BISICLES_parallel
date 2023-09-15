@@ -3,7 +3,7 @@
       "use_rk_stepper" :          false,
      "use_sdc_sweeper" :           true,
                "nproc" :              4,
-              "nsteps" :              4,
+              "nsteps" :            200,
              "nlevels" :              2,
               "niters" :              5,
             "miniters" :              0,

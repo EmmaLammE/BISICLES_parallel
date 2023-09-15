@@ -5,7 +5,7 @@
 #  COMMON ATTRIBUTES (Coarse and fine integrator)
 #####################################################
 
-main.maxTime = 1.0  # maximum time to run to in years
+main.maxTime = 100.0  # maximum time to run to in years
 main.maxStep = 10000   # maximum number of steps to run
 main.constitutiveRelation = L1L2
 
@@ -34,7 +34,7 @@ CalvingModel.type = NoCalvingModel
 #  CRSE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numCrseIntervals = 10
+main.numCrseIntervals = 200
 
 crse.amr.maxLevel = 1   # finest level allowed in simulation
 crse.amr.ref_ratio = 2 2 2 2 2 2 2
@@ -96,7 +96,7 @@ crse.amr.new_timestep = 0
 
 main.numFineIntervals = 200 # time interval
 
-fine.amr.maxLevel = 1   # finest level allowed in simulation, 0: one level of grid, 1: 2 levels of grid etc
+fine.amr.maxLevel = 0   # finest level allowed in simulation, 0: one level of grid, 1: 2 levels of grid etc
 fine.amr.ref_ratio = 2 2 2 2 2 2 2
 fine.amr.num_cells = 0032 0032 16   #number of cells in base grid
 
@@ -134,7 +134,7 @@ fine.amr.lap_vel_tagging_val = 75
 #fine.amr.lap_vel_tagging_val = 1
 
 #initial guess 
-fine.amr.evolve_velocity = true
+fine.amr.evolve_velocity = false
 fine.amr.do_initial_velocity_guess = 1
 fine.amr.do_initial_velocity_solve = 1
 fine.amr.initial_velocity_guess_type = 1 # linear PDE
