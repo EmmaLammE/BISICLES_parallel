@@ -73,7 +73,7 @@ crse.amr.lap_vel_tagging_val = 75
 #crse.amr.lap_vel_tagging_val = 1
 
 #initial guess 
-crse.amr.evolve_velocity = false
+crse.amr.evolve_velocity = true
 crse.amr.do_initial_velocity_guess = 1
 crse.amr.do_initial_velocity_solve = 1
 crse.amr.initial_velocity_guess_type = 1 # linear PDE
@@ -134,7 +134,7 @@ fine.amr.lap_vel_tagging_val = 75
 #fine.amr.lap_vel_tagging_val = 1
 
 #initial guess 
-fine.amr.evolve_velocity = false
+fine.amr.evolve_velocity = true
 fine.amr.do_initial_velocity_guess = 1
 fine.amr.do_initial_velocity_solve = 1
 fine.amr.initial_velocity_guess_type = 1 # linear PDE
@@ -158,7 +158,7 @@ pf.USE_PF = TRUE
 pf.PF_VERBOSE = TRUE
 pf.pf_plot_prefix = pf_
 pf.pf_num_procs_per_time = 10
-pf.num_time_procs = 4
+pf.num_time_procs = 8
 
 
 
