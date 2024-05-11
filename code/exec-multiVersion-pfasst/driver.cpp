@@ -139,7 +139,7 @@ FineInterp::s_default_boundary_limit_type = 0;
                 num_time_procs,". Number of total processor: ",number_procs;
           MayDay::Error("Please check your input file and args for mpirun. Stop here.");
         }
-        cout << "Hello from main process " << rank << " out of " << number_procs << " processes in the main communicator." <<endl;
+        // cout << "Hello from main process " << rank << " out of " << number_procs << " processes in the main communicator." <<endl;
         // split mpi into space mpi
         int space_color = round(rank%num_time_procs);
         MPI_Comm_split(MPI_COMM_WORLD, space_color, rank, &Chombo_MPI::comm); // make sure what key should put in here
@@ -150,8 +150,8 @@ FineInterp::s_default_boundary_limit_type = 0;
         MPI_Comm_split(MPI_COMM_WORLD, time_color, rank, &pf_comm);
         MPI_Comm_rank(pf_comm, &new_time_rank); // Get the rank in the new communicator
         MPI_Comm_size(pf_comm, &new_time_size); // Get the size of the new communicator
-        cout << "   Hello from space process " << new_space_rank << " out of " << new_space_size << " processes in the space communicator." <<endl;
-        cout << "   Hello from time process " << new_time_rank << " out of " << new_time_size << " processes in the time communicator." <<endl;
+        // cout << "   Hello from space process " << new_space_rank << " out of " << new_space_size << " processes in the space communicator." <<endl;
+        // cout << "   Hello from time process " << new_time_rank << " out of " << new_time_size << " processes in the time communicator." <<endl;
         // cout<<"Chombo_MPI::comm "<<Chombo_MPI::comm<<endl;
         // should be correct, but double check if each time processor has the same num of bisicles processors
         if(new_time_size*new_space_size != number_procs){
@@ -1140,9 +1140,10 @@ FineInterp::s_default_boundary_limit_type = 0;
     pcrse.get("evolve_velocity",pf_evolve_velocity);
 
     if (USE_PF){
-      cout<<"\n..............Updating crse-grained using PFASST................\n";
-      cout<<"  PFASST objects passing in from: crse grids and objects\n";
-      // cout<< "  dt passed in: "<<crseDt<<", max T passed in: "<<maxTime<<", max steps passed in:"<<maxStep<< endl;
+      cout <<"###########################################################################"<<endl;
+      cout <<"##############        EL - Start of PFASST simulation     ###################"<<endl;
+      cout <<"###########################################################################"<<endl;
+      // pout()<< "  dt passed in: "<<crseDt<<", max T passed in: "<<maxTime<<", max steps passed in:"<<maxStep<< endl;
 
       AmrIceHolderClass AmrIceHolderPtr;
       MPI_Fint pf_comm_world = MPI_Comm_c2f(pf_comm);
@@ -1174,7 +1175,10 @@ FineInterp::s_default_boundary_limit_type = 0;
       std::chrono::duration<double> duration_pf = end_pf - start_pf;
       (&AmrIceHolderPtr)->printStatistics(number_procs,new_time_size, new_space_size,new_time_rank,\
                                           new_space_rank,duration_pf,pf_evolve_velocity,numCrseIntervals,maxTime);
-      cout<<"  results saved as: "<<crse_plot_prefix<<"...";
+      cout <<"  EL - results saved as: "<<crse_plot_prefix<<"...\n";
+      cout <<"###########################################################################"<<endl;
+      cout <<"##############        EL - End of PFASST simulation     ###################"<<endl;
+      cout <<"###########################################################################"<<endl;
     } else {
     cout<<"\nUpdating crse-grained using serial................\n";
     cout<<"  results saved as: "<<crse_plot_prefix<<"...\n";
@@ -1216,20 +1220,20 @@ FineInterp::s_default_boundary_limit_type = 0;
     }
 
 
-    ParmParse pfine("fine.amr");
-    string fine_plot_prefix;
-    pfine.get("plot_prefix",fine_plot_prefix);
-    cout<<"\n..............Updating fine-grained using serial................\n";
-    cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
-    // pout() << endl;
+    // ParmParse pfine("fine.amr");
+    // string fine_plot_prefix;
+    // pfine.get("plot_prefix",fine_plot_prefix);
+    // cout<<"\n..............Updating fine-grained using serial................\n";
+    // cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
+    // // pout() << endl;
 
-    // now do each fine-grained timestep
-    auto start = high_resolution_clock::now();
-    amrObjectFine.run(maxTime, maxStep);
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "Time taken by serial run: "
-         << duration.count()/1e6<< " seconds" << endl;
+    // // now do each fine-grained timestep
+    // auto start = high_resolution_clock::now();
+    // amrObjectFine.run(maxTime, maxStep);
+    // auto stop = high_resolution_clock::now();
+    // auto duration = duration_cast<microseconds>(stop - start);
+    // cout << "Time taken by serial run: "
+    //      << duration.count()/1e6<< " seconds" << endl;
     // don's really need the time interval loop, the loop is for illustration
     // for (int i=0; i<numFineIntervals; i++) 
     //   {

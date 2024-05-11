@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=t2s2
 #SBATCH --qos=regular
-#SBATCH --time=15:00:00
+#SBATCH --time=1:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=8
