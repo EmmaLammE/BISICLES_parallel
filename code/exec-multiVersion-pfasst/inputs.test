@@ -54,7 +54,7 @@ crse.amr.max_dt_grow_factor = 1.1 #max amount dt can grow from one timestep to a
 
 crse.amr.plot_interval = 1  
 crse.amr.write_dHDt = 1 
-crse.amr.plot_prefix = pf_amr2_nt4_tfin1. # nt is the num of time step main.numCrseIntervals. tfin is main.maxTime
+crse.amr.plot_prefix = pf_amr2_nt4_tfin1. # nt is num of time steps, tfin is final time maxTime
 crse.amr.write_solver_rhs = 1
 crse.amr.check_interval = -1
 crse.amr.check_prefix = chk.032
@@ -204,7 +204,3 @@ JFNKSolver.switchRate = 2.0
 
 #input file for solver benchmark
 main.filename = stream.L1L2.0032.r2.l0.000000.2d.hdf5
-
-
-
-
