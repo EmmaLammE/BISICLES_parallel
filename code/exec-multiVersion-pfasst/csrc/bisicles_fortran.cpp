@@ -65,24 +65,6 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
       *bisicles_vector = new BisiclesVector(num_grid_points,c_AmrIceHolderPtr);
-      // Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
-   //    Vector<LevelData<FArrayBox>* > temp=bisicles_vector->GetHVector();
-   //    int nlvl=temp.size();
-   // for (int lvl=0; lvl < nlvl; lvl++)
-   // {
-   //   LevelData<FArrayBox>& ldf = *temp[lvl];
-   //   DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-   //   DataIterator dit = ldf.dataIterator();
-   //   cout<<"bisicle vector create level "<<lvl<<endl;
-   //   for (dit.reset(); dit.ok(); ++dit) 
-   //    {
-   //     const Box& box = dbl[dit()];
-   //     FArrayBox& fab = ldf[dit()];
-   //    //  test_min=fab.norm(box,1);
-   //    cout<<"  box "<<box<<endl;
-   //    } 
-   // }
-
    }
 
    void BisiclesVectorDestroy(BisiclesVector *bisicles_vector)
@@ -96,10 +78,6 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
                           AmrIceHolderClass *c_AmrIceHolderPtr)
    {
       bisicles_vector->HSetVal2All(y,c_AmrIceHolderPtr);
-      // Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
-      // cout<<"-- 2 bis_for:\n";
-      // bisicles_vector->PrintLevelData(constH);
-
    }
 
    void BisiclesVectorCopy(BisiclesVector *dest, BisiclesVector *src, \
@@ -107,8 +85,6 @@ void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, 
    {
       dest->SetHVector(src);
       Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
-      // cout<<"-- 1 bis_for:\n";
-      // src->PrintLevelData(constH);
    }
 
 int BisiclesCurrentVectorSize(BisiclesVector *bisicles_vector)
@@ -126,14 +102,11 @@ int BisiclesCurrentVectorSize(BisiclesVector *bisicles_vector)
          num_cells_per_lvl[lvl] = dbl.numCells();
          num_total_cells += num_cells_per_lvl[lvl];
       }
-      // cout<<"total num of cells "<<num_total_cells<<endl;
       return num_total_cells;
    }
 
 Real* BisiclesVectorPack(BisiclesVector *bisicles_vector, AmrIceHolderClass *c_AmrIceHolderPtr, int level_id)
 {
-   //  static int call_count = 0;  // Counts how many times this function is called
-   //  static std::chrono::duration<double> total_duration(0); // Total duration of all calls
     auto start_time = std::chrono::high_resolution_clock::now();  // Start time
 
     const Vector<LevelData<FArrayBox>*>& test = bisicles_vector->GetHVector();
@@ -144,7 +117,7 @@ Real* BisiclesVectorPack(BisiclesVector *bisicles_vector, AmrIceHolderClass *c_A
     vector<int> num_cells_per_box(num_lvl);
     int num_total_cells_per_rank = 0;
 
-    // Pre-calculate some values to avoid recalculating inside the loop
+    // Pre-calculate some numbers of cells and boxes
     vector<int> num_boxes_per_lvl(num_lvl);
     for (int lvl = 0; lvl < num_lvl; ++lvl) {
         LevelData<FArrayBox>& ldf = *test[lvl];
@@ -310,31 +283,6 @@ void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, Real* flattened_level
    void BisiclesVectorLevelDataBox(BisiclesVector *bisicles_vector, BisiclesVector *x)
    {
       const Vector<LevelData<FArrayBox>* >& test=bisicles_vector->GetHVector();
-      
-      // int num_lvl = test.size();
-      // int num_total_cells = 0;
-      // int num_cells_per_lvl[num_lvl];
-      // for (int lvl=0; lvl < num_lvl; lvl++)
-      // {
-      //    LevelData<FArrayBox>& ldf = *test[lvl];
-      //    DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-      //    DataIterator dit = ldf.dataIterator();
-      //    // some sizes
-      //    num_cells_per_lvl[lvl] = dbl.numCells();
-      //    num_total_cells += num_cells_per_lvl[lvl];
-      //    int num_boxes_per_lvl = dbl.size();
-      //    int num_cells_per_box = num_cells_per_lvl[lvl]/num_boxes_per_lvl;
-      //    int box_index=0;
-      //    for (dit.reset(); dit.ok(); ++dit) 
-      //    {
-      //       const Box& box = dbl[dit()]; // dbl.numCells(): number of cells in all boxes of entire box layout
-      //       FArrayBox& fab = ldf[dit()];
-      //       box_index++;
-      //       cout<<"in print out level data box, level "<<lvl<<",num_boxes_per_lvl "<<num_boxes_per_lvl<<", num_cells_per_lvl"\
-      //       <<num_cells_per_lvl[lvl]<<",num_cells_per_box "<<num_cells_per_box<<",box"<<box<<endl;
-      //    } 
-      //    cout<<"\n";
-      // }
       pout()<<"\n--------------- EL - begin grid info ------------------\n";
       bisicles_vector->PFPrintLevelData(x);
       pout()<<"\n--------------- EL - end grid info ------------------\n";
@@ -352,7 +300,6 @@ void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, Real* flattened_level
    {
       Vector<LevelData<FArrayBox>* > HVector_print=bisicles_vector->GetHVector();
       bisicles_vector->SaveSnapshot(c_AmrIceHolderPtr);
-      // cout<< "-------------------------------------- done saving pfasst_bisicles results ----------------------------------------- "<< std::endl;
    }
 
 
@@ -361,28 +308,7 @@ void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, Real* flattened_level
    void BisiclesSolverInit(BisiclesdHdtSolver **bisicles_dHdt, int pfasst_level_index, \
                            int num_grid_points,AmrIceHolderClass *c_AmrIceHolderPtr)
     {
-      // MPI_Comm newcomm;
-      // newcomm = glob_space_comm;
-      // carefull about the pfasst_level_index, check if level_index=num_of_total_levels-pfasst_level_index
-      // int level_index = pfasst_level_index;
-      *bisicles_dHdt = new BisiclesdHdtSolver(num_grid_points,c_AmrIceHolderPtr);
-      
-//       Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
-//       int nlvl=constH.size();
-//    for (int lvl=0; lvl < nlvl; lvl++)
-//    {
-//      LevelData<FArrayBox>& ldf = *constH[lvl];
-//      DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-//      DataIterator dit = ldf.dataIterator();
-//      cout<<"bisicle init level "<<lvl<<endl;
-//      for (dit.reset(); dit.ok(); ++dit) 
-//       {
-//        const Box& box = dbl[dit()];
-//        FArrayBox& fab = ldf[dit()];
-//       //  test_min=fab.norm(box,1);
-//       cout<<"  box "<<box<<endl;
-//       } 
-//   }
+            *bisicles_dHdt = new BisiclesdHdtSolver(num_grid_points,c_AmrIceHolderPtr);
     }
 
     void BisiclesVectorSetHIC(BisiclesVector *bisicles_vector,AmrIceHolderClass *c_AmrIceHolderPtr)
@@ -396,93 +322,31 @@ void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, BisiclesVector *y, d
    int pfasst_level_index, BisiclesVector *f, double dt,int maxStep,bool evolve_velocity, AmrIceHolderClass *c_AmrIceHolderPtr)
 
    {
-      // auto start_time = std::chrono::high_resolution_clock::now();  // Start time
-      // AmrIce *amrObjHolderPtr;
-      // amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
-      // IceSheetState *iceStatePtr;
-      // IceSheetState iceState;
-      // iceStatePtr=y->GetIceStatePtr();
-      // iceState=y->GetIceState();
-   
-
-      // // Vector<LevelData<FArrayBox>*> H_old = iceState.ice_thickness;
-      // Vector<LevelData<FArrayBox>* > dHdtVect = c_AmrIceHolderPtr->GetAmrdHdt();
-      // Vector<LevelData<FArrayBox>* > *dHdtVectPtr=c_AmrIceHolderPtr->GetAmrdHdtPtr();
-      // Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH(); // double check with Dan
-      // // cout<<"get amr H right from amr holder pointer\n";
-      // // y->PrintLevelData(constH);
-
-      // Vector<LevelData<FArrayBox>* > H=y->GetHVector(); // this H is the same as H_old
-      // Vector<LevelData<FArrayBox>* > velo = amrObjHolderPtr->amrVelocity();
-
-      // reshapeAndFill(iceState.ice_thickness, H); // H
-      // // cout<<"H after reshape and fill ice state\n";
-      // // y->PrintLevelData(constH);
-
-      // bool recalculateVelocity = true;
-      // // double check with Dan: dHdtVect & H new every time step?
-      // // setState(IceSheetState& a_iceState... => 
-      // amrObjHolderPtr->setState(iceState,recalculateVelocity); 
-      // // cout<<"dHdt after set state\n";
-      // // y->PrintLevelData(dHdtVect);
-      // // cout<<"H after set state\n";
-      // // y->PrintLevelData(constH);
-      // reshape(dHdtVect,constH); // reshape the shape of dHdtVect into constH, function defined in SundialsUtil.cpp
-
-      // amrObjHolderPtr->compute_dHdt(dHdtVect,constH,dt, recalculateVelocity); // dHdtVect is updated after this
-
-      // f->SetdHdtVector(dHdtVect,c_AmrIceHolderPtr);
-
-
-
-
       AmrIce *amrObjHolderPtr;
       amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
-      // IceSheetState *iceStatePtr;
       IceSheetState iceState;
-      // iceStatePtr=y->GetIceStatePtr();
       iceState=y->GetIceState();
 
-      // Vector<LevelData<FArrayBox>*> H_old = iceState.ice_thickness;
       Vector<LevelData<FArrayBox>* > dHdtVect;
-      // Vector<LevelData<FArrayBox>* > *dHdtVectPtr=c_AmrIceHolderPtr->GetAmrdHdtPtr();
-      // Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH(); // double check with Dan
-      // Vector<LevelData<FArrayBox>* > constH_copy=c_AmrIceHolderPtr->GetAmrHBackup(); // 
       Vector<LevelData<FArrayBox>* > H=y->GetHVector(); // this H is the updating one from pfasst
-      // Vector<LevelData<FArrayBox>* > velo = amrObjHolderPtr->amrVelocity();
-
-      // cout<<"H norm 2: ";
-      // y->PrintL2norm(H);
-      // cout<<"constH norm 2: ";
-      // y->PrintL2norm(constH);
-
       reshapeAndFill(iceState.ice_thickness, H); // H is from y vector in pfasst, should not change this line 
-      // reshapeAndFill(iceState.ice_velocity, velo); 
-      // cout<<constH<<endl;
-      // bool recalculateVelocity = false;
-      // cout<<"printing all entries in H \n";
-      // y->PrintAllEntries(H);
-      // cout<<"compute velo "<<evolve_velocity;
-
+      
+      // time setState function
       auto start_setState = std::chrono::high_resolution_clock::now();
       amrObjHolderPtr->setState(iceState,evolve_velocity); // constH is updated after setState
       auto end_setState = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> duration_setState = end_setState - start_setState;
-      // cout<<"constH norm 2 after set state: ";
-      // y->PrintL2norm(constH);
       
-      // reshape(dHdtVect,constH); // this shouldn't matter, whether constH or constH_copy, whether reshape or reshapefill
       reshapeAndFill(dHdtVect,H);
 
+      // time computedHdt function
       auto start_compute_dHdt = std::chrono::high_resolution_clock::now();
       amrObjHolderPtr->compute_dHdt(dHdtVect, H, dt, evolve_velocity);
       auto end_compute_dHdt = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> duration_compute_dHdt = end_compute_dHdt - start_compute_dHdt;// cout<<"dHdtVect norm 2: ";
       
-      // y->PrintL2norm(dHdtVect);
       f->SetdHdtVector(dHdtVect,c_AmrIceHolderPtr);
-      // MayDay::Error("....exit here");
-
+      
       c_AmrIceHolderPtr->updateCallTimeFEval(duration_setState,duration_compute_dHdt);
    }
 
@@ -490,7 +354,7 @@ void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, BisiclesVector *y, d
    void PfasstPrintAmr(BisiclesVector *y, AmrIceHolderClass *c_AmrIceHolderPtr)
    {
       Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
-      // y->PrintLevelData(constH);
+      
       int nlvl=constH.size();
       for (int lvl=0; lvl < nlvl; lvl++)
       {
@@ -502,14 +366,12 @@ void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, BisiclesVector *y, d
          {
          const Box& box = dbl[dit()];
          FArrayBox& fab = ldf[dit()];
-         //  test_min=fab.norm(box,1);
          cout<<"  box "<<box<<endl;
          } 
       }
    }
 
    MPI_Fint PfasstBisicles_MPI_Comm_c2f(MPI_Comm *comm) {
-      cout<<"in mpi c2f: "<<comm<<endl;
       return MPI_Comm_c2f(*comm);
    } 
 
