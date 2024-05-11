@@ -89,14 +89,9 @@ BisiclesVector::BisiclesVector(int num_grid_points, AmrIceHolderClass *c_AmrIceH
       int iter=0;
       for (dit.reset(); dit.ok(); ++dit)
       {
-         // cout<<" dit iter "<<iter<<endl;
          iter ++;
-         // const FArrayBox& curHArray = (*HVector[lvl])[dit()];
-         // Box edgeBox = surroundingNodes(curHArray.box(), 0); // sec var is direction
-         // cout<<"...bisicles vector creating edgeBox "<<edgeBox<<endl;
       }
 
-      // DataIterator dit = (*HVector[lvl]).dataIterator();
       for (dit.begin(); dit.ok(); ++dit)
       {
          (*HVector[lvl])[dit].setVal(0.0);
@@ -105,28 +100,9 @@ BisiclesVector::BisiclesVector(int num_grid_points, AmrIceHolderClass *c_AmrIceH
         
    }
 
-   // bisicles vectors are intialized in pfasst corrrectly in different spatial levels
-   // int nlvl=HVector.size();
-   // for (int lvl=0; lvl < nlvl; lvl++)
-   // {
-   //   LevelData<FArrayBox>& ldf = *HVector[lvl];
-   //   DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-   //   DataIterator dit = ldf.dataIterator();
-   //   cout<<"bisicle vector create level "<<lvl<<endl;
-   //   for (dit.reset(); dit.ok(); ++dit) 
-   //    {
-   //     const Box& box = dbl[dit()];
-   //     FArrayBox& fab = ldf[dit()];
-   //    //  test_min=fab.norm(box,1);
-   //    cout<<"  box "<<box<<endl;
-   //    } 
-   // }
-   
-
    reshapeAndFill(iceState.ice_thickness, HVector);
 
-
-   InitGrid(num_grid_points);
+   // InitGrid(num_grid_points);
    // exit(0);
 }
 
@@ -147,23 +123,6 @@ Vector<LevelData<FArrayBox>* > *BisiclesVector::GetdHdtVectorPtr(void)
 
 const Vector<LevelData<FArrayBox>* >& BisiclesVector::GetHVector(void) const
 {
-   
-      // Real test_min=0;
-      // for (int lvl=0; lvl < HVector.size(); lvl++)
-      // {
-      // LevelData<FArrayBox>& ldf = *HVector[lvl];
-      // DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-      // DataIterator dit = ldf.dataIterator();
-      // for (dit.reset(); dit.ok(); ++dit) 
-      //    {
-      //    const Box& box = dbl[dit()];
-      //    FArrayBox& fab = ldf[dit()];
-      //    test_min=fab.norm(box,1);
-      //    //  cout<<"      bisicles... box "<<box<<endl;
-      //     cout<<"      bisicles... print L2 norm: "<<test_min<<endl;
-      //    } 
-      // }
-      // cout<<"Hvector "<<HVector<<endl;
    return HVector;
 }
 
@@ -194,7 +153,6 @@ void BisiclesVector::SetdHdtVector(Vector<LevelData<FArrayBox>* > src,AmrIceHold
 
    for (int lvl=0; lvl < nlvl; lvl++)
    {
-      // dHdtVector[lvl]=xdHdtVector[lvl];
      LevelData<FArrayBox>& ldf = *HVector[lvl];
      LevelData<FArrayBox>& xldf = *xdHdtVector[lvl];
      DisjointBoxLayout dbl = ldf.disjointBoxLayout();
@@ -210,9 +168,6 @@ void BisiclesVector::SetdHdtVector(Vector<LevelData<FArrayBox>* > src,AmrIceHold
       } 
   
   }
-//   Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
-      // cout<<"-- 5 bis_vec:\n";
-      // PrintLevelData(constH);
 }
 
 
@@ -245,12 +200,6 @@ void BisiclesVector::SetHVector(BisiclesVector* src)
 }
 
 
-// double *BisiclesVector::DataPtrGet(void)
-// {
-//    double *data = (double *)calloc(num_grid_points, sizeof(double));
-//    return data;
-// }
-
 double BisiclesVector::DataGet(void)
 {
    return data;
@@ -277,7 +226,6 @@ void BisiclesVector::HSetVal2All(double val,AmrIceHolderClass *c_AmrIceHolderPtr
    int i=0;
    for (int lvl=0; lvl < HVector.size(); lvl++)
    {
-   //   cout<<"lvl "<<lvl<<endl;
      LevelData<FArrayBox>& ldf = *HVector[lvl];
      DisjointBoxLayout dbl = ldf.disjointBoxLayout();
      DataIterator dit = ldf.dataIterator();
@@ -287,23 +235,6 @@ void BisiclesVector::HSetVal2All(double val,AmrIceHolderClass *c_AmrIceHolderPtr
      }
    }
 
-   // setting some specific entries for packing/unpacking testing
-   // int count=0;
-   // for (int lvl=0; lvl < HVector.size(); lvl++)
-   // {
-   //   LevelData<FArrayBox>& ldf = *HVector[lvl];
-   //   DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-   //   DataIterator dit = ldf.dataIterator();
-   //   for (dit.reset(); dit.ok(); ++dit) {
-   //    const Box& box = dbl[dit()];
-   //    FArrayBox& fab = ldf[dit()];
-   //    if(count==0){ // only setting specific values in first box
-   //       cout<<"setting specific values in box "<<box<<endl;
-   //       fab.setSpecificValTest(box);
-   //    }
-   //    count++;
-   //   }
-   // }
 }
 
 double *BisiclesVector::GetdHdtDataPtr(void)
@@ -315,46 +246,11 @@ double *BisiclesVector::GetdHdtDataPtr(void)
 
 Vector<LevelData<FArrayBox>* >* BisiclesVector::GetHDataPtr()
 {
-   // count the grid cells in each level and store into vecotr
-   // AmrIce *amrObjHolderPtr;
-   // amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
    int nlvl=HVector.size();
    Vector<int> num_of_grid_points_vec(nlvl);
-   // int total_num_grid_points=0;
-   // Real test_min=0;
-   // for (int lvl=0; lvl < nlvl; lvl++)
-   // {
-   //   const DisjointBoxLayout& current_grid_size=amrObjHolderPtr->grids(lvl);
-   //   LayoutIterator lit = current_grid_size.layoutIterator();
-   //   LevelData<FArrayBox>& ldf = *HVector[lvl];
-   //   DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-   //   DataIterator dit = ldf.dataIterator();
-   //   for (dit.begin(); dit.ok(); ++dit)
-   //   {
-   //     const Box& thisBox = current_grid_size.get(dit());
-   //     num_of_grid_points_vec[lvl] += thisBox.numPts();
-   //     const Box& box = dbl[dit()];
-   //     FArrayBox& fab = ldf[dit()];
-   //     test_min=fab.norm(box,1);
-   //    //  cout<<"      in packing H box "<<box<<endl;
-   //    //  cout<<"      in packing H L2 norm: "<<test_min<<endl;
-   //    }
-   //    total_num_grid_points +=num_of_grid_points_vec[lvl];
-   // }
-   // allocate the vector for H and store the pointers in value
-   // double *values = (double *)calloc(total_num_grid_points, sizeof(double));
-   // cout<<"       in packing HVector "<<HVector<<endl;
    return &HVector;
-   // Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
-      // cout<<"-- 3 bis_vec:\n";
-      // PrintLevelData(constH);
 }
 
-// double BisiclesVector::DataNorm(void)
-// {
-//    cout<< "bisicles_vector.cpp abs data "<<abs(data)<< std::endl;
-//    return abs(data);
-// }
 
 double BisiclesVector::dHdtL2Norm(void)
 {
@@ -364,11 +260,9 @@ double BisiclesVector::dHdtL2Norm(void)
 double BisiclesVector::HL2Norm(void)
 {
    double L2norm;
-   // cout<<"      bisicles... in compute norm, HVector "<<HVector<<", size "<<HVector.size()<<endl;
    Real test_min=0;
    for (int lvl=0; lvl < HVector.size(); lvl++)
    {
-   //   cout<<"      bisicles... level "<<lvl<<endl;
      LevelData<FArrayBox>& ldf = *HVector[lvl];
      DisjointBoxLayout dbl = ldf.disjointBoxLayout();
      DataIterator dit = ldf.dataIterator();
@@ -377,14 +271,11 @@ double BisiclesVector::HL2Norm(void)
        const Box& box = dbl[dit()];
        FArrayBox& fab = ldf[dit()];
        test_min=fab.norm(box,1);
-      //  cout<<"      bisicles... box "<<box<<endl;
-      //  cout<<"      bisicles... print L2 norm: "<<test_min<<endl;
       } 
    }
    // input: vector to compute norm, refine ratio, dx, interval?, a_p(1-L1,2-L2),
    // hanging up here with multiple procs
    L2norm=computeNorm(HVector, refineRatio , amrDx[0], Interval(0,0),2, 0); 
-   // cout<<"      ... done L2norm computation\n";
    return L2norm;
 }
 
@@ -404,12 +295,7 @@ void BisiclesVector::PrintHL2norm(void)
        const Box& box = dbl[dit()];
        FArrayBox& fab = ldf[dit()];
        test_min=fab.norm(box,1);
-      //  if(box_index==1){
-      //       cout<<" in printing L2 norm, the box to be packed box "<<box<<endl;
-      //       fab.printAll(box);
-      //       cout<<"\n";
-      //   }
-        box_index++;
+       box_index++;
        cout<<"   ... box "<<box<<", print L2 norm: "<<test_min<<endl;
       } 
   }
@@ -419,13 +305,10 @@ void BisiclesVector::PrintL2norm(Vector<LevelData<FArrayBox>* > Vect2Print)
 {
    Real test_min=0;
    int nlvl=Vect2Print.size();
-   // cout<<" # of levels "<<nlvl<<endl;
    for (int lvl=0; lvl < nlvl; lvl++)
    {
      LevelData<FArrayBox>& ldf = *Vect2Print[lvl];
-   //   cout<<"  level data "<<ldf.getBoxes();
      DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-   //   cout<<"  box "<<dbl;
      DataIterator dit = ldf.dataIterator();
      for (dit.reset(); dit.ok(); ++dit) 
       {
@@ -586,7 +469,6 @@ void BisiclesVector::PrintLevelData(Vector<LevelData<FArrayBox>* > level_data_to
       {
        const Box& box = dbl[dit()];
        FArrayBox& fab = ldf[dit()];
-      //  test_min=fab.norm(box,1);
       cout<<"    box "<<box<<endl;
       } 
    }
@@ -639,7 +521,6 @@ void BisiclesVector::PrintAllFluxBox(Vector<LevelData<FluxBox>* > level_data_to_
    for (int lvl=0; lvl < nlvl; lvl++)
    {
      LevelData<FluxBox>& ldf = *level_data_to_print[lvl];
-   //   LevelData<FArrayBox>& ldf1 = *a_H[lev];
      DisjointBoxLayout dbl = ldf.disjointBoxLayout();
      DataIterator dit = ldf.dataIterator();
      for (dit.reset(); dit.ok(); ++dit) 

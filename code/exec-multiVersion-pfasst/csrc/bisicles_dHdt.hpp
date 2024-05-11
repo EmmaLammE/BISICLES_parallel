@@ -3,12 +3,12 @@
 
 #include <iostream>
 #include <cstdlib>
-#include "chombo_struct.hpp"
+// #include "chombo_struct.hpp"
 #include "bisicles_holder.hpp"
 
 using namespace std;
 
-class BisiclesdHdtSolver : public ChomboStruct, public AmrIceHolderClass{
+class BisiclesdHdtSolver :  public AmrIceHolderClass{
    protected:
 
    public:

@@ -84,54 +84,26 @@ module pfasst_main
      call probin_init(pf_fname)
  
      call create_simple_communicators(nspace, ntime, pf_comm_fromBisicles, space_comm, time_comm, space_color, time_color, space_dim)
-     ! f_comm = MPI_Comm_c2f(pf_commPtr)
-     ! print *,'MPI_COMM_WORLD ',MPI_COMM_WORLD
-     ! print *,'time communicator in pfasst ',pf_comm_fromBisicles,', pf mpi time comm ',time_comm,', pf mpi space comm ',nspace
      call mpi_comm_size(pf_comm_fromBisicles, nproc, error)
      call mpi_comm_rank(pf_comm_fromBisicles, rank,  error)
      print *, 'time communicator in pfasst, num of procs for one time step ',nproc, ', rank ', rank
  
      !>  Set up communicaton
      call pf_mpi_create(comm, pf_comm_fromBisicles)
-     ! print *, '-------------- done assigning mpi communicator from bisicles to pfasst ---------------'
-     ! print *, "after assigning mpi comm, comm%nproc ",comm%nproc
      !>  Create the pfasst structure
      call pf_pfasst_create(pf, comm, fname=pf_fname) !< o
-     ! print *, "after create pf obj, pf%comm%nproc ",pf%comm%nproc
-     ! print *, '--------------------------- done creating pfasst obj ---------------------------------'
- 
+     
      !> ----- initialize the vectors & solvers for later, not initial condition of setting values -----
       call PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,evolve_velocity_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
-     !  print *, 'after pfasst init'
-     !  call pf%levels(pf%state%finest_level)%Q(1)%eprint()
-      !> PfasstBisiclesInit=allocate lev_shape+ulevel+factory+sweeper+level_set_size+pf_setup
-     !> ----- end of initialize the vectors & solvers for later, including params change -----
-     !print *, 'pfasst_main.f90 0000 grid size from bisicles to pfasstpf%levels(2)%lev_shape ',pf%levels(2)%lev_shape 
-     ! print *, 'check if temporal params are passed in correctly:'
-     ! print *, 'pfasst_main.f90 0000 T final ',Tfin
-     ! print *, 'pfasst_main.f90 0000 dt ',dt
-     ! print *, 'pfasst_main.f90 0000 nsteps ',nsteps
-     !  print *,'5 pf%comm%nproc ', pf%comm%nproc
-     !>  Output run parameters
-    !  if (PF_VERBOSE) then
-    !    call print_loc_options(pf, pf_comm_fromBisicles)
-    !    ! check if num of time steps assigned correctly
- 
-    !    ! print *, '--------------------------- done print out ------------------------------------------'
-    !  end if
+     
  
      
      !>  Add some hooks for output
      call pf_add_hook(pf, -1, PF_POST_ITERATION, echo_error)
-     ! print *, '--------------------------- done pf adding hooks -------------------------------------'
-     ! print *, 'after adding hooks'
-     ! call pf%levels(pf%state%finest_level)%Q(1)%eprint()
-     ! print *,'6 pf%comm%nproc ', pf%comm%nproc
      !> setup initial condition
      level_index = 1
      !> Set the initial condition
      call bvf%create_single(y_0_base, level_index, lev_shape(level_index,:))
-     !print *,'y_end create single '
      call bvf%create_single(y_end_base, level_index, lev_shape(level_index,:))
      call bvf%create_single(y_test_base, level_index, lev_shape(level_index,:))
  
@@ -142,29 +114,9 @@ module pfasst_main
      !> intialize y_0 and y_end to some value
      y_0_IC = 1.0_pfdp
      y_end_IC = 10.7_pfdp
-     !call BisiclesAssignIC(pf,y_0,y_end,y_0_IC,y_end_IC)
-     !print *,'y_end assign single '
+     
      call y_end%setval(1000.0_pfdp)
      call y_0%setval(1000.0_pfdp)
-    !  print *, "Bisicles Disjoint Boxes in current PFASST temporal processor:"
-    !  call y_0%eprintLevelDataBox(y_0)
-     ! packing test
-     ! call y_0%eprint()
-     ! allocate(v(num_grid_points))
-     ! call y_0%pack(v)
-     ! call y_test%unpack(v)
-     ! call y_test%eprint()
-     ! call exit(0)
- 
-     !call y_0%copy(y_end)
-     !print *,'y_end axpy single '
-     !call y_end%axpy(-1.0_pfdp, y_0)
-     !print *,'y_end done axpy single '
-     !call y_0%pack(v)
- 
-     !call y_end%eprint()
-     !norm = y_end%norm()
-    !  t=0.1
      z_c_ptr=pf%cptr_AmrIceHolder
  
      !call y_end%savesnap()

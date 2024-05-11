@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <cstdlib>
-#include "chombo_struct.hpp"
+// #include "chombo_struct.hpp"
 #include "bisicles_holder.hpp"
 #include "LevelData.H"
 #include "FArrayBox.H"
@@ -13,7 +13,7 @@
 
 using namespace std;
 
-class BisiclesVector: public ChomboStruct, public AmrIceHolderClass{
+class BisiclesVector:  public AmrIceHolderClass{
    protected:
       double data;
       Vector<LevelData<FArrayBox>* > *dHdtVectorPtr;

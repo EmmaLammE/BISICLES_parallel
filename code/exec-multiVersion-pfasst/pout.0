@@ -1,4 +1,4 @@
-number_procs = 4, rank = 0
+number_procs = 4, rank = 1
 No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false
 AmrIce::initGrids
 Level 0: 256 cells: ((0,0) (3,3) (0,0))[0] # ((0,4) (3,7) (0,0))[0] # ((0,8) (3,11) (0,0))[1] # ((0,12) (3,15) (0,0))[1]
@@ -442,137 +442,116 @@ IceNonlinearViscousTensor::setState (recomputes viscous tensor coeffs)
 AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
-resetting solution time from 0  to 2.122e-314
+resetting solution time from 0  to 1.47186e-316
 AmrIce::setState
-resetting solution time from 2.122e-314  to 0
+resetting solution time from 1.78216e-316  to 7.90505e-322
 AmrIce::setState
-resetting solution time from 0  to 2.122e-314
+resetting solution time from 7.90505e-322  to 1.78216e-316
 AmrIce::setState
-resetting solution time from 2.122e-314  to 0
+resetting solution time from 1.47186e-316  to -2.33036e-28
 AmrIce::setState
-resetting solution time from 0  to 2.122e-314
+resetting solution time from 7.90505e-322  to 0
 AmrIce::setState
-resetting solution time from 2.122e-314 AmrIceAmrIce::setState
-resetting solution time from 0 AmrIceAmrIce::setState
-resetting solution time from 0 AmrIceAmrIce::setState
-resetting solution time from 0 AmrIceAmrIce::setState
-resetting solution time from 0 AmrIceAmrIce::setState
-resetting solution time from 0 AmrIceAmrIce::setState
-resetting solution time from 0 AmrIceAmrIce::setState
-resetting solution time from 0 AmrIceAmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solutiAmrIce::setState
+reseAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::setState
+reseAmrIce::setState
+resetting solutiAmrIce::setState
+resetting solution time frAmrIce::setAmrIce::setState
+resetting solution time from 0  to 1.47186e-316
+AmrIce::setState
+resetting solution time from 1.47186e-316  to -2.33036e-28
+AmrIce::setState
+resetting solution time from -2.33036e-28  to 1.AmrIce::setAmrIceresetting sresetting solution time frAmrIce::setState
+resetting solutiAmrIce::setState
+reseAmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
-resetting solution time from 0  to 2.122e-314
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::setState
+reseAmrIce::setState
+resetting solutiAmrIce::setState
+resetting solution time frAmrIce::setAmrIce::setState
+resetting solution time from 0  to 1.47186e-316
 AmrIce::setState
-resetting solution time from 2.122e-314  to 0
+resetting solution time from 1.47186e-316  to -2.33036e-28
 AmrIce::setState
-resetting solution time from 0  to 2.122e-314
-AmrIce::setState
-resetting solution time from 2.122e-314  to 0
-AmrIce::setState
+resetting solution time from -2.33036e-28  to 1.AmrIce::setAmrIce::setState
+resetting solution time frAmrIce::setState
+resetting solutiAmrIce::setState
+reseAmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::setState
+reseAmrIce::setState
+resetting solutiAmrIce::setState
+resetting solution time frAmrIce::setAmrIce::setState
+resetting solution time from 0  to 1.47186e-316
+AmrIce::setState
+resetting solution time from 1.47186e-316  to -2.33036e-28
+AmrIce::setState
+resetting solution time from -2.33036e-28  to 1.AmrIce::setAmrIce::setState
+resetting solution time frAmrIce::setState
+resetting solutiAmrIce::setState
+reseAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::setState
+reseAmrIce::setState
+resetting solutiAmrIce::setState
+resetting solution time frAmrIce::setAmrIce::setState
+resetting solution time from 0  to 1.47186e-316
+AmrIce::setState
+resetting solution time from 1.47186e-316  to -2.33036e-28
+AmrIce::setState
+resetting solution time from -2.33036e-28  to 1.AmrIce::setAmrIce::setState
+resetting solution time frAmrIce::setState
+resetting solutiAmrIce::setState
+reseAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::setState
+reseAmrIce::setState
+resetting solutiAmrIce::setState
+resetting solution time frAmrIce::setAmrIce::setState
+resetting solution time from 0  to 1.47186e-316
+AmrIce::setState
+resetting solution time from 1.47186e-316  to -2.33036e-28
+AmrIce::setState
+resetting solution time from -2.33036e-28  to 1.AmrIce::setAmrIce::setState
+resetting solution time frAmrIce::setState
+resetting solutiAmrIce::setState
+reseAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
+resetting solution time froAmrIce::seAmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
-resetting solution time from 0  to 0
+resetting solution time from 0  to 1.78216e-316
 AmrIce::setState
-resetting solution time from 0  to 0
+resetting solution time from 1.78216e-316  to 7.90505e-322
 AmrIce::setState
-resetting solution time from 0  to 0
+resetting solution time from 7.90505e-322  to 1.78216e-316
 AmrIce::setState
-resetting solution time from 0  to 2.122e-314
+resetting solution time from 1.78216e-316  to 7.90505e-322
 AmrIce::setState
-resetting solution time from 2.122e-314  to 0
-AmrIce::setState
-resetting solution time from 0  to 2.122e-314
-AmrIce::setState
-resetting solution time from 2.122e-314  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 2.122e-314
-AmrIce::setState
-resetting solution time from 2.122e-314  to 0
-AmrIce::setState
-resetting solution time from 0  to 2.122e-314
-AmrIce::setState
-resetting solution time from 2.122e-314  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 2.122e-314
-AmrIce::setState
-resetting solution time from 2.122e-314  to 0
-AmrIce::setState
-resetting solution time from 0  to 2.122e-314
-AmrIce::setState
-resetting solution time from 2.122e-314  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 2.122e-314
-AmrIce::setState
-resetting solution time from 2.122e-314  to 0
-AmrIce::setState
-resetting solution time from 0  to 2.122e-314
-AmrIce::setState
-resetting solution time from 2.122e-314  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution time from 0  to 1.74153e-316
-AmrIce::setState
-resetting solution time from 1.74153e-316  to -1
-AmrIce::setState
-resetting solution time from -1 AmrIce::setState
-AmrIce::setState
-resetting solution time from 1.74153e-316  to -1
-AmrIce::setState
-resetting solution time from -1  to 0
+resetting solution time from 7.90505e-322  to 0
 AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
@@ -590,76 +569,97 @@ resetting solution time from 0  to 0
 AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
-resetting solution time from 0  to 1.74153eAmrIcAmrIce::setState
-resetting solution time from 1.7AmrIce::setState
+resetting solution time from 0  to 1.78216e-316
 AmrIce::setState
-resetting solution tAmrIce::setState
-resetting soAmrIce::setState
-resetting solutioAmrIce::setState
-resetting solutAmrIce::setState
-resetting solution time from -1resettiAmrIce::setState
-resetting solution timAmrIce::setStatAmrIce::setState
-resetting solution time from 0 AmrIceAmrIce::setState
+resetting solution time from 1.78216e-316  to 7.90505e-322
+AmrIce::setState
+resetting solution time from 7.90505e-322  to 1.78216e-316
+AmrIce::setState
+resetting solution time from 1.78216e-316  to 7.90505e-322
+AmrIce::setState
+resetting solution time from 7.90505e-322  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
-resetting solution time from 0 AmrIceAmrIce::setState
-resetting solution time from 0  to 1.74153e-316
-AmrIce::setState
-resetting solution time from 1.74153e-316  to -1
-AmrIce::setState
-resetting solution time fresetting solution time AmrIce::setState
-resetting solution time from 1.74153e-316  to -1
-AmrIce::setState
-resetting solution resetting solution AmrIce::setState
-resetting solution time from 0  to 0
-AmrIce::setState
-resetting solution AmrIce::setState
-rAmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
-resetting solution AmrIce::setState
-rAmrIce::setState
-resetting solution AmrIce::setState
-resetting soAmrIce::setState
-resettinAmrIce::setState
-resetting solution time AmrIce::setStAmrIce::setState
-resetting solution time from 0  to 2AmrIce::seAmrIce::setState
-resetting solution time from 2.122e-314AmrIce:AmrIce::seresettiresetting solution time from 0 AmrIce::setStatAmrIce::setState
-resetting solution timAmrIce::setState
-resettiAmrIce::setState
-resetting solAmrIce::setState
-resetting solution time resetting solAmrIce::setState
-resetting solution time resetting solAmrIce::setState
-resettiAmrIce::setState
-resetting solAmrIce::setState
-resettiAmrIce::setState
-resetting solution time AmrIce::setStAmrIce::setState
-resetting solution time from 0  to 0AAmrIce::setState
-resetting solution time from 0  to 2.122e-314
+resetting solution time from 0  to 1.78216e-316
 AmrIce::setState
-resetting solution time from 2.122e-314  to 0
+resetting solution time from 1.78216e-316  to 7.90505e-322
 AmrIce::setState
-resetting solution time from 0  to 2.122e-3AmrAmrIce::setStaresresetting solution time from 2.122AmrIce::setSAmrIce::setState
-resetting solution time fAmrIce::setState
+resetting solution time from 7.90505e-322  to 1.78216e-316
+AmrIce::setState
+resetting solution time from 1.78216e-316  to 7.90505e-322
+AmrIce::setState
+resetting solution time from 7.90505e-322  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
 resetting solution time from 0  to 0
-AmrIce::setSAmrIce::setState
-resetting solution time fAmrIce::setSAmrIce::setState
-resetting solution time from 0  to 0AAmrIce::setState
+AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
-resetting solution time from 0  to 2.122e-314
+resetting solution time from 0  to 0
 AmrIce::setState
-resetting solution time from 2.122e-314  to 0
+resetting solution time from 0  to 1.78216e-316
 AmrIce::setState
-resetting solution time from 0  to 2.122e-314
+resetting solution time from 1.78216e-316  to 7.90505e-322
 AmrIce::setState
-resetting solution time from 2.122e-314  to 0
+resetting solution time from 7.90505e-322  to 1.78216e-316
+AmrIce::setState
+resetting solution time from 1.78216e-316  to 7.90505e-322
+AmrIce::setState
+resetting solution time from 7.90505e-322  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 1.78216e-316
+AmrIce::setState
+resetting solution time from 1.78216e-316  to 7.90505e-322
+AmrIce::setState
+resetting solution time from 7.90505e-322  to 1.78216e-316
+AmrIce::setState
+resetting solution time from 1.78216e-316  to 7.90505e-322
+AmrIce::setState
+resetting solution time from 7.90505e-322  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 1.78216e-316
+AmrIce::setState
+resetting solution time from 1.78216e-316  to 7.90505e-322
+AmrIce::setState
+resetting solution time from 7.90505e-322  to 1.78216e-316
+AmrIce::setState
+resetting solution time from 1.78216e-316  to 7.90505e-322
+AmrIce::setState
+resetting solution time from 7.90505e-322  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
 AmrIce::setState
 resetting solution time from 0  to 0
 AmrIce::setState
@@ -672,7 +672,15 @@ AmrIce::writeAMRPlotFile
 AmrIce::~AmrIce()
 AmrIce::~AmrIce()
 AmrIce::~AmrIce()
-g solution time from 0  to 0
+ 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
+AmrIce::setState
+resetting solution time from 0  to 0
 AmrIce::writeAMRPlotFile
 AmrIce::~AmrIce()
 AmrIce::~AmrIce()
