@@ -5,7 +5,7 @@
 ebase = compare
 
 ## location of 'lib' directory
-CHOMBO_HOME = /Users/emmaliu/packages/Chombo/lib
+CHOMBO_HOME = /global/homes/e/emmaliu/Chombo/lib
 
 ##
 ## names of Chombo libraries needed by this program, in order of search.

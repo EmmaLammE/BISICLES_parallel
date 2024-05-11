@@ -1,0 +1,10 @@
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+../src/L1L2ConstitutiveRelation.cpp:473: Assertion `resNorm < 2.0 * m_solverTol' failed. !!!
+srun: error: nid004350: task 1: Aborted
+srun: Terminating StepId=18406695.0
+slurmstepd: error: *** STEP 18406695.0 ON nid004350 CANCELLED AT 2023-11-19T21:09:41 ***
+srun: error: nid004350: tasks 0,2-3: Terminated
+srun: Force Terminated StepId=18406695.0

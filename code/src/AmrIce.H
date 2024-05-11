@@ -680,6 +680,12 @@ void  amrThickness(Vector<LevelData<FArrayBox>* >& a_vectH)
   /// access function for surface heat flux
   const  Vector<LevelData<FArrayBox>* >& surfaceHeatFlux() const {return m_sHeatFlux; }
 
+  // EL - return the physical domain at all levels
+  const Vector<ProblemDomain> getProblemDomain() const
+  {
+    return m_amrDomains;
+  }
+
 protected:
 
   

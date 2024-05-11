@@ -1126,11 +1126,12 @@ FineInterp::s_default_boundary_limit_type = 0;
     // bool USE_PF;
     bool PF_VERBOSE;
     string pf_plot_prefix;
-    int pf_num_procs_per_time;
+    int pf_num_procs_per_time, pf_num_repeats;
     // ppfasst.get("USE_PF", USE_PF);
     ppfasst.get("PF_VERBOSE", PF_VERBOSE);
     ppfasst.get("pf_plot_prefix", pf_plot_prefix);
     ppfasst.get("pf_num_procs_per_time", pf_num_procs_per_time);
+    ppfasst.get("pf_num_repeats", pf_num_repeats);
 
     ParmParse pcrse("crse.amr");
     string crse_plot_prefix;
@@ -1141,7 +1142,6 @@ FineInterp::s_default_boundary_limit_type = 0;
     if (USE_PF){
       cout<<"\n..............Updating crse-grained using PFASST................\n";
       cout<<"  PFASST objects passing in from: crse grids and objects\n";
-      cout<<"  results saved as: "<<crse_plot_prefix<<"...";
       // cout<< "  dt passed in: "<<crseDt<<", max T passed in: "<<maxTime<<", max steps passed in:"<<maxStep<< endl;
 
       AmrIceHolderClass AmrIceHolderPtr;
@@ -1167,49 +1167,52 @@ FineInterp::s_default_boundary_limit_type = 0;
       reshape(crsedHdtVect[0],crseH);
       // cout<<"num of levels in crseH: "<<crseH.size()<<endl;
       Vector<LevelData<FArrayBox>* > ice_thick=crseStateVect[1].ice_thickness;
+      auto start_pf = std::chrono::high_resolution_clock::now();
       Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,pf_evolve_velocity,\
-      num_total_cells,pf_num_procs_per_time,PF_VERBOSE);
- 
+              num_total_cells,pf_num_repeats,PF_VERBOSE);
+      auto end_pf = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double> duration_pf = end_pf - start_pf;
+      (&AmrIceHolderPtr)->printStatistics(number_procs,new_time_size, new_space_size,new_time_rank,\
+                                          new_space_rank,duration_pf,pf_evolve_velocity,numCrseIntervals,maxTime);
+      cout<<"  results saved as: "<<crse_plot_prefix<<"...";
     } else {
     cout<<"\nUpdating crse-grained using serial................\n";
     cout<<"  results saved as: "<<crse_plot_prefix<<"...\n";
-    
+    cout<<"Not running coarse sequential\n";
     // now do each crse-grained timestep
-    for (int i=0; i<numCrseIntervals; i++)
-      {
-        // first, set state
-        bool recalculateVelocity = true;
-        //    amrObjectCrse.setState(crseHVect[i], crseTimeVect[i], recalculateVelocity);
-        recalculateVelocity = false;
-        amrObjectCrse.setState(crseStateVect[i],
-                               recalculateVelocity);         
+    // for (int i=0; i<numCrseIntervals; i++)
+    //   {
+    //     // first, set state
+    //     bool recalculateVelocity = true;
+    //     //    amrObjectCrse.setState(crseHVect[i], crseTimeVect[i], recalculateVelocity);
+    //     recalculateVelocity = false;
+    //     amrObjectCrse.setState(crseStateVect[i],
+    //                            recalculateVelocity);         
 
-        // reshape dH/dt and then call computeDhDt
-        reshape(crsedHdtVect[i],crseH);
-        amrObjectCrse.compute_dHdt(crsedHdtVect[i],crseH,crseDt, recalculateVelocity);
+    //     // reshape dH/dt and then call computeDhDt
+    //     reshape(crsedHdtVect[i],crseH);
+    //     amrObjectCrse.compute_dHdt(crsedHdtVect[i],crseH,crseDt, recalculateVelocity);
         
-        Real test_min=0;
-        int nlvl=crseH.size();
-        for (int lvl=0; lvl < nlvl; lvl++)
-        {
-          LevelData<FArrayBox>& ldf = *crseH[lvl];
-          DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-          DataIterator dit = ldf.dataIterator();
-          for (dit.reset(); dit.ok(); ++dit) 
-            {
-            const Box& box = dbl[dit()];
-            FArrayBox& fab = ldf[dit()];
-            test_min=fab.norm(box,1);
-            cout<<"   "<<test_min<<endl;
-            } 
-        }
-
-        // now advance ice sheet
-        amrObjectCrse.run(maxTime, maxStep);
-
-        // now retrieve state and store
-        amrObjectCrse.getState(crseStateVect[i+1]);
-      }
+    //     Real test_min=0;
+    //     int nlvl=crseH.size();
+    //     for (int lvl=0; lvl < nlvl; lvl++)
+    //     {
+    //       LevelData<FArrayBox>& ldf = *crseH[lvl];
+    //       DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+    //       DataIterator dit = ldf.dataIterator();
+    //       for (dit.reset(); dit.ok(); ++dit) 
+    //         {
+    //         const Box& box = dbl[dit()];
+    //         FArrayBox& fab = ldf[dit()];
+    //         test_min=fab.norm(box,1);
+    //         cout<<"   "<<test_min<<endl;
+    //         } 
+    //     }
+    //     // now advance ice sheet
+    //     amrObjectCrse.run(maxTime, maxStep);
+    //     // now retrieve state and store
+    //     amrObjectCrse.getState(crseStateVect[i+1]);
+    //   }
     }
 
 
@@ -1218,7 +1221,7 @@ FineInterp::s_default_boundary_limit_type = 0;
     pfine.get("plot_prefix",fine_plot_prefix);
     cout<<"\n..............Updating fine-grained using serial................\n";
     cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
-    pout() << endl;
+    // pout() << endl;
 
     // now do each fine-grained timestep
     auto start = high_resolution_clock::now();
@@ -1248,7 +1251,7 @@ FineInterp::s_default_boundary_limit_type = 0;
     //     amrObjectFine.getState(fineStateVect[i+1]);
     //     cout << "loop # " << i << std::endl;
 
-    //   }    
+      // }    
 
         
 

@@ -168,7 +168,7 @@ contains
     y_encap => cast_as_bisicles_vector(lev%Q(snapshot_to_save))
     !print *, ' saving results... y_encap ID y_encap%c_encap_ptr,',y_encap%c_encap_ptr
     print *, '                    temp_level_to_save,snapshot_to_save',temp_level_to_save,snapshot_to_save
-    call y_encap%eprint()
+    ! call y_encap%eprint()
     
 
     call y_encap%savesnap()

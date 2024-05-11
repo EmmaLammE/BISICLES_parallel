@@ -249,20 +249,20 @@ void FillFromReference(LevelData<FArrayBox>& a_destData,
 	   // now fill in ghost cells, using PiecewiseLinearFillPatch
 	   IntVect ghostVect = a_destData.ghostVect();
 	   if (ghostVect[0] != 0)
-	     {
+	   {
 	       if (a_verbose)
-		 {
-		   pout() << " ...interpolating " << ghostVect[0] 
-			  << " cells of ghost data along coarse-fine interfaces refinement ratio =  "
-			  << nRef << endl;
-		 }
+          {
+            pout() << " ...interpolating " << ghostVect[0] 
+              << " cells of ghost data along coarse-fine interfaces refinement ratio =  "
+              << nRef << endl;
+          }
 	       ProblemDomain coarseDomain = fineDomain;
 	       coarseDomain.coarsen(nRef);
 	       //const ProblemDomain coarseDomain = srcGrids.physDomain();
 	       PiecewiseLinearFillPatch pwl(destGrids, srcGrids, a_destData.nComp(), coarseDomain, nRef,  ghostVect[0]);
 	       Real time_interp_coeff = 0.0;
 	       pwl.fillInterp(a_destData, a_srcData, a_srcData,time_interp_coeff, 0, 0, a_destData.nComp());
-	     }
+	    }
 	 }
        else if (nRef%2 == 0)
 	 {

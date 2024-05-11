@@ -51,6 +51,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <mpi.h>
+#include <chrono>  // For high-resolution clock
 using namespace std;
 
 
@@ -130,233 +131,163 @@ int BisiclesCurrentVectorSize(BisiclesVector *bisicles_vector)
    }
 
 Real* BisiclesVectorPack(BisiclesVector *bisicles_vector, AmrIceHolderClass *c_AmrIceHolderPtr, int level_id)
-   {
-      const Vector<LevelData<FArrayBox>* >& test=bisicles_vector->GetHVector();
-      int num_lvl = test.size();
-     int num_boxes_per_lvl_per_rank[num_lvl];
-     int num_boxes_per_lvl;
-     int num_cells_per_lvl[num_lvl];
-     int num_cells_per_lvl_per_rank[num_lvl];
-     int num_cells_per_box[num_lvl];
-     int num_total_cells_per_rank = 0;
-     for (int lvl=0; lvl < num_lvl; lvl++)
-     {
+{
+   //  static int call_count = 0;  // Counts how many times this function is called
+   //  static std::chrono::duration<double> total_duration(0); // Total duration of all calls
+    auto start_time = std::chrono::high_resolution_clock::now();  // Start time
+
+    const Vector<LevelData<FArrayBox>*>& test = bisicles_vector->GetHVector();
+    int num_lvl = test.size();
+    vector<int> num_boxes_per_lvl_per_rank(num_lvl);
+    vector<int> num_cells_per_lvl(num_lvl);
+    vector<int> num_cells_per_lvl_per_rank(num_lvl);
+    vector<int> num_cells_per_box(num_lvl);
+    int num_total_cells_per_rank = 0;
+
+    // Pre-calculate some values to avoid recalculating inside the loop
+    vector<int> num_boxes_per_lvl(num_lvl);
+    for (int lvl = 0; lvl < num_lvl; ++lvl) {
+        LevelData<FArrayBox>& ldf = *test[lvl];
+        DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+        num_cells_per_lvl[lvl] = dbl.numCells();
+        num_boxes_per_lvl[lvl] = dbl.size();
+        num_cells_per_box[lvl] = num_cells_per_lvl[lvl] / num_boxes_per_lvl[lvl];
+        num_boxes_per_lvl_per_rank[lvl] = 0;
+        num_cells_per_lvl_per_rank[lvl] = 0;
+    }
+
+    // Main loop
+    for (int lvl = 0; lvl < num_lvl; ++lvl) {
+        LevelData<FArrayBox>& ldf = *test[lvl];
+        DataIterator dit = ldf.dataIterator();
+        for (dit.reset(); dit.ok(); ++dit) {
+            num_boxes_per_lvl_per_rank[lvl]++;
+            num_cells_per_lvl_per_rank[lvl] += num_cells_per_box[lvl];
+        }
+        num_total_cells_per_rank += num_cells_per_lvl_per_rank[lvl];
+    }
+
+    Real** flattened_box;
+    vector<Real*> flattened_array(num_lvl);
+    for (int lvl = 0; lvl < num_lvl; ++lvl) {
+        int num_cells = num_boxes_per_lvl_per_rank[lvl] * num_cells_per_box[lvl];
+        flattened_array[lvl] = (Real*)malloc(num_cells * sizeof(Real));
+
         LevelData<FArrayBox>& ldf = *test[lvl];
         DisjointBoxLayout dbl = ldf.disjointBoxLayout();
         DataIterator dit = ldf.dataIterator();
-        num_cells_per_lvl[lvl] = dbl.numCells();
-        num_boxes_per_lvl = dbl.size();
-        num_cells_per_box[lvl] = num_cells_per_lvl[lvl]/num_boxes_per_lvl;
-        num_boxes_per_lvl_per_rank[lvl]=0;
-        num_cells_per_lvl_per_rank[lvl]=0;
-        for (dit.reset(); dit.ok(); ++dit)
-        {
-           num_boxes_per_lvl_per_rank[lvl]++;
-           num_cells_per_lvl_per_rank[lvl] += num_cells_per_box[lvl];
-        }
-        num_total_cells_per_rank += num_cells_per_lvl_per_rank[lvl];
-      //   cout<<"rank "<<space_rank<<",lvl "<<lvl<<",num of boxes on this rank "<<num_boxes_per_lvl_per_rank[lvl]<<endl;
-     }
-
-      
-      Real** flattened_box;
-      Real* flattened_array[num_lvl];
-      Real* flattened_level;
-      for (int lvl=0; lvl < num_lvl; lvl++)
-      {
-         LevelData<FArrayBox>& ldf = *test[lvl];
-         DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-         DataIterator dit = ldf.dataIterator();
-         // some sizes
-         // num_cells_per_lvl[lvl] = dbl.numCells();
-         // num_total_cells += num_cells_per_lvl[lvl];
-         // int num_boxes_per_lvl = dbl.size();
-         // int num_cells_per_box = num_cells_per_lvl[lvl]/num_boxes_per_lvl;
-         int box_index=0;
-         // declare a vector of pointers with each pointer pointing to a flattened box
-         Real** flattened_box = (Real **)malloc(num_boxes_per_lvl_per_rank[lvl] * sizeof(Real *));
-         for (dit.reset(); dit.ok(); ++dit) 
-         {
-            // cout<<"dit "<<dit()<<endl;
-            const Box& box = dbl[dit()]; // dbl.numCells(): number of cells in all boxes of entire box layout
+        int box_index = 0;
+        for (dit.reset(); dit.ok(); ++dit) {
+            const Box& box = dbl[dit()];
             FArrayBox& fab = ldf[dit()];
-            // if(box_index==0){
-            // cout<<" in packing, the box to be packed box "<<box<<endl;
-            // fab.printAll(box);
-            // cout<<"\n";
-            // }
-            flattened_box[box_index] = fab.flattenAll(box);
-            // flattened_array = fab.flattenAll(box);
-            // check if the array is flattened properly
-            // box.numPts() returns the num of cells in this one box only
-            // printf("flattened_box of size %d:",box.numPts(),"\n");
-            // for (int i = 0; i < box.numPts(); i++) {
-            //    printf("%lf ", flattened_box[box_index][i]);
-            // }
-            // printf("\n");
+            Real* flattened_data = fab.flattenAll(box);
+            memcpy(flattened_array[lvl] + box_index * num_cells_per_box[lvl], flattened_data, num_cells_per_box[lvl] * sizeof(Real));
+            free(flattened_data);
             box_index++;
-         } 
-         flattened_array[lvl] = (Real *)malloc(num_boxes_per_lvl_per_rank[lvl]*num_cells_per_box[lvl] * sizeof(Real));
-         // Copy data from the individual arrays to the concatenated array
-         for(int i=0;i<num_boxes_per_lvl_per_rank[lvl];i++){
-            memcpy(flattened_array[lvl] + i*num_cells_per_box[lvl], flattened_box[i], num_cells_per_box[lvl] * sizeof(Real));
-         }
-         free(flattened_box);
-         // cout<<"flattened_array "<<flattened_array<<endl;
-         // printf("flattened_array of size %lld:",num_cells_per_lvl[lvl],"\n");
-         // for (int i = 0; i < num_cells_per_lvl[lvl]; i++) {
-         //       printf("%lf ", flattened_array[lvl][i]);
-         // }
-         // printf("\n");
-      }
-      flattened_level = (Real *)malloc(num_total_cells_per_rank * sizeof(Real));
-      // cout<<"flattened level before copy\n";
-      //    for (int i = 0; i < 2560; i++) {
-      //          printf("%lf \n", flattened_level[i]);
-      //    }
-      for (int lvl=0; lvl < num_lvl; lvl++)
-      {
-         // cout<<"  level "<<lvl<<", flattened array to copy of size"<<num_cells_per_lvl[lvl]<<"\n";
-         // for (int i = 0; i < num_cells_per_lvl[lvl]; i++) {
-         //       printf("   %lld, %lf \n", i,flattened_array[lvl][i]);
-         // }
-         if(lvl==0){
-         memcpy(flattened_level, flattened_array[lvl], num_cells_per_lvl_per_rank[lvl] * sizeof(Real));
-         }else{
-         memcpy(flattened_level + num_cells_per_lvl_per_rank[lvl-1], flattened_array[lvl], num_cells_per_lvl_per_rank[lvl] * sizeof(Real));
-         }
-         // cout<<"  level "<<lvl<<", flattened level after copy\n";
-         // for (int i = 0; i < 2560; i++) {
-         //       printf("   %lld, %lf \n", i,flattened_level[i]);
-         // }
+        }
+    }
 
-         // check if flattened array corretcly copied all flattened box values
-         // cout<<"packing flattened_level "<<flattened_level<<endl;
-         // printf("flattened_level of size %lld:",num_total_cells,"\n");
-         // for (int i = 0; i < num_total_cells; i++) {
-         //       printf("%lf ", flattened_level[i]);
-         // }
-         // printf("\n");
-      }
-      // free(flattened_box);
-      // free(flattened_array);
-      return flattened_level;
-   }
+    // Concatenate all level arrays
+    Real* flattened_level = (Real*)malloc(num_total_cells_per_rank * sizeof(Real));
+    int offset = 0;
+    for (int lvl = 0; lvl < num_lvl; ++lvl) {
+        memcpy(flattened_level + offset, flattened_array[lvl], num_boxes_per_lvl_per_rank[lvl] * num_cells_per_box[lvl] * sizeof(Real));
+        offset += num_boxes_per_lvl_per_rank[lvl] * num_cells_per_box[lvl];
+        free(flattened_array[lvl]); // Free each level array after copying
+    }
+    // check if flattened array corretcly copied all flattened box values
+      //   cout<<"packing flattened_level "<<flattened_level<<endl;
+      //   printf("flattened_level of size %lld:",num_total_cells_per_rank,"\n");
+      //   for (int i = 0; i < num_total_cells_per_rank; i++) {
+      //         printf("%lf ", flattened_level[i]);
+      //   }
 
-   void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, Real* flattened_level, \
+    // Update the timing and call count in AmrIceHolderClass
+    auto end_time = std::chrono::high_resolution_clock::now();  // End time
+    std::chrono::duration<double> duration = end_time - start_time;
+    c_AmrIceHolderPtr->updateCallTimePack(duration);
+
+   //  std::cout << "BisiclesVector Pack called " << call_count << " times. "
+   //            << "Total time: " << total_duration.count() << " seconds." << std::endl;
+
+    return flattened_level;
+}
+
+
+
+
+
+void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, Real* flattened_level,
                           AmrIceHolderClass *c_AmrIceHolderPtr)
-   {
-      // cout<< "bisicles_fortran.cpp unpacking............................"<< std::endl;
-      // bisicles_vector->HSetVal2All(y,c_AmrIceHolderPtr);
-      // cout<<"unpacking......\n";
-      // cout<<"flattened_array "<<flattened_array<<endl;
+{
+    auto start_time = std::chrono::high_resolution_clock::now();  // Start time
 
-      // get the H to be set
-      Vector<LevelData<FArrayBox>* > HVector = bisicles_vector->GetHVector();
-      int num_lvl = HVector.size();
-     int num_boxes_per_lvl_per_rank[num_lvl];
-     int num_boxes_per_lvl;
-     int num_cells_per_lvl[num_lvl];
-     int num_cells_per_lvl_per_rank[num_lvl];
-     int num_cells_per_box[num_lvl];
-     int num_total_cells_per_rank = 0;
-     for (int lvl=0; lvl < num_lvl; lvl++)
-     {
+    Vector<LevelData<FArrayBox>* > HVector = bisicles_vector->GetHVector();
+    int num_lvl = HVector.size();
+    vector<int> num_boxes_per_lvl_per_rank(num_lvl);
+    vector<int> num_cells_per_lvl(num_lvl);
+    vector<int> num_cells_per_lvl_per_rank(num_lvl);
+    vector<int> num_cells_per_box(num_lvl);
+    int num_total_cells_per_rank = 0;
+
+    // Calculate the number of cells and boxes per level
+    for (int lvl=0; lvl < num_lvl; lvl++)
+    {
         LevelData<FArrayBox>& ldf = *HVector[lvl];
         DisjointBoxLayout dbl = ldf.disjointBoxLayout();
         DataIterator dit = ldf.dataIterator();
         num_cells_per_lvl[lvl] = dbl.numCells();
-        num_boxes_per_lvl = dbl.size();
-        num_cells_per_box[lvl] = num_cells_per_lvl[lvl]/num_boxes_per_lvl;
-        num_boxes_per_lvl_per_rank[lvl]=0;
-        num_cells_per_lvl_per_rank[lvl]=0;
+        int num_boxes_per_lvl = dbl.size();
+        num_cells_per_box[lvl] = num_cells_per_lvl[lvl] / num_boxes_per_lvl;
+        num_boxes_per_lvl_per_rank[lvl] = 0;
+        num_cells_per_lvl_per_rank[lvl] = 0;
+
         for (dit.reset(); dit.ok(); ++dit)
         {
-           num_boxes_per_lvl_per_rank[lvl]++;
-           num_cells_per_lvl_per_rank[lvl] += num_cells_per_box[lvl];
+            num_boxes_per_lvl_per_rank[lvl]++;
+            num_cells_per_lvl_per_rank[lvl] += num_cells_per_box[lvl];
         }
         num_total_cells_per_rank += num_cells_per_lvl_per_rank[lvl];
-      //   cout<<"rank "<<space_rank<<",lvl "<<lvl<<",num of boxes on this rank "<<num_boxes_per_lvl_per_rank[lvl]<<endl;
-     }
+    }
 
-      // int num_lvl = HVector.size();
-      // int num_total_cells = 0;
-      // int num_cells_per_lvl[num_lvl];
-      Real* flattened_array[num_lvl];
+    int offset = 0;
+    for (int lvl = 0; lvl < num_lvl; lvl++)
+    {
+        LevelData<FArrayBox>& ldf = *HVector[lvl];
+        DataIterator dit = ldf.dataIterator();
+        DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+        // Initialize storage for the boxes' data
+        vector<Real*> flattened_box(num_boxes_per_lvl_per_rank[lvl]);
+        int box_index=0;
 
-      for (int lvl=0; lvl < HVector.size(); lvl++)
-      {
-         LevelData<FArrayBox>& ldf = *HVector[lvl];
-         DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-         DataIterator dit = ldf.dataIterator();
-         // some sizes
-         // num_cells_per_lvl[lvl] = dbl.numCells();
-         // num_total_cells += num_cells_per_lvl[lvl];
-         // int num_boxes_per_lvl = dbl.size();
-         // int num_cells_per_box = num_cells_per_lvl[lvl]/num_boxes_per_lvl;
-         int box_index=0;
+        for (dit.reset(); dit.ok(); ++dit)
+        {
+            // Allocate and copy data from the flattened level to each box
+            flattened_box[box_index] = (Real*)malloc(num_cells_per_box[lvl] * sizeof(Real));
+            memcpy(flattened_box[box_index], flattened_level + offset, num_cells_per_box[lvl] * sizeof(Real));
+            offset += num_cells_per_box[lvl];
 
-         flattened_array[lvl] = (Real *)malloc(num_cells_per_lvl_per_rank[lvl] * sizeof(Real));
-         // cout<<"  level "<<lvl<<", flattened level after copy\n";
-         // for (int i = 0; i < 2560; i++) {
-         //       printf("   %lld, %lf \n", i,flattened_level[i]);
-         // }
-         if(lvl==0){
-            memcpy(flattened_array[lvl], flattened_level, num_cells_per_lvl_per_rank[lvl] * sizeof(Real));
-         }
-         else{
-            memcpy(flattened_array[lvl], flattened_level + num_cells_per_lvl_per_rank[lvl-1], num_cells_per_lvl_per_rank[lvl] * sizeof(Real));
-         }
-         // cout<<"  level "<<lvl<<", flattened array copied of size"<<num_cells_per_lvl[lvl]<<"\n";
-         // for (int i = 0; i < num_cells_per_lvl[lvl]; i++) {
-         //       printf("   %lld, %lf \n", i,flattened_array[lvl][i]);
-         // }
-         // declare a vector of pointers with each pointer pointing to a flattened box
-         Real** flattened_box = (Real **)malloc(num_boxes_per_lvl_per_rank[lvl] * sizeof(Real *));
-         for (dit.reset(); dit.ok(); ++dit) 
-         {
-            // declare each box and copy the entries from big flattened array into each flattened box
-            flattened_box[box_index] = (Real *)malloc(num_cells_per_box[lvl]* sizeof(Real));
-            memcpy(flattened_box[box_index], flattened_array[lvl] + box_index*num_cells_per_box[lvl], num_cells_per_box[lvl] * sizeof(Real));
-
-            // now set the flattened array value back to bisicles
+            // Unpack the data back into the original FArrayBox
             const Box& box = dbl[dit()];
             FArrayBox& fab = ldf[dit()];
-            // const FArrayBox& xfab = xldf[dit()];
-            // fab.copy(xfab,box);
-            fab.unpackAll(box,flattened_box[box_index]);
-            // if(lvl==1){
-            //    cout<<" in unpacking, the box got unpacked "<<box<<" at level "<<lvl<<endl;
-            //    fab.printAll(box);
-            //    cout<<"\n";
-            // }
-            // cout<<"dit "<<dit()<<endl;
-            // check if the array is flattened properly
-            // box.numPts() returns the num of cells in this one box only
-            // printf("flattened_box of size %d:",num_cells_per_box,"\n");
-            // for (int i = 0; i < num_cells_per_box; i++) {
-            //    printf("%lf ", flattened_box[box_index][i]);
-            // }
-            // printf("\n");
+            fab.unpackAll(box, flattened_box[box_index]);
             box_index++;
-         }
-         free(flattened_box); 
-         // concatenate all flattened box into one flattened array, this is for one level
-         
-         // Real *flattened_array = (Real *)malloc(num_cells_per_lvl * sizeof(Real));
-         // // Copy data from the individual arrays to the concatenated array
-         // for(int i=0;i<num_boxes_per_lvl;i++){
-         //    memcpy(flattened_array + i*num_cells_per_box, flattened_box[i], num_cells_per_box * sizeof(Real));
-         // }
-         // check if flattened array corretcly copied all flattened box values
-         // printf("flattened_level of size %lld:",num_total_cells,"\n");
-         // for (int i = 0; i < dbl.numCells(); i++) {
-         //       printf("%lf ", flattened_array[i]);
-         // }
-         // printf("\n");
-      }
-      // free(flattened_array);
-   }
+
+            // Free the memory for this box after unpacking
+            // free(flattened_box[box_index]);
+        }
+      //   free(flattened_box);
+    }
+    auto end_time = std::chrono::high_resolution_clock::now();  // End time
+    std::chrono::duration<double> duration = end_time - start_time;
+    c_AmrIceHolderPtr->updateCallTimeUnpack(duration);
+
+   //  std::cout << "BisiclesVector Unpack called " << call_count << " times. "
+   //            << "Total time: " << total_duration.count() << " seconds." << std::endl;
+}
+
+
+
 
    // needs to be FIXED!!!!
    double BisiclesVectorNorm(BisiclesVector *bisicles_vector, \
@@ -404,8 +335,9 @@ Real* BisiclesVectorPack(BisiclesVector *bisicles_vector, AmrIceHolderClass *c_A
       //    } 
       //    cout<<"\n";
       // }
-      
+      pout()<<"\n--------------- begin grid info ------------------\n";
       bisicles_vector->PFPrintLevelData(x);
+      pout()<<"\n--------------- end grid info ------------------\n";
    }
 
    double BisiclesVectorGetVal(BisiclesVector *bisicles_vector, \
@@ -420,7 +352,7 @@ Real* BisiclesVectorPack(BisiclesVector *bisicles_vector, AmrIceHolderClass *c_A
    {
       Vector<LevelData<FArrayBox>* > HVector_print=bisicles_vector->GetHVector();
       bisicles_vector->SaveSnapshot(c_AmrIceHolderPtr);
-      cout<< "-------------------------------------- done saving pfasst_bisicles results ----------------------------------------- "<< std::endl;
+      // cout<< "-------------------------------------- done saving pfasst_bisicles results ----------------------------------------- "<< std::endl;
    }
 
 
@@ -429,11 +361,11 @@ Real* BisiclesVectorPack(BisiclesVector *bisicles_vector, AmrIceHolderClass *c_A
    void BisiclesSolverInit(BisiclesdHdtSolver **bisicles_dHdt, int pfasst_level_index, \
                            int num_grid_points,AmrIceHolderClass *c_AmrIceHolderPtr)
     {
-      MPI_Comm newcomm;
-      newcomm = glob_space_comm;
+      // MPI_Comm newcomm;
+      // newcomm = glob_space_comm;
       // carefull about the pfasst_level_index, check if level_index=num_of_total_levels-pfasst_level_index
-      int level_index = pfasst_level_index;
-      *bisicles_dHdt = new BisiclesdHdtSolver(newcomm,num_grid_points,c_AmrIceHolderPtr);
+      // int level_index = pfasst_level_index;
+      *bisicles_dHdt = new BisiclesdHdtSolver(num_grid_points,c_AmrIceHolderPtr);
       
 //       Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
 //       int nlvl=constH.size();
@@ -464,6 +396,7 @@ void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, BisiclesVector *y, d
    int pfasst_level_index, BisiclesVector *f, double dt,int maxStep,bool evolve_velocity, AmrIceHolderClass *c_AmrIceHolderPtr)
 
    {
+      // auto start_time = std::chrono::high_resolution_clock::now();  // Start time
       // AmrIce *amrObjHolderPtr;
       // amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
       // IceSheetState *iceStatePtr;
@@ -505,18 +438,18 @@ void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, BisiclesVector *y, d
 
       AmrIce *amrObjHolderPtr;
       amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
-      IceSheetState *iceStatePtr;
+      // IceSheetState *iceStatePtr;
       IceSheetState iceState;
-      iceStatePtr=y->GetIceStatePtr();
+      // iceStatePtr=y->GetIceStatePtr();
       iceState=y->GetIceState();
 
-      Vector<LevelData<FArrayBox>*> H_old = iceState.ice_thickness;
+      // Vector<LevelData<FArrayBox>*> H_old = iceState.ice_thickness;
       Vector<LevelData<FArrayBox>* > dHdtVect;
-      Vector<LevelData<FArrayBox>* > *dHdtVectPtr=c_AmrIceHolderPtr->GetAmrdHdtPtr();
-      Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH(); // double check with Dan
-      Vector<LevelData<FArrayBox>* > constH_copy=c_AmrIceHolderPtr->GetAmrHBackup(); // 
+      // Vector<LevelData<FArrayBox>* > *dHdtVectPtr=c_AmrIceHolderPtr->GetAmrdHdtPtr();
+      // Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH(); // double check with Dan
+      // Vector<LevelData<FArrayBox>* > constH_copy=c_AmrIceHolderPtr->GetAmrHBackup(); // 
       Vector<LevelData<FArrayBox>* > H=y->GetHVector(); // this H is the updating one from pfasst
-      Vector<LevelData<FArrayBox>* > velo = amrObjHolderPtr->amrVelocity();
+      // Vector<LevelData<FArrayBox>* > velo = amrObjHolderPtr->amrVelocity();
 
       // cout<<"H norm 2: ";
       // y->PrintL2norm(H);
@@ -530,18 +463,27 @@ void BisiclesSolverFEval(BisiclesdHdtSolver *bisicles_dHdt, BisiclesVector *y, d
       // cout<<"printing all entries in H \n";
       // y->PrintAllEntries(H);
       // cout<<"compute velo "<<evolve_velocity;
+
+      auto start_setState = std::chrono::high_resolution_clock::now();
       amrObjHolderPtr->setState(iceState,evolve_velocity); // constH is updated after setState
+      auto end_setState = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double> duration_setState = end_setState - start_setState;
       // cout<<"constH norm 2 after set state: ";
       // y->PrintL2norm(constH);
       
       // reshape(dHdtVect,constH); // this shouldn't matter, whether constH or constH_copy, whether reshape or reshapefill
       reshapeAndFill(dHdtVect,H);
 
-      amrObjHolderPtr->compute_dHdt(dHdtVect,H,dt,evolve_velocity); // dHdtVect is updated after this, H is used in the function be careful
-      // cout<<"dHdtVect norm 2: ";
+      auto start_compute_dHdt = std::chrono::high_resolution_clock::now();
+      amrObjHolderPtr->compute_dHdt(dHdtVect, H, dt, evolve_velocity);
+      auto end_compute_dHdt = std::chrono::high_resolution_clock::now();
+      std::chrono::duration<double> duration_compute_dHdt = end_compute_dHdt - start_compute_dHdt;// cout<<"dHdtVect norm 2: ";
+      
       // y->PrintL2norm(dHdtVect);
       f->SetdHdtVector(dHdtVect,c_AmrIceHolderPtr);
       // MayDay::Error("....exit here");
+
+      c_AmrIceHolderPtr->updateCallTimeFEval(duration_setState,duration_compute_dHdt);
    }
 
 

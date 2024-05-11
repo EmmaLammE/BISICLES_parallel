@@ -1,0 +1,4 @@
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+slurmstepd: error: *** STEP 25446604.0 ON nid005119 CANCELLED AT 2024-05-11T00:36:23 DUE TO TIME LIMIT ***
+slurmstepd: error: *** JOB 25446604 ON nid005119 CANCELLED AT 2024-05-11T00:36:23 DUE TO TIME LIMIT ***

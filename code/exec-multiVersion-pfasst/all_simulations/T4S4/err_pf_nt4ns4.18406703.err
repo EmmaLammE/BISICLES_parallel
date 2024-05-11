@@ -1,0 +1,12 @@
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+ViscousTensorOp.cpp:1422: Assertion `m_relaxCoef[dit()].norm(0) < 1.0e+15' failed. !!!
+ViscousTensorOp.cpp:1422: Assertion `m_relaxCoef[dit()].norm(0) < 1.0e+15' failed. !!!
+ViscousTensorOp.cpp:1422: Assertion `m_relaxCoef[dit()].norm(0) < 1.0e+15' failed. !!!
+srun: error: nid005408: tasks 5,9,13: Aborted
+srun: Terminating StepId=18406703.0
+slurmstepd: error: *** STEP 18406703.0 ON nid005408 CANCELLED AT 2023-11-19T21:14:14 ***
+srun: error: nid005408: tasks 0-4,6-8,10-12,14-15: Terminated
+srun: Force Terminated StepId=18406703.0

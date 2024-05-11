@@ -9,11 +9,11 @@ compare.isTimeDep = 0
 
 #name of file for "exact" solution (single-level fine-resolution solution)
 # compare.exactRoot = ./../data_amr_test/amr1/pf_amr1_nt100_notcomputeVel_surfFlux10.petsc.000000.2d.hdf5
-compare.exactRoot = ./../pf_amr1_nt4_notComputeVel_surfFlux0.petsc.000000.2d.hdf5
+compare.exactRoot = ./../ref_amr1_regrid10_ns8_nt104_tfin100_computeVel.000104.2d.hdf5
 
 #name of file containing "computed" solution (which may be AMR )
-compare.computedRoot = ./../pf_amr1_np4_nt10_notComputeVel_surfFlux0.petsc.000000.2d.hdf5
-# compare.computedRoot = ./../data_amr_test/amr1/ref_amr1_nt90_notcomputeVel_surfFlux102.petsc.000003.2d.hdf5
+compare.computedRoot = ./../pf_amr1_regrid10_np1ns8_nt104_tfin100_computeVel.000000.2d.hdf5
+# compare.computedRoot = ./../data_amr_test/amr1/ref_amr1_noregrid_ns8_nt104_tfin100_computeVel.000104.2d.hdf5
 
 
 

@@ -173,7 +173,17 @@ AmrIce::newTimeStep(Real a_dt)
 
 
       LevelData<FArrayBox>& levelOldThickness = *m_old_thickness[lev];
-            
+      
+      // EL - debugging getting ghost cells
+      // LevelData<FArrayBox>& ldf = *m_old_thickness[lev];
+      // DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+      // cout<<"level:"<<lev<<",  m_old_thickness: "<<dbl<<endl;
+      // DataIterator dit = ldf.dataIterator();
+      // for (dit.reset(); dit.ok(); ++dit) 
+      //    {
+      //       const Box& box = dbl[dit()];
+      //       cout<<"      box: "<<box<<endl;
+      //    }
       // ensure that ghost cells for thickness  are filled in
       if (lev > 0)
         {          
@@ -578,6 +588,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   m_time = a_cur_time;
   
   // it's convenient to pull out the grids here
+  // new_amrGrids is only for physical grid, not including ghost
   Vector<DisjointBoxLayout> new_amrGrids(a_thicknessVect.size());
   for (int lev=0; lev<new_amrGrids.size(); lev++)
   {
@@ -589,14 +600,28 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   // {
   //     LevelData<FArrayBox>& ldf = *a_thicknessVect[lvl];
   //     DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-  //     cout<<"  a_thick: "<<dbl<<endl;
-  // }
-  // for (int lvl=0; lvl < a_thicknessVect.size(); lvl++)
-  // {
-  //     DisjointBoxLayout dbl = new_amrGrids[lvl];
-  //     cout<<"  new_amrGrids: "<<dbl<<endl;
+  //     cout<<"level:"<<lvl<<",  a_thick: "<<dbl<<endl;
+  //     DataIterator dit = ldf.dataIterator();
+  //     for (dit.reset(); dit.ok(); ++dit) 
+  //        {
+  //           const Box& box = dbl[dit()];
+  //           cout<<"      box: "<<box<<endl;
+  //        }
   // }
 
+  // for (int lvl=0; lvl < a_thicknessVect.size(); lvl++)
+  // {
+  //     LevelData<FArrayBox>& ldf = *a_thicknessVect[lvl];
+  //     DisjointBoxLayout dbl = new_amrGrids[lvl];
+  //     cout<<"level:"<<lvl<<endl;
+  //     DataIterator dit = ldf.dataIterator();
+  //     for (dit.reset(); dit.ok(); ++dit) 
+  //        {
+  //           const Box& box = dbl[dit()];
+  //           cout<<"      box: "<<box<<endl;
+  //        }
+  // }
+  // exit(0);
 
   /// begin code lifted from AmrIce::regrid
   //test to see if grids have changed
@@ -731,6 +756,15 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
         {
             thisLevelH[dit].copy((*a_thicknessVect[lev])[dit]);
         }
+       
+            // DisjointBoxLayout dbl = thisLevelH.disjointBoxLayout();
+            // cout<<"level:"<<lev<<",  thisLevelH: "<<dbl<<endl;
+            // // DataIterator dit = thisLevelH.dataIterator();
+            // for (dit.reset(); dit.ok(); ++dit) 
+            //   {
+            //       const Box& box = dbl[dit()];
+            //       cout<<"      box: "<<box<<endl;
+            //   }
         
         if (oldDBL.isClosed())
         {	              
@@ -931,7 +965,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
 	    } // end if !gridsSame  
       
   } // end loop over currently defined levels
-
+  // exit(0);
   
   // now ensure that any remaining levels are null pointers
   // (in case of de-refinement)

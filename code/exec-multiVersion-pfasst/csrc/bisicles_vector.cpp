@@ -81,7 +81,7 @@ BisiclesVector::BisiclesVector(int num_grid_points, AmrIceHolderClass *c_AmrIceH
       // const DisjointBoxLayout& phy_coord = my_tempH->getBoxes();
       HVector[lvl] = new LevelData<FArrayBox>(phy_coord,1,IntVect::Zero); 
       dHdtVector[lvl] = new LevelData<FArrayBox>(phy_coord,1,IntVect::Zero); 
-      IntVect sigmaCSGhost = vect_coordSys->ghostVect();
+      IntVect sigmaCSGhost = vect_coordSys->ghostVect(); // sigmaCSGhost is (4,4)
       HVector[lvl]->define(phy_coord, 1, sigmaCSGhost);
       dHdtVector[lvl]->define(phy_coord, 1, sigmaCSGhost);
       // cout<<"...bisicles vector creating sigmaCSGhost "<<sigmaCSGhost<<", level "<<lvl<<endl;
@@ -127,7 +127,7 @@ BisiclesVector::BisiclesVector(int num_grid_points, AmrIceHolderClass *c_AmrIceH
 
 
    InitGrid(num_grid_points);
-
+   // exit(0);
 }
 
 BisiclesVector::~BisiclesVector(void)
@@ -601,13 +601,16 @@ void BisiclesVector::PFPrintLevelData(BisiclesVector *x)
      LevelData<FArrayBox>& ldf = *level_data_to_print[lvl];
      DisjointBoxLayout dbl = ldf.disjointBoxLayout();
      DataIterator dit = ldf.dataIterator();
-     cout<<"  level "<<lvl<<endl;
+     // get num of ghost cells
+     int nGhost = ldf.ghostVect()[0];
+     pout()<<"  level "<<lvl<<endl;
+     pout()<<"     num of ghost cells: "<<nGhost<<endl;
      for (dit.reset(); dit.ok(); ++dit) 
       {
        const Box& box = dbl[dit()];
        FArrayBox& fab = ldf[dit()];
       //  test_min=fab.norm(box,1);
-      cout<<"    box "<<box<<endl;
+      pout()<<"    box "<<box<<", "<<box.size()<<endl;
       } 
    }
 }

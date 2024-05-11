@@ -4921,7 +4921,7 @@ void AmrIce::updateViscousTensor() const
       	    }
       	}
 
-
+      // EL - this m_viscousTensorFace does have ghost
       EdgeToCell(*m_viscousTensorFace[lev],*m_viscousTensorCell[lev]);
       if (lev > 0)
 	{
@@ -4940,7 +4940,7 @@ void AmrIce::updateViscousTensor() const
 
 	}
       m_viscousTensorCell[lev]->exchange();
-
+      // this viscosityCoef does not have ghost
       EdgeToCell(*viscosityCoef[lev],*m_viscosityCoefCell[lev]);
 
       for (DataIterator dit(m_amrGrids[lev]); dit.ok(); ++dit)

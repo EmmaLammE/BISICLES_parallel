@@ -264,7 +264,7 @@ contains
 
    !  do level_id = 1, 1
     ! EL - packing should be correct now, without amr
-      z_c_ptr = BisiclesVectorPack(this%c_encap_ptr,cptr_AmrIceHolder,level_id)
+      z_c_ptr = BisiclesVectorPack(this%c_encap_ptr,cptr_AmrIceHolder,flags)
       num_grid_points = BisiclesCurrentVectorSize(this%c_encap_ptr)
       call c_f_pointer(z_c_ptr, z_ptr, [num_grid_points]) ! convert z_c_ptr to z_ptr
    !  end do

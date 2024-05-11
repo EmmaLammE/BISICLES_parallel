@@ -10,7 +10,7 @@ module pfasst_main
  contains
  
    !!! still working on it
-   subroutine Pf_Main(AmrIceHolderPtr,pf_comm_fromBisicles,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,evolve_velocity_bisicles,numGridPointsBisicles,pf_num_procs_per_time,PF_VERBOSE) bind(c, name="Pf_Main")
+   subroutine Pf_Main(AmrIceHolderPtr,pf_comm_fromBisicles,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,evolve_velocity_bisicles,numGridPointsBisicles,pf_num_repeats,PF_VERBOSE) bind(c, name="Pf_Main")
      use pfasst             !< contains all neccessary mods for pfasst rountines. pfasst/src/pfasst.f90
      use pf_mod_dtype
      use pf_mod_mpi
@@ -23,6 +23,7 @@ module pfasst_main
      use encap
      use pf_space_comm
      use pfasst_bisicles
+     use mpi
  
      type(c_ptr),value :: AmrIceHolderPtr
      ! type(c_ptr),value :: pf_commPtr
@@ -32,7 +33,7 @@ module pfasst_main
      real(c_double), value :: Tfin_bisicles
      integer(c_int), value :: maxStep_bisicles
      integer(c_int), value :: numGridPointsBisicles
-     integer(c_int), value :: pf_num_procs_per_time
+     integer(c_int), value :: pf_num_repeats
     !  character(kind=c_char), intent(IN) :: pf_plot_prefix(:)
      logical(c_bool), value :: PF_VERBOSE
      logical(c_bool), value :: evolve_velocity_bisicles
@@ -67,16 +68,17 @@ module pfasst_main
      real :: pf_start_time, pf_finish_time, elapse_time, elapse_time_max,elapse_time_min,elapse_time_sum, elapse_time_mean
      real :: elapse_time_per_repeat, elapse_time_per_repeat_max, elapse_time_per_repeat_min, elapse_time_per_repeat_sum
      integer :: i, num_repeat_pf_run
+
+    ! setup IO stripe width
+    !  MPI_Info :: 
+     integer :: ierr, info
+
+    ! Create a new info object
+    call MPI_Info_create(info, ierr)
+    ! Set the stripe width hint
+    call MPI_Info_set(info, "striping_factor", "24", ierr)
  
-     !> first initialize mpi
-     !> Initialize MPI
-     !call mpi_init(ierror)
-     !if (ierror /= 0) &
-     !   stop "ERROR: Can't initialize MPI."
  
- 
-     ! check size
-     ! nproc = 2
  
      !> Read problem parameters
      call probin_init(pf_fname)
@@ -144,8 +146,8 @@ module pfasst_main
      !print *,'y_end assign single '
      call y_end%setval(1000.0_pfdp)
      call y_0%setval(1000.0_pfdp)
-     print *, "Bisicles Disjoint Boxes in current PFASST temporal processor:"
-     call y_0%eprintLevelDataBox(y_0)
+    !  print *, "Bisicles Disjoint Boxes in current PFASST temporal processor:"
+    !  call y_0%eprintLevelDataBox(y_0)
      ! packing test
      ! call y_0%eprint()
      ! allocate(v(num_grid_points))
@@ -162,7 +164,7 @@ module pfasst_main
  
      !call y_end%eprint()
      !norm = y_end%norm()
-     t=0.1
+    !  t=0.1
      z_c_ptr=pf%cptr_AmrIceHolder
  
      !call y_end%savesnap()
@@ -175,12 +177,13 @@ module pfasst_main
      print *, '--------------------------- Start pfasst run --------------------------------------'
      ! call PfasstBisiclesPrintAmr(y_0,pf%cptr_AmrIceHolder)
      !> run pfasst
-     print *,"Start pfasst timing..."
-     num_repeat_pf_run = 1
+     print *,"Start pfasst timing... for ",pf_num_repeats," repeats"
+     num_repeat_pf_run = pf_num_repeats
      elapse_time_per_repeat_sum = 0
      elapse_time_per_repeat_max = 0
      elapse_time_per_repeat_min = 1e8
      do i = 1,num_repeat_pf_run
+      print *,"  pf repeats # ",i
        call cpu_time(pf_start_time)
        !> pfasst run
        call pf_pfasst_run(pf, y_0, dt, Tfin, nsteps,y_end)
@@ -196,7 +199,7 @@ module pfasst_main
        end if
      enddo
      elapse_time = elapse_time_per_repeat_sum/num_repeat_pf_run
-     print '("Averaged time for pfasst run on rank "I0" = ",f8.3," seconds for "I0" repeats.")',rank,elapse_time,num_repeat_pf_run
+    !  print '("Averaged time for pfasst run on rank "I0" = ",f8.3," seconds for "I0" repeats.")',rank,elapse_time,num_repeat_pf_run
  
      !> calculate average time of pf run
      call MPI_REDUCE(elapse_time_per_repeat_max,elapse_time_max,1,MPI_REAL,mpi_max,0,pf_comm_fromBisicles,ierror) ! compute mpi global sum and put to root processor 0
