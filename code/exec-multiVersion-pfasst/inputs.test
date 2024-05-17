@@ -5,7 +5,7 @@
 #  COMMON ATTRIBUTES (Coarse and fine integrator)
 #####################################################
 
-main.maxTime = 1.0  # maximum time to run to in years
+main.maxTime = 20.0  # maximum time to run to in years
 main.maxStep = 10000   # maximum number of steps to run
 main.constitutiveRelation = L1L2
 
@@ -34,9 +34,9 @@ CalvingModel.type = NoCalvingModel
 #  CRSE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numCrseIntervals = 4
+main.numCrseIntervals = 1200
 
-crse.amr.maxLevel = 3   # finest level allowed in simulation
+crse.amr.maxLevel = 2   # finest level allowed in simulation
 crse.amr.ref_ratio = 2 2 2 2 2 2 2
 crse.amr.num_cells = 0016 0016 16   #number of cells in base grid
 
@@ -54,7 +54,7 @@ crse.amr.max_dt_grow_factor = 1.1 #max amount dt can grow from one timestep to a
 
 crse.amr.plot_interval = 1  
 crse.amr.write_dHDt = 1 
-crse.amr.plot_prefix = pf_amr2_nt400_tfin100.
+crse.amr.plot_prefix = pf_amr2_nt1200_tfin20.
 crse.amr.write_solver_rhs = 1
 crse.amr.check_interval = -1
 crse.amr.check_prefix = chk.032
@@ -73,7 +73,7 @@ crse.amr.lap_vel_tagging_val = 75
 #crse.amr.lap_vel_tagging_val = 1
 
 #initial guess 
-crse.amr.evolve_velocity = false
+crse.amr.evolve_velocity = true
 crse.amr.do_initial_velocity_guess = 1
 crse.amr.do_initial_velocity_solve = 1
 crse.amr.initial_velocity_guess_type = 1 # linear PDE
@@ -94,7 +94,7 @@ crse.amr.new_timestep = 0
 #  FINE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numFineIntervals = 4 # time interval
+main.numFineIntervals = 1200 # time interval
 
 fine.amr.maxLevel = 2   # finest level allowed in simulation, 0: one level of grid, 1: 2 levels of grid etc
 fine.amr.ref_ratio = 2 2 2 2 2 2 2
@@ -111,11 +111,11 @@ bc.hi_bc = 0 0 0
 fine.amr.cfl = 0.1  # "cfl" number
 fine.amr.initial_cfl = 0.1  # "cfl" number
 fine.amr.max_dt_grow_factor = 1.1 #max amount dt can grow from one timestep to another
-fine.amr.fixed_dt =0.78125 # maxTime/numFineIntervals
+fine.amr.fixed_dt =0.01666666667 # maxTime/numFineIntervals
 
 fine.amr.plot_interval = 1  
 fine.amr.write_dHDt = 1 
-fine.amr.plot_prefix = ref_amr2_nt400_tfin100.
+fine.amr.plot_prefix = ref_amr2_nt1200_tfin20.
 fine.amr.write_solver_rhs = 1
 fine.amr.check_interval = -1
 fine.amr.check_prefix = chk.064
@@ -157,9 +157,9 @@ fine.amr.new_timestep = 0
 pf.USE_PF = true
 pf.PF_VERBOSE = TRUE
 pf.pf_plot_prefix = pf_
-pf.pf_num_procs_per_time = 2
+pf.pf_num_procs_per_time = 1
 pf.pf_num_repeats = 1
-pf.num_time_procs = 2
+pf.num_time_procs = 1
 
 
 

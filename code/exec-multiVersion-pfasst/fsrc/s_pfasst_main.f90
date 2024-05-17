@@ -113,12 +113,12 @@ module pfasst_main
      ! print *, 'pfasst_main.f90 0000 nsteps ',nsteps
      !  print *,'5 pf%comm%nproc ', pf%comm%nproc
      !>  Output run parameters
-    !  if (PF_VERBOSE) then
-    !    call print_loc_options(pf, pf_comm_fromBisicles)
-    !    ! check if num of time steps assigned correctly
+     if (PF_VERBOSE) then
+       call print_loc_options(pf, pf_comm_fromBisicles)
+       ! check if num of time steps assigned correctly
  
-    !    ! print *, '--------------------------- done print out ------------------------------------------'
-    !  end if
+       ! print *, '--------------------------- done print out ------------------------------------------'
+     end if
  
      
      !>  Add some hooks for output

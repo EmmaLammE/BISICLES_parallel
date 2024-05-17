@@ -1220,20 +1220,20 @@ FineInterp::s_default_boundary_limit_type = 0;
     }
 
 
-    // ParmParse pfine("fine.amr");
-    // string fine_plot_prefix;
-    // pfine.get("plot_prefix",fine_plot_prefix);
-    // cout<<"\n..............Updating fine-grained using serial................\n";
-    // cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
-    // // pout() << endl;
+    ParmParse pfine("fine.amr");
+    string fine_plot_prefix;
+    pfine.get("plot_prefix",fine_plot_prefix);
+    cout<<"\n..............Updating fine-grained using serial................\n";
+    cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
+    // pout() << endl;
 
-    // // now do each fine-grained timestep
-    // auto start = high_resolution_clock::now();
-    // amrObjectFine.run(maxTime, maxStep);
-    // auto stop = high_resolution_clock::now();
-    // auto duration = duration_cast<microseconds>(stop - start);
-    // cout << "Time taken by serial run: "
-    //      << duration.count()/1e6<< " seconds" << endl;
+    // now do each fine-grained timestep
+    auto start = high_resolution_clock::now();
+    amrObjectFine.run(maxTime, maxStep);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    cout << "Time taken by serial run: "
+         << duration.count()/1e6<< " seconds" << endl;
     // don's really need the time interval loop, the loop is for illustration
     // for (int i=0; i<numFineIntervals; i++) 
     //   {

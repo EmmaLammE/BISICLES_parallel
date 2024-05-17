@@ -1,8 +1,6 @@
 !
 ! This file is part of LIBPFASST.
 !
-!> Sweeper and RHS specification for Dahlquist example.
-!>     u_t = lam1*u + lam2*u
 module pf_my_sweeper
   use encap
   use pf_mod_imex_sweeper_bisicles
@@ -134,20 +132,6 @@ contains
     y_encap => cast_as_bisicles_vector(y)
     f_encap => cast_as_bisicles_vector(f)
 
-    ! Compute the function values
-    !select case (piece)
-    !case (1)  ! Explicit piece
-    !   val = lam1 * y_encap%getval()
-    !   call f_encap%setval(val)
-    !case (2)  ! Implicit piece
-    !   val = lam2 * y_encap%getval()
-    !   call f_encap%setval(val)
-    !case DEFAULT
-    !  print *,'Bad case for piece in f_eval ', piece
-    !  call exit(0)
-    !end select
-    !print *, 'c_sweeper.f90 000000 c_AmrIceHolderPtr', c_AmrIceHolderPtr
-    ! call PfasstPrintAmr(y_encap%c_encap_ptr,c_AmrIceHolderPtr)
     call BisiclesSolverFEval(this%c_bisicles_solver_ptr,y_encap%c_encap_ptr, t, level_index, f_encap%c_encap_ptr, dt, maxStep,evolve_velocity,c_AmrIceHolderPtr)
 
   end subroutine f_eval
@@ -167,27 +151,7 @@ contains
 
     !class(bisicles_vector_encap), pointer :: y_encap, f_encap, rhs_encap
     real(pfdp) :: val
-
-    !y_encap => cast_as_bisicles_vector(y)
-    !f_encap => cast_as_bisicles_vector(f)
-    !rhs_encap => cast_as_bisicles_vector(rhs)
-
-    
-    !if (piece == 2) then
-
-       !  Do the solve
-       ! y_encap%y =  rhs_encap%y/(1.0_pfdp - dtq*lam2)
-    !   val = rhs_encap%getval()/(1.0_pfdp - dtq*lam2)
-    !   call y_encap%setval(val)
-
-       !  The function is easy to derive  (equivalent to lam2*y)
-       ! f_encap%y = (y_encap%y - rhs_encap%y) / dtq
-    !   val = (y_encap%getval() - rhs_encap%getval()) / dtq
-    !   call f_encap%setval(val)
-    !else
-    !   print *,'Bad piece in f_comp ',piece
-    !   call exit(0)
-    !end if
+    ! EL - not implemented
   end subroutine f_comp
 
 
