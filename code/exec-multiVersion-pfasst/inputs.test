@@ -5,7 +5,7 @@
 #  COMMON ATTRIBUTES (Coarse and fine integrator)
 #####################################################
 
-main.maxTime = 20.0  # maximum time to run to in years
+main.maxTime = 1.0  # maximum time to run to in years
 main.maxStep = 10000   # maximum number of steps to run
 main.constitutiveRelation = L1L2
 
@@ -34,7 +34,7 @@ CalvingModel.type = NoCalvingModel
 #  CRSE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numCrseIntervals = 1200
+main.numCrseIntervals = 4
 
 crse.amr.maxLevel = 2   # finest level allowed in simulation
 crse.amr.ref_ratio = 2 2 2 2 2 2 2
@@ -94,7 +94,7 @@ crse.amr.new_timestep = 0
 #  FINE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numFineIntervals = 1200 # time interval
+main.numFineIntervals = 4 # time interval
 
 fine.amr.maxLevel = 2   # finest level allowed in simulation, 0: one level of grid, 1: 2 levels of grid etc
 fine.amr.ref_ratio = 2 2 2 2 2 2 2

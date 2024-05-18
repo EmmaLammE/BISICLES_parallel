@@ -95,27 +95,10 @@ module pfasst_main
      
      !> ----- initialize the vectors & solvers for later, not initial condition of setting values -----
       call PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,evolve_velocity_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
-<<<<<<< HEAD
-     
-=======
-     !  print *, 'after pfasst init'
-     !  call pf%levels(pf%state%finest_level)%Q(1)%eprint()
-      !> PfasstBisiclesInit=allocate lev_shape+ulevel+factory+sweeper+level_set_size+pf_setup
-     !> ----- end of initialize the vectors & solvers for later, including params change -----
-     !print *, 'pfasst_main.f90 0000 grid size from bisicles to pfasstpf%levels(2)%lev_shape ',pf%levels(2)%lev_shape 
-     ! print *, 'check if temporal params are passed in correctly:'
-     ! print *, 'pfasst_main.f90 0000 T final ',Tfin
-     ! print *, 'pfasst_main.f90 0000 dt ',dt
-     ! print *, 'pfasst_main.f90 0000 nsteps ',nsteps
-     !  print *,'5 pf%comm%nproc ', pf%comm%nproc
-     !>  Output run parameters
+
      if (PF_VERBOSE) then
        call print_loc_options(pf, pf_comm_fromBisicles)
-       ! check if num of time steps assigned correctly
- 
-       ! print *, '--------------------------- done print out ------------------------------------------'
      end if
->>>>>>> nersc_dev
  
      
      !>  Add some hooks for output

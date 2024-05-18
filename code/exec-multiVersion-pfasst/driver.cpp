@@ -1151,12 +1151,12 @@ FineInterp::s_default_boundary_limit_type = 0;
     // cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
 
     // now do each fine-grained timestep
-    auto start = high_resolution_clock::now();
-    amrObjectFine.run(maxTime, maxStep);
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "Time taken by serial run: "
-         << duration.count()/1e6<< " seconds" << endl;
+    // auto start = high_resolution_clock::now();
+    // amrObjectFine.run(maxTime, maxStep);
+    // auto stop = high_resolution_clock::now();
+    // auto duration = duration_cast<microseconds>(stop - start);
+    // cout << "Time taken by serial run: "
+    //      << duration.count()/1e6<< " seconds" << endl;
     // don's really need the time interval loop, the loop is for illustration
     // for (int i=0; i<numFineIntervals; i++) 
     //   {
