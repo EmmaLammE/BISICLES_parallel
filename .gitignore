@@ -32,9 +32,10 @@
 *.app
 *.ex
 
-# data
-*.hdf5
-*.json
-*.dat
+# Data files (ignores in all directories)
+**/*.dat
+**/*.json
+**/*.hdf5
 
-
+# MacOS Folder Attributes
+.DS_Store
