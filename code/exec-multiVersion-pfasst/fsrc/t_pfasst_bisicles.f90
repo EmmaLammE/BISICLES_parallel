@@ -14,19 +14,6 @@ module pfasst_bisicles
   implicit none
 
 
-  !real(pfdp), save :: dt     ! time step
-  !real(pfdp), save :: Tfin   ! Final time
-  !integer, save :: nsteps    ! number of time steps
-  !type(c_ptr), save :: cptr_AmrIceHolder
-
-  !namelist /params/  dt, Tfin, nsteps
-  !namelist /params/ cptr_AmrIceHolder
-
-
-!type, extends(pf_pfasst_t) :: bisicles_holder_ptr
-!      type(c_ptr) :: c_test_ptr = c_null_ptr ! c pointer
-!end type bisicles_holder_ptr
-
 
 contains
 
@@ -67,10 +54,8 @@ contains
     !> Loop over levels and set some level specific parameters
     allocate(lev_shape(pf%nlevels,1))
     ! print *, 'in pfasst bisicles init'
-    ! call pf%levels(pf%state%finest_level)%Q(1)%eprint()
     do l = 1, pf%nlevels
        lev_shape(l,1) = num_grid_points
-       !lev_shape(l,2) = AmrIceHolderPtr
        !>  Allocate the user specific level object
        allocate(my_level_t::pf%levels(l)%ulevel)
 
@@ -85,22 +70,13 @@ contains
        call BisiclesSolverInit(sw_lev%c_bisicles_solver_ptr, &
                          l, &
                          lev_shape(l,1),cptr_AmrIceHolder)
-      !  print *, 'after bisicles solver init'
-      !  call pf%levels(pf%state%finest_level)%Q(1)%eprint()
        !>  Set the size of the data on this level (here just one)
        call pf_level_set_size(pf,l,lev_shape(l,:)) ! shape_in=1, meaning grid size=1
        ! check if grid size is assigned correctly
        ! print *, 'pfasst_main.f90 0000 grid size from bisicles to pfasst ',pf%levels(l)%lev_shape
     end do
     !>  Set up some pfasst stuff
-    ! level = 1 -> tauQ=8; level = 2 -> tauQ=16, no third level???
-    ! print *, 'before pfasst set up'
-    ! call pf%levels(pf%nlevels)%Q(1)%eprint()
     call pf_pfasst_setup(pf)
-    ! print *, '--------------------------- done pf additional setup ---------------------------------'
-    ! lev => pf%levels(2)
-    ! print *, 'after pfasst set up, tauQ allocated ',allocated(pf%levels(2)%tauQ),'  print Q(1)'
-    ! call pf%levels(pf%nlevels)%Q(1)%eprint()
 
   end subroutine PfasstBisiclesInit
 
@@ -120,8 +96,6 @@ contains
 
 
     !  Some local variables for reading
-    !print *,'pfasst_bisicles.f90 00000, crse_nsteps ',crse_nsteps
-    !print *,'pfasst_bisicles.f90 00000, pf%state%nsteps ',pf%state%nsteps
     pf%state%nsteps = crse_nsteps
     nsteps = crse_nsteps
     dt = dt_bisicles
@@ -130,21 +104,11 @@ contains
     evolve_velocity = evolve_velocity_bisicles
 
     num_grid_points=numGridPointsBisicles
-
-
-      !  print *,'pfasst_bisicles.f90 pf '
-       pf_bisicles => cast_as_pf_bisicles_t(pf)
-!       pf_bisicles%c_test_ptr=AmrIceHolderPtr
+    pf_bisicles => cast_as_pf_bisicles_t(pf)
 
     
     pf%cptr_AmrIceHolder=AmrIceHolderPtr
     cptr_AmrIceHolder=AmrIceHolderPtr
-    ! pf%evolve_velocity = evolve_velocity
-    !print *,'nsteps after changed ',nsteps
-    !print *,'pfasst_bisicles.f90 pf%cptr_AmrIceHolder ', pf%cptr_AmrIceHolder
-    !print *,'pfasst_bisicles.f90 pf%c_test_ptr ', pf_bisicles%c_test_ptr
-    ! up till here, amr pointer is successfully assigned to pf_bisicles
-    !call ABORT
   
   end subroutine update_bisicles_params
 
@@ -166,13 +130,9 @@ contains
     c_AmrIceHolderPtr=pf%cptr_AmrIceHolder
 
     y_encap => cast_as_bisicles_vector(lev%Q(snapshot_to_save))
-    !print *, ' saving results... y_encap ID y_encap%c_encap_ptr,',y_encap%c_encap_ptr
-    ! print *, '                    temp_level_to_save,snapshot_to_save',temp_level_to_save,snapshot_to_save
-    ! call y_encap%eprint()
     
 
     call y_encap%savesnap()
-    !call PfasstBisiclesSaveResults(y_encap%c_encap_ptr,c_AmrIceHolderPtr)
 
   end subroutine pfasst_bisicles_save_results
   
