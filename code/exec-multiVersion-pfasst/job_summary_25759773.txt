@@ -1,0 +1,12 @@
+JobID           JobName      State    Elapsed   TotalCPU      NCPUS     MaxRSS     AveRSS     ReqMem    CPUTime  SystemCPU 
+------------ ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- ---------- 
+25759773          nt130  COMPLETED   02:54:14   02:46:09        256                              40G 30-23:23:44  00:12.072 
+25759773.ba+      batch  COMPLETED   02:54:14  00:00.187        256      8684K      8684K            30-23:23:44  00:00.120 
+25759773.ex+     extern  COMPLETED   02:54:14  00:00.001        256          0          0            30-23:23:44  00:00.001 
+25759773.0   driver2d.+  COMPLETED   02:54:07   02:46:09          8   1858228K   1858228K              23:12:56  00:11.951 
+Job Summary for 25759773
+Elapsed Time: 02:54:07
+Total CPU Time: 02:46:09
+Number of CPUs: 8
+CPU Efficiency: 11.93%
+Avg RSS: 1858228 KB (1814.68 MB, 1.77 GB)
