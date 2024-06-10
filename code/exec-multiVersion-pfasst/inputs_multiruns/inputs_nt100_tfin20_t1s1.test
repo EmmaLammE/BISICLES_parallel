@@ -1,0 +1,210 @@
+#inputs file for Amr ice-sheet solver
+# template for two-model (coarse and fine) twisty-stream runs
+
+#####################################################
+#  COMMON ATTRIBUTES (Coarse and fine integrator)
+#####################################################
+
+main.maxTime = 20.0  # maximum time to run to in years
+main.maxStep = 10000   # maximum number of steps to run
+main.constitutiveRelation = L1L2
+
+main.domain_size = 160000.0 160000.0 160000.0 
+
+geometry.problem_type = basic
+geometry.basal_type = constantZb
+geometry.thickness_type = constantThickness1km
+
+geometry.beta_type = twistyStreamx
+geometry.betaValue = 100000.0
+geometry.betaEps = 0.01
+# slope should correspond to a .5 degree x-slope
+geometry.basalSlope = -0.087488664 0.0  # 0.5 degree slope
+#geometry.basalSlope = -0.001745331 0.0 # 0.1 degree slope
+
+# surfaceFlux.type = zeroFlux
+basalFlux.type = zeroFlux
+surfaceFlux.type = constantFlux # zeroFlux
+surfaceFlux.flux_value = 0.0 # 1 m/yr
+
+CalvingModel.type = NoCalvingModel
+
+
+#####################################################
+#  CRSE-INTEGRATOR ATTRIBUTES 
+#####################################################
+
+main.numCrseIntervals = 100
+
+crse.amr.maxLevel = 2   # finest level allowed in simulation
+crse.amr.ref_ratio = 2 2 2 2 2 2 2
+crse.amr.num_cells = 0016 0016 16   #number of cells in base grid
+
+
+crse.amr.is_periodic = 1 1 1    # 1 if domain is periodic 
+# (note that periodic BC's override physical BC types)
+# physical BC types:  0 = homogeneous Dirichlet
+#                     1 = homogeneous Neumann
+bc.lo_bc = 0 0 0  
+bc.hi_bc = 0 0 0  
+
+crse.amr.cfl = 0.1  # "cfl" number
+crse.amr.initial_cfl = 0.1  # "cfl" number
+crse.amr.max_dt_grow_factor = 1.1 #max amount dt can grow from one timestep to another
+
+crse.amr.plot_interval = 1  
+crse.amr.write_dHDt = 1 
+crse.amr.plot_prefix = pf_amr2_nt100_tfin20.
+crse.amr.write_solver_rhs = 1
+crse.amr.check_interval = -1
+crse.amr.check_prefix = chk.032
+crse.amr.verbosity = 5
+
+crse.amr.regrid_interval = 10   # number of timesteps between regridding
+crse.amr.blockFactor = 4           # block factor used in grid generation
+crse.amr.fill_ratio = 0.8          # how efficient are the grids
+crse.amr.nestingRadius = 3         # proper nesting radius required
+crse.amr.tags_grow = 2             # amount to buffer tags
+crse.amr.max_box_size = 4         # largest box length allowed
+#crse.amr.tagging_val = .0001       # min undivided grad(vel) resulting in tagging
+
+crse.amr.tag_on_laplacian_velocity = 1
+crse.amr.lap_vel_tagging_val = 75
+#crse.amr.lap_vel_tagging_val = 1
+
+#initial guess 
+crse.amr.evolve_velocity = true
+crse.amr.do_initial_velocity_guess = 1
+crse.amr.do_initial_velocity_solve = 1
+crse.amr.initial_velocity_guess_type = 1 # linear PDE
+crse.amr.initial_velocity_guess_const_mu = 1.0e+6
+crse.amr.initial_velocity_guess_solver_type = 1 # use JFNK solver's linear mode
+
+crse.amr.max_solver_iterations = 50
+crse.amr.velocity_solver_tolerance = 1.e-8
+
+#velocity solve type -- 0=Picard, 1=JFNK, 2=knownVel, 3=petsc, 4=FAS-MG
+crse.amr.velocity_solver_type = 1
+
+crse.amr.new_timestep = 0
+
+
+
+#####################################################
+#  FINE-INTEGRATOR ATTRIBUTES 
+#####################################################
+
+main.numFineIntervals = 100 # time interval
+
+fine.amr.maxLevel = 2   # finest level allowed in simulation, 0: one level of grid, 1: 2 levels of grid etc
+fine.amr.ref_ratio = 2 2 2 2 2 2 2
+fine.amr.num_cells = 0016 0016 16   #number of cells in base grid
+
+
+fine.amr.is_periodic = 1 1 1    # 1 if domain is periodic 
+# (note that periodic BC's override physical BC types)
+# physical BC types:  0 = homogeneous Dirichlet
+#                     1 = homogeneous Neumann
+bc.lo_bc = 0 0 0  
+bc.hi_bc = 0 0 0  
+
+fine.amr.cfl = 0.1  # "cfl" number
+fine.amr.initial_cfl = 0.1  # "cfl" number
+fine.amr.max_dt_grow_factor = 1.1 #max amount dt can grow from one timestep to another
+fine.amr.fixed_dt =0.20000001 # maxTime/numFineIntervals
+
+fine.amr.plot_interval = 1  
+fine.amr.write_dHDt = 1 
+fine.amr.plot_prefix = ref_amr2_nt100_tfin20.
+fine.amr.write_solver_rhs = 1
+fine.amr.check_interval = -1
+fine.amr.check_prefix = chk.064
+fine.amr.verbosity = 5
+
+fine.amr.regrid_interval = 10   # number of timesteps between regridding
+fine.amr.blockFactor = 4           # block factor used in grid generation
+fine.amr.fill_ratio = 0.8          # how efficient are the grids
+fine.amr.nestingRadius = 3         # proper nesting radius required
+fine.amr.tags_grow = 2             # amount to buffer tags
+fine.amr.max_box_size = 4         # largest box length allowed
+#fine.amr.tagging_val = .0001       # min undivided grad(vel) resulting in tagging
+
+fine.amr.tag_on_laplacian_velocity = 1
+fine.amr.lap_vel_tagging_val = 75
+#fine.amr.lap_vel_tagging_val = 1
+
+#initial guess 
+fine.amr.evolve_velocity = true
+fine.amr.do_initial_velocity_guess = 1
+fine.amr.do_initial_velocity_solve = 1
+fine.amr.initial_velocity_guess_type = 1 # linear PDE
+fine.amr.initial_velocity_guess_const_mu = 1.0e+6
+fine.amr.initial_velocity_guess_solver_type = 1 # use JFNK solver's linear mode
+
+fine.amr.max_solver_iterations = 50
+fine.amr.velocity_solver_tolerance = 1.e-8
+
+#velocity solve type -- 0=Picard, 1=JFNK, 2=knownVel, 3=petsc, 4=FAS-MG
+fine.amr.velocity_solver_type = 1
+
+fine.amr.new_timestep = 0
+
+
+#####################################################
+#  PFASST related params
+#####################################################
+
+pf.USE_PF = true
+pf.PF_VERBOSE = TRUE
+pf.pf_plot_prefix = pf_
+pf.pf_num_procs_per_time = 1
+pf.pf_num_repeats = 1
+pf.num_time_procs = 1
+
+
+
+
+
+#####################################################
+#  SOLVER ATTRIBUTES (Coarse and fine integrator)
+$ (Currently treated as common)
+#####################################################
+
+
+#petsc.maxIter = 50
+#petsc.absNLTol = 1.e-30
+#petsc.relNLTol = 1.e-8
+#petsc.minPicardIterations = 5
+#petsc.plotResidual = true
+
+#JFNK parameters
+JFNKSolver.vtopSafety = 0.95
+JFNKSolver.minPicardIterations = 3
+JFNKSolver.maxIter = 20
+JFNKSolver.absTol = 1.0e-3
+JFNKSolver.relTol = 1.0e-8
+# 0 = relax, 1 = BiCGStab, 2 = GMRES, 3 = CG, 4 = petsc
+JFNKSolver.solverType = 4
+JFNKSolver.bottom_solver_type = 1  # = petsc
+JFNKSolver.RelaxRelTol = 2.0e-3
+JFNKSolver.RelaxHang = 0.8
+JFNKSolver.maxRelaxIter = 30
+JFNKSolver.normType = 2
+JFNKSolver.verbosity = 5
+JFNKSolver.vtopRelaxTol = 0.005
+JFNKSolver.vtopRelaxMinIter = 8
+JFNKSolver.numMGSmooth = 8
+JFNKSolver.numMGIter = 1
+JFNKSolver.h = 0.025
+JFNKSolver.switchRate = 2.0
+#JFNKSolver.writeResiduals = true
+#JFNKSolver.muMin = 1.0e+4
+#JFNKSolver.uMaxAbs = 1.0e+6
+#JFNKSolver.repartition_petsc = 1
+
+#input file for solver benchmark
+main.filename = stream.L1L2.0032.r2.l0.000000.2d.hdf5
+
+
+
+
