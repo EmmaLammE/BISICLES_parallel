@@ -40,5 +40,6 @@
 # MacOS Folder Attributes
 **/*.DS_Store
 
-# Allow tracking .test files in all directories
+# Allow tracking .test files and job sumary files in all directories
 !**/*.test
+!job_summary_*.txt
