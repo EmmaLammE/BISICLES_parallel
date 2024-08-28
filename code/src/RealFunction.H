@@ -238,6 +238,124 @@ public:
 };
 
 
+class ParaboloidFunction : public RealFunction<RealVect>
+{
+  RealVect m_center;
+  RealVect m_radius;
+  Real m_mag;
+  Real m_offset;
+public:
+  ParaboloidFunction(RealVect a_center, const RealVect& a_radius, Real a_mag, Real a_offset=0.0)
+    : m_center(a_center),m_radius(a_radius), m_mag(a_mag), m_offset(a_offset)
+  {;}
+
+  Real operator()(const RealVect& x)
+  {
+    RealVect loc(x);
+    loc -= m_center;
+    loc /= m_radius;
+    Real radSqr = D_TERM(loc[0]*loc[0],+loc[1]*loc[1],+loc[2]*loc[2]);
+    
+    Real r =  m_mag*(1 -radSqr) + m_offset;
+    
+    return r;
+
+  }
+
+};
+
+
+class ParaboloidThicknessFunction : public RealFunction<RealVect>
+{
+  RealVect m_center;
+  RealVect m_radius;
+  Real m_mag;
+  Real m_offset;
+public:
+  ParaboloidThicknessFunction(RealVect a_center, const RealVect& a_radius, Real a_mag, Real a_offset=0.0)
+    : m_center(a_center),m_radius(a_radius), m_mag(a_mag), m_offset(a_offset)
+  {;}
+
+  Real operator()(const RealVect& x)
+  {
+    RealVect loc(x);
+    loc -= m_center;
+    loc /= m_radius;
+    Real radSqr = D_TERM(loc[0]*loc[0],+loc[1]*loc[1],+loc[2]*loc[2]);
+    
+    Real b =  (1 -radSqr) + m_offset;
+    Real h;
+    if (b > 0)
+      {
+        h = m_mag;
+      }
+    else
+      {
+        h = m_mag + b;
+      }
+
+    if (h < 0) h = 0;
+    
+    return h;
+
+  }
+
+};
+
+
+class cosSqrFunction : public RealFunction<RealVect>
+{
+  RealVect m_center;
+  RealVect m_radius;
+  Real m_mag;
+  Real m_offset;
+public:
+  cosSqrFunction(RealVect a_center, const RealVect& a_radius, Real a_mag, Real a_offset=0.0)
+    : m_center(a_center),m_radius(a_radius), m_mag(a_mag), m_offset(a_offset)
+  {;}
+
+  Real operator()(const RealVect& x)
+  {
+    RealVect loc(x);
+    loc -= m_center;
+    loc /= m_radius;
+
+    Real r =  m_mag*(cos(loc[0])*cos(loc[0])*cos(loc[1])*cos(loc[1]) - 2.0/3.0) + m_offset;
+    
+    return r;
+
+  }
+
+};
+
+
+class cosSqrThicknessFunction : public RealFunction<RealVect>
+{
+  RealVect m_center;
+  RealVect m_radius;
+  Real m_mag;
+  Real m_offset;
+public:
+  cosSqrThicknessFunction(RealVect a_center, const RealVect& a_radius, Real a_mag, Real a_offset=0.0)
+    : m_center(a_center),m_radius(a_radius), m_mag(a_mag), m_offset(a_offset)
+  {;}
+
+  Real operator()(const RealVect& x)
+  {
+    RealVect loc(x);
+    loc -= m_center;
+    loc /= m_radius;
+    
+    Real b =  m_mag*(cos(loc[0])*cos(loc[0])*cos(loc[1])*cos(loc[1]) - 2.0/3.0);
+    Real h = b + m_offset;
+    
+    return h;
+
+  }
+
+};
+
+
 /// allow flowline data to be read from an hdf5 file
 /// Flowline is parallel to the x axis
 /// Data must contain n values f_i, where f_i = f(dx * (i + 1/2))
