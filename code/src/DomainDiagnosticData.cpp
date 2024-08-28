@@ -1190,23 +1190,29 @@ void DomainDiagnosticData::read(HDF5Handle& a_handle)
     }
 }
 
+#endif
+
 DomainDiagnosticData::DomainDiagnosticData()
 {
+#ifdef CH_USE_HDF5    
   setCFdata();
+#endif
 }
 
 DomainDiagnosticData::DomainDiagnosticData(const DomainDiagnosticData& a)
 {
+#ifdef CH_USE_HDF5    
   setCFdata();
+#endif
 }
 
 DomainDiagnosticData&  DomainDiagnosticData::operator=(const DomainDiagnosticData& a)
 {
+#ifdef CH_USE_HDF5    
   setCFdata();
+#endif
   return *this;
 }
 
 
-
-#endif
 #include "NamespaceFooter.H"

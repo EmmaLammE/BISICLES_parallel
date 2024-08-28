@@ -1597,9 +1597,10 @@ void InverseVerticallyIntegratedVelocitySolver::applyProjection
     ca.averageToCoarse(crse,fine);
   }
 
+#ifdef CH_USE_HDF5      
     m_amrIce->writeAMRHierarchyHDF5(a_file,m_grids,vdata,names, m_domain[0].domainBox(),
-      m_dx[0][0], dt, time , m_refRatio, vdata.size());
-  
+                                    m_dx[0][0], dt, time , m_refRatio, vdata.size());
+#endif
   
     for (int lev = 0; lev <= m_finest_level;lev++)
       {

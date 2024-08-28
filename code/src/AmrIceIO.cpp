@@ -77,7 +77,7 @@ using std::string;
 
 #include "NamespaceHeader.H"
 
-
+#ifdef CH_USE_HDF5
 void AmrIce::setOutputOptions(ParmParse& a_pp)
 {
 
@@ -2073,6 +2073,7 @@ AmrIce::readCheckpointFile(HDF5Handle& a_handle)
   
 }
 
+#endif
 #ifdef CH_USE_HDF5
 
 void AmrIce::writeMetaDataHDF5(HDF5Handle& a_handle) const
