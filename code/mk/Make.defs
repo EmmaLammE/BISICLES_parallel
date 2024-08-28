@@ -93,6 +93,15 @@ include $(CHOMBO_HOME)/mk/Make.example
 #if PYTHON_INC was not defined, try to work it out from PYTHON_VERSION
 ifeq ($(PYTHON_INC),)
 
+# EL setting python version to 2.7
+#PYTHON_VERSION = 3.6
+
+ifeq ($(PYTHON_VERSION),3.6)
+#python 3.6m  standard install
+PYTHON_INC := -I/usr/include/python3.6m 
+PYTHON_LIBS := -lpython3.6m
+endif
+
 ifeq ($(PYTHON_VERSION),2.7)
 #python 2.7 standard install
 PYTHON_INC := -I/usr/include/python2.7 
