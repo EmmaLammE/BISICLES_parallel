@@ -515,6 +515,11 @@ public:
 			InverseVerticallyIntegrated = 6,
                         NUM_SOLVER_TYPES};
 
+  void setStep(int a_cur_step)
+  {
+    m_cur_step = a_cur_step;
+  }
+  
   void setTime(Real a_time)
   {
     m_time = a_time - m_offsetTime;
