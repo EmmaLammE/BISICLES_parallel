@@ -103,13 +103,13 @@ getbflawname()
 mkdir -p scripts-noPython
 TAGLAP=0
 BASEDIR=$PWD
-for SGN in 0 4
+for SGN in 4
 do
-for BFLAWA in powerLaw tsaiLaw leguyLaw
+for BFLAWA in  tsaiLaw 
 do
     for BASENY in 20 #40 # 80
     do
-	for MELT in spin melt0 melt4 melt5 melt42 melt52
+	for MELT in spin melt0 melt4 
 	do
 	    WIDTH=24
 	    GEOM=isomip$WIDTH
@@ -117,16 +117,16 @@ do
 	    THCK=thickness$WIDTH
 	    TEMPLATE=inputs.isomip-noPython.template
 	    ACAB=0.3
-	    for ACOEF in 2e-17 2.2e-17 
+	    for ACOEF in  2.2e-17 
 	    do
 		CFUNC=constfriction 	
 		for solver in Chombo 
 		do
-		    for smod in ssa l1l2 l1l2_full;
+		    for smod in l1l2;
 		    do
-			for lev in 0 1 2 3 4; 
+			for lev in 0 3 4; 
 			do
-			    for TAGGROW in 4 #8 16
+			    for TAGGROW in 4
 			    do
 				tagcap=$(( lev - 1 )) 
 				getbase
