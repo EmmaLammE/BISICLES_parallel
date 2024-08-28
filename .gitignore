@@ -33,11 +33,10 @@
 *.ex
 
 # data
-*.hdf5
-*.json
-*.dat
 **/*.hdf5
-
+**/*.json
+**/*.dat
+**/pout.*
 **/*.DS_Store
 
 # sbatch err and out files
