@@ -3134,7 +3134,7 @@ AmrIce::initData(Vector<RefCountedPtr<LevelSigmaCS> >& a_vectCoordSys,
 #endif
      
     }
-  // tempearture depends on internal energy
+  // temperature depends on internal energy
   updateTemperature();
 
   // this is a good time to check for remote ice
@@ -4461,7 +4461,9 @@ if (result != MPI_SUCCESS)
 	 << " < TIME_EPS = " << TIME_EPS;
         
       m_plot_prefix = m_plot_prefix + std::string("_error_.");
+#ifdef CH_USE_HDF5        
       writePlotFile();
+#endif
       pout() << " AmrIce::computeDt exit because " << ss.str() << endl;
       MayDay::Error(ss.str().c_str());
     }

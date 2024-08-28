@@ -1445,7 +1445,9 @@ void bisicles_write_checkpoint(int *instance_key)
 	  if (i->second != NULL)
 	    {
 	      AmrIce& amrIce = i->second->m_amrIce;
+#ifdef CH_USE_HDF5                
 	      amrIce.writeCheckpointFile();
+#endif
 	    }
 	}
     }
@@ -1463,7 +1465,9 @@ void bisicles_write_plot(int *instance_key)
 	  if (i->second != NULL)
 	    {
 	      AmrIce& amrIce = i->second->m_amrIce;
+#ifdef CH_USE_HDF5                
 	      amrIce.writePlotFile();
+#endif
 	    }
 	}
     }
@@ -1484,7 +1488,9 @@ void bisicles_read_checkpoint(int *instance_key, const char *checkpoint_fname)
 	    {
 	      AmrIce& amrIce = i->second->m_amrIce;
 	      std::string s = checkpoint_fname;
+#ifdef CH_USE_HDF5                
 	      amrIce.restart(std::string(s));
+#endif
 	    }
 	}
     }
@@ -1504,7 +1510,9 @@ void bisicles_set_header(int *instance_key, const char *attr_key, const T *val)
 	    {
 	      AmrIce& amrIce = i->second->m_amrIce;
 	      std::string s(attr_key);
+#ifdef CH_USE_HDF5                
 	      amrIce.setHeader(attr_key, *val);
+#endif
 	    }
 	}
     }
@@ -1523,7 +1531,9 @@ void bisicles_get_header(int *instance_key, const char *attr_key, T *val)
 	  if (i->second != NULL && attr_key != NULL && val != NULL)
 	    {
 	      AmrIce& amrIce = i->second->m_amrIce;
+#ifdef CH_USE_HDF5                
 	      amrIce.getHeader(attr_key, *val);
+#endif
 	    }
 	}
     }
@@ -1542,7 +1552,9 @@ void bisicles_get_header(int *instance_key, const char *attr_key, char *val)
 	      AmrIce& amrIce = i->second->m_amrIce;
 	      std::string v(val);
 	      int l = v.size();
+#ifdef CH_USE_HDF5                
 	      amrIce.getHeader(attr_key, v);
+#endif
 	      strncpy(val,v.c_str(),l); //should pad val with 0 if l > v.size()
 	    }
 	}

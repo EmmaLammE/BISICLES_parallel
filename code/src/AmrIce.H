@@ -311,9 +311,10 @@ public:
    */
   bool isDefined() const;
 
-#ifdef CH_USE_HDF5
+
 
 private:
+#ifdef CH_USE_HDF5  
   /// General purpose storage for (small) metadata.
   /**  
        Anything placed here will get written to the plot and 
@@ -323,8 +324,10 @@ private:
 
   /// write BISICLES specific metadata to HDF5 attributes
   void writeMetaDataHDF5(HDF5Handle& a_handle) const;
-
+#endif
+  
 public:
+#ifdef CH_USE_HDF5
   void setHeader(const std::string& a_key, const std::string& a_val)
   {
     m_headerData.m_string[a_key] = a_val;
@@ -398,19 +401,14 @@ public:
   /// set up for restart
   void restart(const string& a_restart_file);
 
-  /// set a prefix for all interactions with ParmParse for this object
-  void setParmParsePrefix(const string& a_prefix)
-  {
-    m_parmParsePrefix = a_prefix;
-  }
-  
+#endif
 
   string m_parmParsePrefix;
 
 
 
 private:
-
+#ifdef CH_USE_HDF5
   /// store CF output data on a uniform mesh 
   LevelData<FArrayBox> m_uniform_cf_data;
   /// mesh level for cf data
@@ -437,10 +435,12 @@ private:
 
   /// a number that represents the current time
   long outputNumbering(); 
-
+#endif
+  
   friend class DomainDiagnosticData;
   DomainDiagnosticData m_cf_domain_diagnostic_data;
 
+#ifdef CH_USE_HDF5  
   /// set options for plotfile,checkpoint IO
 
   void setOutputOptions(ParmParse& a_pp);
@@ -468,9 +468,11 @@ private:
 
   /// set up various run-long data for CF Output
   void initCFData();
+#endif
+
 public:
   
-#endif
+
 
   /// compute total ice and total grounded ice (volume, at this point)
   //Real computeTotalGroundedIce() const;
@@ -558,13 +560,27 @@ public:
     return m_vect_coordSys;
   }
 
-  /// increment ice thickness by delta_thk
-  void incrementIceThickness(Vector<LevelData<FArrayBox>*> a_delta_thk);
+  /// nearly direct access to the ice thickness 
+  void incrementIceThickness(Vector<LevelData<FArrayBox>*> a_thk);
   
   const Vector<int>& refRatios() const { return m_refinement_ratios;}
 
   const Vector<Real>& amrDx() const {return m_amrDx;}
 
+
+  /// access to the ice density
+  virtual Real iceDensity() const
+  {
+    return m_iceDensity;
+  }
+
+  /// access to the sewater density
+  virtual Real seawaterDensity() const
+  {
+    return m_seaWaterDensity;
+  }
+
+  
   const LevelData<FArrayBox>* velocity(int a_level) const
   {
     return m_velocity[a_level];
