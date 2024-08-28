@@ -1,0 +1,11 @@
+numCrseStart 0
+exact Filename = ref_end.hdf5
+computed Filename = pf_amr1_regrid10_np1ns1_nt310_tfin50_computeVel.000000.2d.hdf5
+error Filename = compareOut_pf_ref_np1_nt40_grid32.hdf5
+error, step 0: L1, L2, Max, sum
+thickness: 3.1555e+09, 6.1225e+04, 3.4903e+00, 5.4662e-03
+
+Vector NSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE: 32 bytes (0 Mb)
+---------------------------------
+Total Unfreed : 32 bytes (0 Mb)
+peak memory usage: 1105082 bytes (1 Mb)

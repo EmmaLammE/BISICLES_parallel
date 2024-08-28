@@ -14,7 +14,7 @@ class BisiclesdHdtSolver : public ChomboStruct, public AmrIceHolderClass{
    public:
       
 
-      BisiclesdHdtSolver(MPI_Comm in_comm = MPI_COMM_WORLD, int num_grid_points=16,\
+      BisiclesdHdtSolver(int num_grid_points=16,\
                          AmrIceHolderClass *c_AmrIceHolderPtr=nullptr);
       ~BisiclesdHdtSolver(void);
       void Cleanup(void);
@@ -27,4 +27,3 @@ class BisiclesdHdtSolver : public ChomboStruct, public AmrIceHolderClass{
 
 
 #endif
-

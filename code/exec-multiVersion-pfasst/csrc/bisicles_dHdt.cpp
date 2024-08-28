@@ -3,10 +3,10 @@
 
 
 
-BisiclesdHdtSolver::BisiclesdHdtSolver(MPI_Comm in_comm,int num_grid_points,\
+BisiclesdHdtSolver::BisiclesdHdtSolver(int num_grid_points,\
 						  AmrIceHolderClass *c_AmrIceHolderPtr)
 {
-	InitGrid(num_grid_points);
+	// InitGrid(num_grid_points);
 	/* Emma TODO
    		add more functions
    		not sure what to add yet

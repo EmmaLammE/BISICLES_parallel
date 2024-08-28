@@ -6,7 +6,7 @@
 #SBATCH -J ant_bdmach_inverse
 ##SBATCH --qos=debug
 #SBATCH --qos=regular
-#SBATCH --time=10:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --nodes=4
 #SBATCH --tasks-per-node=68
 #SBATCH --constraint=knl

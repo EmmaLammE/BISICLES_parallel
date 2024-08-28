@@ -51,7 +51,7 @@ extern "C" {
 
   // numCrseIntervals: num of crse time steps
   void Pf_Main(AmrIceHolderClass *AmrIceHolderPtr,MPI_Fint pf_commPtr,int numCrseIntervals,double dt,\
-    double maxTime,int maxStep, int pf_num_procs_per_time, int numGridPoints, bool PF_VERBOSE); 
+    double maxTime,int maxStep, bool pf_evolve_velocity, int pf_num_procs_per_time, int numGridPoints, bool PF_VERBOSE); 
 
   
 }

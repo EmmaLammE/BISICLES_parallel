@@ -62,7 +62,7 @@ BISICLES_BRANCH := $(THIS_DIR)/../../
 endif
 
 ifeq ($(CHOMBO_HOME),)
-CHOMBO_HOME := $(BISICLES_HOME)/Chombo/lib
+CHOMBO_HOME := $(BISICLES_HOME)/Chombo_parallel/lib
 endif
 
 # For the ChomboNVector headers

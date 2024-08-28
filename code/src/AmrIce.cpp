@@ -5391,7 +5391,7 @@ void AmrIce::computeAreaFraction(LevelData<FArrayBox>& a_area,
 				 int a_maskVal,
 				 int a_level) const
 {
-  CH_assert(a_level <= m_finest_level)
+  CH_assert(a_level <= m_finest_level);
     {
       const LevelData<BaseFab<int> >& levelMask = m_vect_coordSys[a_level]->getFloatingMask();
       // set a_area = 1.0 where we have grounded ice

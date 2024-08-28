@@ -1,19 +1,18 @@
 # -*- Mode: Makefile -*- 
-LIBPFASST = /global/homes/e/emmaliu/PFASST_icesheet
+LIBPFASST = /home/groups/jsuckale/liuwj/PFASST_icesheet/
 USE_PFASST = TRUE
 MPI = TRUE
 HDF5 = TRUE
 USE_PETSC=FALSE
 FC_COMPILE = gfortran -O3 #mpifort #
-LIBGFORTRAN = /opt/cray/pe/gcc/11.2.0/snos/lib64 -lmpifort#/opt/homebrew/lib/gcc/13
-# LIBOMP = /opt/homebrew/opt/libomp
-# LIBLLVM = /opt/homebrew/opt/llvm
-
+LIBGFORTRAN = /share/software/user/open/gcc/12.2.0/lib64 -lmpi -lgfortran#/opt/homebrew/lib/gcc/13
+OBJ_DIR = ../o/2d.Linux.64.mpicxx.mpifort.DEBUG.MPI
+	
 ### This makefile produces an executable for each 
 ### name in the `ebase' variable
 ebase := driver
-src_dirs = fsrc
-src_dirs += csrc
+src_dirs = csrc
+src_dirs += fsrc
 
 #all:  libBisicles2d.Linux.64.g++.gfortran.DEBUG.a libbike 
 #driver:  libBisicles2d.Linux.64.g++.gfortran.DEBUG.a libbike 
@@ -23,15 +22,22 @@ driver: clean libbike
 .NOTPARALLEL: all
 
 include ../mk/Make.defs
+OBJ_DIR = o/2d.Linux.64.mpicxx.gfortran.DEBUG.MPI
+-include $(OBJ_DIR)/*.d
+include .depend
 FFLAGS  += -I$(LIBPFASST)/include
 FFLAGS  += -I$(LIBPFASST)/build 
+FFLAGS  += -I/share/software/user/open/openmpi/4.1.2/lib
+FFLAGS  += -MD -MP -cpp
 # FFLAGS  += -I/include
-LDFLAGS += -lstdc++ -lquadmath #-lmpi_mpifh #
+LDFLAGS += -lstdc++ -lquadmath -lmpi_mpifh #-lpgc #-lpgf90rt -lpgf90rtl -lpgftnrtl#
 # LDFLAGS += -L/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/13/gcc/aarch64-apple-darwin22/13 -lgcc
 LDFLAGS +=  -L$(LIBPFASST)/lib -lpfasst -lmpi
 LDFLAGS += "-Wl,--copy-dt-needed-entries"
-# LDFLAGS += "-Wl,--fno-underscore"
-# LDFLAGS += "-Wl,-no_compact_unwind"
+LDFLAGS += -L/share/software/user/open/openmpi/4.1.2/lib -lmpi
+LDFLAGS += -L/home/groups/jsuckale/liuwj/Toolkits/hdf5-1.12.2/lib -lhdf5 -lz
+FFLAGS += "-Wl,--fno-underscore"
+FFLAGS += "-Wl,-no_compact_unwind"
 # LDFLAGS += -L$(LIBLLVM)/lib
 # CPPFLAGS+= -I$(LIBLLVM)/include -fopenmp
 # LDFLAGS += -L$(LIBOMP)/lib -fopenmp
@@ -66,7 +72,7 @@ LIBFLAGS += -lstdc++ $(LIBPFASST)/lib/libpfasst.a
 
 driver: clean libbike ../lib/libBisicles$(config).a 
 
-alltest: libbike ../lib/libBisicles$(config).a 
+alltest: clean libbike ../lib/libBisicles$(config).a 
 
 #include Makefile.fortran
 pfasst: 
@@ -75,3 +81,9 @@ pfasst:
 
 
 .PHONY: all lib libbike libclean alltest
+
+fsrcmake:
+	$(info ---------------- making fsrc first --------------------)
+	encap.o: fsrc/encap.f90
+		$(FC) $(FFLAGS) -c $< -o $(OBJ_DIR)/$@
+	

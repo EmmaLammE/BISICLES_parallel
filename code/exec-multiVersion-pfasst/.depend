@@ -1,9 +1,18 @@
+OBJ_DIR = ../o/2d.Linux.64.mpicxx.mpifort.DEBUG.MPI
+$(OBJ_DIR)/probin.o: fsrc/probin.f90 
+$(OBJ_DIR)/encap.o: fsrc/encap.f90 $(OBJ_DIR)/probin.o
+$(OBJ_DIR)/sweeper.o: fsrc/sweeper.f90 $(OBJ_DIR)/probin.o $(OBJ_DIR)/encap.o
+$(OBJ_DIR)/hooks.o: fsrc/hooks.f90 $(OBJ_DIR)/sweeper.o $(OBJ_DIR)/probin.o $(OBJ_DIR)/encap.o
+$(OBJ_DIR)/levels.o: fsrc/levels.f90 $(OBJ_DIR)/hooks.o $(OBJ_DIR)/sweeper.o $(OBJ_DIR)/probin.o $(OBJ_DIR)/encap.o
+$(OBJ_DIR)/pfasst_bisicles.o: fsrc/pfasst_bisicles.f90 $(OBJ_DIR)/levels.o
+$(OBJ_DIR)/pfasst_main.o: fsrc/pfasst_main.f90 $(OBJ_DIR)/pfasst_bisicles.o $(OBJ_DIR)/levels.o $(OBJ_DIR)/hooks.o $(OBJ_DIR)/sweeper.o $(OBJ_DIR)/probin.o $(OBJ_DIR)/encap.o
 
-./o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/encap.o : ./fsrc/encap.f90 
-./o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/probin.o : ./fsrc/probin.f90 ./fsrc/encap.f90 
-./o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/sweeper.o : ./fsrc/sweeper.f90 ./fsrc/probin.f90 ./fsrc/encap.f90 
-./o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/hooks.o : ./fsrc/hooks.f90 ./fsrc/sweeper.f90 ./fsrc/probin.f90 ./fsrc/encap.f90
-./o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/level.o : ./fsrc/level.f90 ./fsrc/hooks.f90 ./fsrc/sweeper.f90 ./fsrc/probin.f90 ./fsrc/encap.f90
-./o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/pfasst_bisicles.o : ./fsrc/pfasst_bisicles.f90 ./fsrc/level.f90
-./o/2d.Darwin.64.mpicxx.gfortran.DEBUG.MPI/pfasst_main.o : ./fsrc/pfasst_main.f90 ./fsrc/pfasst_bisicles.f90 ./fsrc/level.f90 ./fsrc/hooks.f90 ./fsrc/sweeper.f90 ./fsrc/probin.f90 ./fsrc/encap.f90
+
+# ./o/2d.Linux.64.mpicxx.gfortran.DEBUG.MPI/encap.o : ./fsrc/encap.f90 
+# ./o/2d.Linux.64.mpicxx.gfortran.DEBUG.MPI/probin.o : ./fsrc/probin.f90 ./fsrc/encap.f90 
+# ./o/2d.Linux.64.mpicxx.gfortran.DEBUG.MPI/sweeper.o : ./fsrc/sweeper.f90 ./fsrc/probin.f90 ./fsrc/encap.f90 
+# ./o/2d.Linux.64.mpicxx.gfortran.DEBUG.MPI/hooks.o : ./fsrc/hooks.f90 ./fsrc/sweeper.f90 ./fsrc/probin.f90 ./fsrc/encap.f90
+# ./o/2d.Linux.64.mpicxx.gfortran.DEBUG.MPI/level.o : ./fsrc/level.f90 ./fsrc/hooks.f90 ./fsrc/sweeper.f90 ./fsrc/probin.f90 ./fsrc/encap.f90
+# ./o/2d.Linux.64.mpicxx.gfortran.DEBUG.MPI/pfasst_bisicles.o : ./fsrc/pfasst_bisicles.f90 ./fsrc/level.f90
+# ./o/2d.Linux.64.mpicxx.gfortran.DEBUG.MPI/pfasst_main.o : ./fsrc/pfasst_main.f90 ./fsrc/pfasst_bisicles.f90 ./fsrc/level.f90 ./fsrc/hooks.f90 ./fsrc/sweeper.f90 ./fsrc/probin.f90 ./fsrc/encap.f90
 
