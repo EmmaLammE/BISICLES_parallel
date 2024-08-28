@@ -36,3 +36,13 @@
 *.hdf5
 *.json
 *.dat
+**/*.hdf5
+
+**/*.DS_Store
+
+# sbatch err and out files
+**/*.err
+**/*.out
+
+# Allow tracking .test files and job sumary files in all directories
+!**/*.test
