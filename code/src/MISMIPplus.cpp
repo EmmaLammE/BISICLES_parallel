@@ -60,6 +60,12 @@ MISMIPmelt::surfaceThicknessFlux(LevelData<FArrayBox>& a_flux,
   const LevelData<FArrayBox>& surfaceHeight = iceGeom->getSurfaceHeight();
   
   DataIterator dit = a_flux.dataIterator();
+
+  // first, set everything to zero
+  for (dit.begin(); dit.ok(); ++dit)
+    {
+      a_flux[dit].setVal(0.0);
+    }
   
   // experiment 0 is control and spinup (no melting other than calving-front)
   if ((m_experiment == "spin") || (m_experiment == "melt0"))
