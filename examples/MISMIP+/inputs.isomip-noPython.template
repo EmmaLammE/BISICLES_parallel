@@ -54,8 +54,7 @@ basalFlux.type = maskedFlux
 basalFlux.grounded.type = zeroFlux
 
 basalFlux.floating.type = MISMIPmelt
-basalFlux.floating.experiment = @MELTbasalsource
-
+basalFlux.floating.experiment = @MELT
 
 #CalvingModel.type = FixedFrontCalvingModel
 #CalvingModel.min_thickness = 10.0
@@ -121,7 +120,7 @@ amr.time_step_ticks = 0
 
 #plotting options
 amr.plot_time_interval = @PLOTINTERVAL
-amr.plot_prefix = ../plot.@NAME.
+amr.plot_prefix = plot.@NAME.
 
 amr.write_solver_rhs = 1
 amr.write_viscous_tensor = true
@@ -130,7 +129,7 @@ amr.write_thickness_sources = true
 #check points
 amr.check_interval = 1000
 
-amr.check_prefix = ../chk.@NAME.
+amr.check_prefix = chk.@NAME.
 
 amr.check_overwrite = 0
 amr.verbosity = 5
@@ -160,7 +159,7 @@ amr.grounding_line_tagging_min_vel = 0
 
 #misc options
 amr.verbosity = 5
-amr.velocity_solve_interval = @SOLVEINTERVAL
+#amr.velocity_solve_interval = @SOLVEINTERVAL
 
 #l1l2_fullamr.additional_velocity
 #l1l2_fullamr.diffusion_treatment = implicit

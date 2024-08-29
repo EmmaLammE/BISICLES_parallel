@@ -139,7 +139,7 @@ do
 				gettaggrowname
 				getbflawname
 				getmaxtime
-				NAME=$GEOM.$MELT.$smod$BFLAWNAME$BASENAME.l$lev""$TAGGROWNAME.$solver.A$ACOEF.$CFUNC""$SGNAME.a$ACAB
+				NAME=$GEOM.$MELT.$smod$BFLAWNAME$BASENAME.l$lev""$TAGGROWNAME.$solver.A$ACOEF.$CFUNC""$SGNAME.a$ACAB-noPython
 				SPINNAME=$GEOM.spin.$smod$BFLAWNAME$BASENAME.l$lev""$TAGGROWNAME.$solver.A$ACOEF.$CFUNC""$SGNAME.a$ACAB
 				INFILE=inputs-noPython.$NAME
 				sed -e s/@SGN/$SGN/ -e s/@TAGGROW/$TAGGROW/ -e s/@PLLMODEL/$PLLMODEL/ -e s/@PLLCOEF/$PLLCOEF/ -e s/@BFLAW/$BFLAW/ -e s/@BASENX/$BASENX/ -e s/@BASENY/$BASENY/ -e s/@MAXTIME/$MAXTIME/ -e s/@THCK/$THCK/ -e s/@TOPG/$TOPG/ -e s/@SPINNAME/$SPINNAME/ -e s/@TAGLAP/$TAGLAP/ -e s/@PLOTINTERVAL/$PLOTINTERVAL/ -e s/@MELT/$MELT/ -e s/@SOLVEINTERVAL/$SOLVEINTERVAL/  -e s/#$smod// -e s/#$solver// -e s/@SOLVER/$solver/ -e s/@GEOM/$GEOM/ -e s/@NAME/$NAME/ -e s/@ACOEF/$ACOEF/ -e s/@CFUNC/$CFUNC"_"$WIDTH/ -e s/@ACAB/$ACAB/ -e s/@MAXLEVEL/$lev/ -e s/@TAGCAP/$tagcap/ -e s/@SMOD/$smod/ -e s/@CRE/$cre/ $TEMPLATE > scripts-noPython/$INFILE
