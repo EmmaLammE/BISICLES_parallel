@@ -17,8 +17,8 @@ src_dirs += csrc
 
 #all:  libBisicles2d.Linux.64.g++.gfortran.DEBUG.a libbike 
 #driver:  libBisicles2d.Linux.64.g++.gfortran.DEBUG.a libbike 
-all: clean libbike driver $(if $(USE_PFASST), clean libbike driver pfasst)
-driver: clean libbike
+all: libbike driver $(if $(USE_PFASST), libbike driver pfasst)
+driver:  libbike
 
 .NOTPARALLEL: all
 
@@ -64,13 +64,15 @@ LIBFLAGS += -lstdc++ $(LIBPFASST)/lib/libpfasst.a
 
 
 
-driver: clean libbike ../lib/libBisicles$(config).a 
+driver:  libbike ../lib/libBisicles$(config).a 
 
 alltest: libbike ../lib/libBisicles$(config).a 
 
 #include Makefile.fortran
 pfasst: 
 	mkdir -p include
+#silly workaround if there are not mod files to move
+	touch dummy.mod
 	mv *.mod include/
 
 
