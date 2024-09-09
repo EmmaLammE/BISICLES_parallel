@@ -381,7 +381,7 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
       // allocate storage
       const LevelData<FArrayBox>& currentH = *a_H[lev]; // a_H is passed in correctly
       const DisjointBoxLayout& levelGrids = currentH.getBoxes(); // 
-      faceH[lev] = new LevelData<FluxBox>(levelGrids, 1, IntVect::Zero);
+      faceH[lev] = new LevelData<FluxBox>(levelGrids, 1, IntVect::Unit);
       // vectFluxes needs to have a ghost cell to ensure that
       // the Copier works correctly (it's a bit complicated)
       vectFluxes[lev] = new LevelData<FluxBox>(levelGrids, 1, IntVect::Unit);
@@ -398,9 +398,8 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
       // set basal thickness source
       m_basalFluxPtr->surfaceThicknessFlux(levelBTS, *this, lev, a_dt);
       
-      // for now, just do simple cell-to-face averaging
-      // (may want to go back to PPM at some point)
-      // {
+      // just in case, do an exchange and C/F BCs here
+      // cast away const-ness just for BC filling
       LevelData<FArrayBox>& nonConstH = *(const_cast<LevelData<FArrayBox>*>(&currentH));
       // ensure that ghost cells for thickness  are filled in
       if (lev > 0)
@@ -413,7 +412,7 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
                                                    m_refinement_ratios[lev-1],
                                                    nGhost);
           
-          // // since we're not subcycling, don't need to interpolate in time
+          // since we're not subcycling, don't need to interpolate in time
           Real time_interp_coeff = 0.0;
           thicknessFiller.fillInterp(nonConstH,
                                      *a_H[lev-1],
@@ -424,9 +423,26 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
         // just in case, do an exchange here
         // cast away const-ness just for the exchange
         nonConstH.exchange(); // what does this line do? periodic BC for ghost cells to exchange values on two ends of domain
-      // }
-      CellToEdge(currentH,*faceH[lev]);
-    }
+    } // end loop over levels for surface fluxes
+
+
+  // can either use PPM or cell-to-face averaging to generate face-centered
+  // thickness values  
+  if (m_use_ppm_for_face_values)
+    {
+      // use dt=0 to compute face velocities at current time.
+      computeH_half(faceH, 0);
+    } 
+  else    
+    {
+      for (int lev=0; lev<= m_finest_level; lev++)      
+        {
+          // cell to face averaging
+          const LevelData<FArrayBox>& currentH = *a_H[lev];          
+          CellToEdge(currentH,*faceH[lev]);      
+        } // end loop over levels
+    } // end if we're doing cell-to-face averaging
+  
   // dhDt is just div(faceH*faceVel) + thicknessSources
 
   // we already have a function to compute thicknessFluxes (faceH*faceVel)
@@ -590,10 +606,18 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   // it's convenient to pull out the grids here
   // new_amrGrids is only for physical grid, not including ghost
   Vector<DisjointBoxLayout> new_amrGrids(a_thicknessVect.size());
+  int newFinestLevel = 0;
   for (int lev=0; lev<new_amrGrids.size(); lev++)
-  {
-      new_amrGrids[lev] = a_thicknessVect[lev]->getBoxes();
-  }
+    {
+      if (a_thicknessVect[lev] != NULL)
+        {
+          new_amrGrids[lev] = a_thicknessVect[lev]->getBoxes();
+          if (new_amrGrids[lev].isDisjoint())
+            {
+              newFinestLevel = lev;
+            }
+        }
+    }
 
   // cout<<"2 in set state, ice thickness:\n";
   // for (int lvl=0; lvl < a_thicknessVect.size(); lvl++)
@@ -625,15 +649,19 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
 
   /// begin code lifted from AmrIce::regrid
   //test to see if grids have changed
-  bool gridsSame = true;
+  // if finest-level has changed, can skip the rest
+  bool gridsSame = (newFinestLevel == m_finest_level);
   // assume that we'll always have the same level 0
   int lbase = 0;
-  for (int lev=lbase+1; lev< new_amrGrids.size(); ++lev)
-  {
-      const DisjointBoxLayout oldDBL = m_amrGrids[lev];
-      gridsSame &= oldDBL.sameBoxes(new_amrGrids[lev]);
-  }
-  
+
+  if (gridsSame)
+    {
+      for (int lev=lbase+1; lev<= newFinestLevel; ++lev)
+        {
+          const DisjointBoxLayout oldDBL = m_amrGrids[lev];
+          gridsSame &= oldDBL.sameBoxes(new_amrGrids[lev]);
+        }
+    }
   // cout<<"2 amr ice new time step gridsame: "<<gridsSame<<endl;
 
 
@@ -676,7 +704,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   
   // cout<<"1 amr ice new time step: "<<new_amrGrids.size()<<endl;
   // new_amrGrids.size() is corret
-  for (int lev=lbase+1; lev< new_amrGrids.size(); ++lev)
+  for (int lev=lbase+1; lev<= newFinestLevel; ++lev)
   {
       // cout<<" lev # "<<lev<<endl;
       const DisjointBoxLayout oldDBL = m_amrGrids[lev];
@@ -972,7 +1000,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   // unnecessary if gridsSame
   if (!gridsSame)
   {
-      for (int lev = a_thicknessVect.size(); lev < m_old_thickness.size(); lev++)
+      for (int lev = newFinestLevel+1; lev < m_old_thickness.size(); lev++)
         {
           // cout<<"2 amr ice new time step: "<<a_thicknessVect.size()<<endl;
           // MayDay::Error("--------------- stop ----------------n");
@@ -1035,8 +1063,9 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
           DisjointBoxLayout emptyDBL;
           m_amrGrids[lev] = emptyDBL;
         }
-      
-      m_finest_level = a_thicknessVect.size()-1;
+
+      // reset m_finest_level
+      m_finest_level = newFinestLevel;
     
   
   
@@ -1195,8 +1224,9 @@ AmrIce::getState(IceSheetState& a_iceState)
 {
 
   // thickness
-  Vector<LevelData<FArrayBox>* > thickness(m_velocity.size());
-  for (int i=0; i<thickness.size(); i++)
+  // set pointers to NULL to account for any un-initialized levels
+  Vector<LevelData<FArrayBox>* > thickness(m_velocity.size(), NULL);
+  for (int i=0; i<=m_finest_level; i++)
     {
       thickness[i] =  &(m_vect_coordSys[i]->getH());
     }

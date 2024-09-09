@@ -402,6 +402,13 @@ public:
   void restart(const string& a_restart_file);
 
 #endif
+  
+  /// set a prefix for all interactions with ParmParse for this object
+  void setParmParsePrefix(const string& a_prefix)
+  {
+    m_parmParsePrefix = a_prefix;
+  }
+  
 
   string m_parmParsePrefix;
 
@@ -1449,6 +1456,11 @@ protected:
 
   // if true, use new (SUNDIALS) timestep
   bool m_newTimestep;  
+
+  // if true, use PPM for face-centered values when computing temporal RHS, even for RK4 
+  /** if false, use simple cell->face averaging
+   */
+  bool m_use_ppm_for_face_values;
   
   // if true, allow thickness to change in time
   bool m_evolve_thickness; 

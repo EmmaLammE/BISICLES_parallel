@@ -398,7 +398,7 @@ public:
     `A.constitutiveRelation =  GlensLaw` is found. Options are:
     
      - GlensLaw.n = <float> - the power in Glen's flow law, default (3.0)
-     - GlensLaw.epsSqr0 = <float> - regularization at low strain rates. Default 10^-12
+     - GlensLaw.epsSqr0 = <float> - regularization at low strain rates. Default 1e-12
      - GlensLaw.delta = <float> - regularization at high strain rates. Default 0.0
 
 */

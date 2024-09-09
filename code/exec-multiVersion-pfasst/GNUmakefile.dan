@@ -17,15 +17,15 @@ src_dirs += csrc
 
 #all:  libBisicles2d.Linux.64.g++.gfortran.DEBUG.a libbike 
 #driver:  libBisicles2d.Linux.64.g++.gfortran.DEBUG.a libbike 
-all:  libbike driver $(if $(USE_PFASST),  libbike driver pfasst)
-driver:  libbike
+all: clean libbike driver $(if $(USE_PFASST), clean libbike driver pfasst)
+driver: clean libbike
 
 .NOTPARALLEL: all
 
 include ../mk/Make.defs
 FFLAGS  += -I$(LIBPFASST)/include
-FFLAGS  += -I$(LIBPFASST)/build
-FFLAGS  += -I./include
+FFLAGS  += -I$(LIBPFASST)/build 
+# FFLAGS  += -I/include
 LDFLAGS += -lstdc++ -lquadmath #-lmpi_mpifh #
 # LDFLAGS += -L/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/13/gcc/aarch64-apple-darwin22/13 -lgcc
 LDFLAGS +=  -L$(LIBPFASST)/lib -lpfasst -lmpi
@@ -64,7 +64,7 @@ LIBFLAGS += -lstdc++ $(LIBPFASST)/lib/libpfasst.a
 
 
 
-driver:  libbike ../lib/libBisicles$(config).a 
+driver: clean libbike ../lib/libBisicles$(config).a 
 
 alltest: libbike ../lib/libBisicles$(config).a 
 

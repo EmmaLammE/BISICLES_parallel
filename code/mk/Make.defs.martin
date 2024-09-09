@@ -3,6 +3,7 @@ NETCDF_LIBS=  -lnetcdf -lhdf5_hl
 PYTHON_VERSION = 2.7
 LIBFLAGS += -lgfortran
 SUNDIALS_HOME=$(SUNDIALS_INSTALLDIR)
-LIBPFASST = /home/dan/code/parallelInTime/PFASST_icesheet
-CHOMBO_HOME = /home/dan/code/Chombo/lib
+LIBPFASST = /home/dan/cleanCheckout/parallelInTime/PFASST_icesheet
+CHOMBO_HOME = /home/dan/cleanCheckout/parallelInTime/Chombo_parallel/lib
+
 
