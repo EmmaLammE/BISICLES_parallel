@@ -1041,16 +1041,23 @@ FineInterp::s_default_boundary_limit_type = 0;
     // amrObjectCrse.amrThickness(crseH);
     ParmParse ppcrse("crse"); int crselevel=0;
     ppcrse.get("amr.maxLevel", crselevel);
+    int finestLevel = 0;
     Vector<LevelData<FArrayBox>* > crseH(crselevel+1, NULL);
     for (int lvl=0; lvl<crselevel+1;lvl++)
       {
         const DisjointBoxLayout& current_grid_size=amrObjectCrse.grids(lvl);
-        crseH[lvl] = new LevelData<FArrayBox>(current_grid_size,1,IntVect::Zero); 
-        DataIterator dit = (*crseH[lvl]).dataIterator();
-        for (dit.begin(); dit.ok(); ++dit)
-        {
-          (*crseH[lvl])[dit].setVal(1000.0);
-        }
+        // only do this if the level is defined
+        if (current_grid_size.isClosed())
+          {
+            // keep track of the finest defined level
+            finestLevel = lvl;
+            crseH[lvl] = new LevelData<FArrayBox>(current_grid_size,1,IntVect::Zero); 
+            DataIterator dit = (*crseH[lvl]).dataIterator();
+            for (dit.begin(); dit.ok(); ++dit)
+              {
+                (*crseH[lvl])[dit].setVal(1000.0);
+              }
+          }
       }
 
     const Vector<LevelData<FArrayBox>* >& crseVel = amrObjectCrse.amrVelocity();

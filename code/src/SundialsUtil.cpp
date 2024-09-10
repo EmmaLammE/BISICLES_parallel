@@ -78,20 +78,36 @@ void reshapeAndFill(Vector<LevelData<FArrayBox>* >& a_dest,
     {
       // eventually can be clever and not reshape level 0, just do a copy
       // (since level 0 grids never change)
-      // if we need to, allocate a LevelData here
-      if (a_dest[lev] == NULL)
+
+      // don't do anything if a_src[lev] is NULL
+      if (a_src[lev] == NULL)
         {
-          a_dest[lev] = new LevelData<FArrayBox>;
+          if (a_dest[lev] != NULL)
+            {
+              delete a_dest[lev];
+              a_dest[lev] = NULL;
+            }
+        } // end if src[lev] is NULL
+      else
+        {
+          // if we need to, allocate a LevelData here
+          if (a_dest[lev] == NULL)
+            {
+              a_dest[lev] = new LevelData<FArrayBox>;
+            }
+          
+          reshapeAndFill(*a_dest[lev], *a_src[lev]);
         }
-      
-      reshapeAndFill(*a_dest[lev], *a_src[lev]);
-    }
+    } // end loop over levels
 
   // if there are any extra levels in dest, delete them
   for (int lev=a_src.size(); lev<a_dest.size(); lev++)
     {
-      delete a_dest[lev];
-      a_dest[lev] = NULL;
+      if (a_dest[lev] != NULL)
+        {
+          delete a_dest[lev];
+          a_dest[lev] = NULL;
+        }
     }
 }
 
