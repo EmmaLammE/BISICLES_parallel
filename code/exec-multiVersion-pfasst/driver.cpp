@@ -307,12 +307,12 @@ FineInterp::s_default_boundary_limit_type = 0;
       MuCoefficient* muCoefPtr =  MuCoefficient::parseMuCoefficient("muCoefficient");
 
       if (muCoefPtr == NULL)
-  {
-    const std::string err("failed to parse muCoefficient");
-    pout() << err << endl;
-    MayDay::Error(err.c_str());
-  }
-     
+        {
+          const std::string err("failed to parse muCoefficient");
+          pout() << err << endl;
+          MayDay::Error(err.c_str());
+        }
+      
       amrObjectFine.setMuCoefficient(muCoefPtr);
       amrObjectCrse.setMuCoefficient(muCoefPtr);      
       delete muCoefPtr;
@@ -382,52 +382,52 @@ FineInterp::s_default_boundary_limit_type = 0;
         MarineIBC* ibcPtr = new MarineIBC;
         ParmParse mPP("marineIceSheet");
   
-  Real  seaLevel;
-  seaLevel = 0.0;
-  mPP.query("seaLevel", seaLevel);
-
-  std::string thicknessType = "constant";
-  mPP.query("thickness_type",thicknessType);
-  RefCountedPtr<RealFunction<RealVect> > thicknessFunction;
-  Vector<RefCountedPtr<RealFunction<RealVect> > > bedrockFunction(1);
-  if (thicknessType == "constant")
-    {
-      Real thickness;
-      mPP.get("thickness", thickness);
-      RefCountedPtr<RealFunction<RealVect> > ptr(new ConstantRealFunction<RealVect>(thickness));
-      thicknessFunction =ptr;
-    }
+        Real  seaLevel;
+        seaLevel = 0.0;
+        mPP.query("seaLevel", seaLevel);
+        
+        std::string thicknessType = "constant";
+        mPP.query("thickness_type",thicknessType);
+        RefCountedPtr<RealFunction<RealVect> > thicknessFunction;
+        Vector<RefCountedPtr<RealFunction<RealVect> > > bedrockFunction(1);
+        if (thicknessType == "constant")
+          {
+            Real thickness;
+            mPP.get("thickness", thickness);
+            RefCountedPtr<RealFunction<RealVect> > ptr(new ConstantRealFunction<RealVect>(thickness));
+            thicknessFunction =ptr;
+          }
         else if (thicknessType == "compactSupportConstant")
           {
-      Real thickness;
+            Real thickness;
             Vector<Real> tmpIntVect(SpaceDim,0); 
-      mPP.get("thickness", thickness);
+            mPP.get("thickness", thickness);
             mPP.getarr("loBound", tmpIntVect, 0, SpaceDim);
             RealVect loBound(D_DECL(tmpIntVect[0], tmpIntVect[1], tmpIntVect[2]));
             mPP.getarr("hiBound", tmpIntVect, 0, SpaceDim);
             RealVect hiBound(D_DECL(tmpIntVect[0], tmpIntVect[1], tmpIntVect[2]));
-
-      RefCountedPtr<RealFunction<RealVect> > ptr(new CompactSupportConstantRealFunction(thickness,loBound, hiBound));
-      thicknessFunction =ptr;
-
+            
+            RefCountedPtr<RealFunction<RealVect> > ptr(new CompactSupportConstantRealFunction(thickness,loBound, hiBound));
+            thicknessFunction =ptr;
+            
           }
         else if (thicknessType == "circularSupportConstant")
           {
-      Real thickness, supportRadius;
+            Real thickness, supportRadius;
             Vector<Real> tmpRealVect(SpaceDim,0); 
-      mPP.get("thickness", thickness);
+            mPP.get("thickness", thickness);
             mPP.get("supportRadius", supportRadius);
             mPP.getarr("center", tmpRealVect, 0, SpaceDim);
             RealVect center(D_DECL(tmpRealVect[0],tmpRealVect[1],tmpRealVect[2]));
 
-      RefCountedPtr<RealFunction<RealVect> > ptr(new CircularSupportConstantRealFunction(thickness,center, supportRadius));
-      thicknessFunction =ptr;            
+            RefCountedPtr<RealFunction<RealVect> > ptr(new CircularSupportConstantRealFunction(thickness,center, supportRadius));
+            thicknessFunction =ptr;            
           }
         else if (thicknessType == "compactSupportInclinedPlane")
           {
-      Real originThickness;
+            Real originThickness;
             Vector<Real> tmpIntVect(SpaceDim,0); 
-      mPP.get("origin_thickness", originThickness);
+            mPP.get("origin_thickness", originThickness);
             mPP.getarr("loBound", tmpIntVect, 0, SpaceDim);
             RealVect loBound(D_DECL(tmpIntVect[0], tmpIntVect[1], tmpIntVect[2]));
             mPP.getarr("hiBound", tmpIntVect, 0, SpaceDim);
@@ -437,111 +437,111 @@ FineInterp::s_default_boundary_limit_type = 0;
             mPP.getarr("thickness_slope", vect, 0, SpaceDim);
             thicknessSlope = RealVect(D_DECL(vect[0], vect[1], vect[2]));
             RefCountedPtr<RealFunction<RealVect> > ptr(new CompactSupportInclinedPlaneFunction(originThickness, thicknessSlope,loBound, hiBound));
-      thicknessFunction =ptr;
+            thicknessFunction =ptr;
             
           }
-  else if (thicknessType == "step")
-    {
+        else if (thicknessType == "step")
+          {
             int dir=0;
-      Real leftThickness, rightThickness, cutoff;
-      mPP.get("left_thickness", leftThickness);
-      mPP.get("right_thickness", rightThickness);
-      mPP.get("x_cutoff", cutoff);
+            Real leftThickness, rightThickness, cutoff;
+            mPP.get("left_thickness", leftThickness);
+            mPP.get("right_thickness", rightThickness);
+            mPP.get("x_cutoff", cutoff);
             mPP.query("dir", dir);
-
-      RefCountedPtr<RealFunction<RealVect> > ptr(new StepRealFunction(leftThickness, rightThickness, cutoff, dir));
-      thicknessFunction =ptr;
-    }
-  else if (thicknessType == "flowline")
-    {
-      Real dx; 
-      std::string file, set;
-      mPP.get("thickness_flowline_dx", dx);
-      mPP.get("thickness_flowline_file", file);
-      mPP.get("thickness_flowline_set", set);
-      RefCountedPtr<RealFunction<RealVect> > ptr(new ExtrudedPieceWiseLinearFlowline(file,set,dx));
-      thicknessFunction = ptr;
-    }
-  else 
-    {
-      MayDay::Error("bad marineIceSheet.thicknessType");
-    }
-
-  
-  std::string geometry = "plane";
-  mPP.query("geometry",geometry);
-
-  if (geometry == "plane")
-    {
-      //inclined plane geometry
-      RealVect basalSlope;
-      Vector<Real> vect(SpaceDim);
-      mPP.getarr("basal_slope", vect, 0, SpaceDim);
-      basalSlope = RealVect(D_DECL(vect[0], vect[1], vect[2]));
-      Real originElevation;
-      mPP.get("originElevation", originElevation);
-
-     
-      RefCountedPtr<RealFunction<RealVect> > ptr(new InclinedPlaneFunction(originElevation, basalSlope));
-      bedrockFunction[0] =  ptr;
-    }
-  else if (geometry == "symmetricPlane")
-    {
-      //inclined plane geometry, symmetric about origin
-      RealVect basalSlope;
-      Vector<Real> vect(SpaceDim);
-      mPP.getarr("basal_slope", vect, 0, SpaceDim);
-      basalSlope = RealVect(D_DECL(vect[0], vect[1], vect[2]));
-
-      Real originElevation;
-      mPP.get("originElevation", originElevation);
-
+            
+            RefCountedPtr<RealFunction<RealVect> > ptr(new StepRealFunction(leftThickness, rightThickness, cutoff, dir));
+            thicknessFunction =ptr;
+          }
+        else if (thicknessType == "flowline")
+          {
+            Real dx; 
+            std::string file, set;
+            mPP.get("thickness_flowline_dx", dx);
+            mPP.get("thickness_flowline_file", file);
+            mPP.get("thickness_flowline_set", set);
+            RefCountedPtr<RealFunction<RealVect> > ptr(new ExtrudedPieceWiseLinearFlowline(file,set,dx));
+            thicknessFunction = ptr;
+          }
+        else 
+          {
+            MayDay::Error("bad marineIceSheet.thicknessType");
+          }
+        
+        
+        std::string geometry = "plane";
+        mPP.query("geometry",geometry);
+        
+        if (geometry == "plane")
+          {
+            //inclined plane geometry
+            RealVect basalSlope;
+            Vector<Real> vect(SpaceDim);
+            mPP.getarr("basal_slope", vect, 0, SpaceDim);
+            basalSlope = RealVect(D_DECL(vect[0], vect[1], vect[2]));
+            Real originElevation;
+            mPP.get("originElevation", originElevation);
+            
+            
+            RefCountedPtr<RealFunction<RealVect> > ptr(new InclinedPlaneFunction(originElevation, basalSlope));
+            bedrockFunction[0] =  ptr;
+          }
+        else if (geometry == "symmetricPlane")
+          {
+            //inclined plane geometry, symmetric about origin
+            RealVect basalSlope;
+            Vector<Real> vect(SpaceDim);
+            mPP.getarr("basal_slope", vect, 0, SpaceDim);
+            basalSlope = RealVect(D_DECL(vect[0], vect[1], vect[2]));
+            
+            Real originElevation;
+            mPP.get("originElevation", originElevation);
+            
             RealVect symmetryPoint(RealVect::Zero);
             mPP.getarr("symmetryPoint", vect, 0, SpaceDim);
             symmetryPoint = RealVect(D_DECL(vect[0], vect[1], vect[2]));
-     
-      RefCountedPtr<RealFunction<RealVect> > ptr(new SymmetricInclinedPlaneFunction(originElevation, basalSlope, symmetryPoint));
-      bedrockFunction[0] =  ptr;
-    }
-  else if (geometry == "gaussianHump")
-    {
-      //gaussian bedrock geometry, symmetric about origin
-      RealVect center;
-      Vector<Real> vect(SpaceDim);
-      mPP.getarr("center", vect, 0, SpaceDim);
-      center = RealVect(D_DECL(vect[0], vect[1], vect[2]));
-
-      RealVect radius;
-      mPP.getarr("radius", vect, 0, SpaceDim);
-      radius = RealVect(D_DECL(vect[0], vect[1], vect[2]));            
-
-      Real magnitude;
-      mPP.get("magnitude", magnitude);
+            
+            RefCountedPtr<RealFunction<RealVect> > ptr(new SymmetricInclinedPlaneFunction(originElevation, basalSlope, symmetryPoint));
+            bedrockFunction[0] =  ptr;
+          }
+        else if (geometry == "gaussianHump")
+          {
+            //gaussian bedrock geometry, symmetric about origin
+            RealVect center;
+            Vector<Real> vect(SpaceDim);
+            mPP.getarr("center", vect, 0, SpaceDim);
+            center = RealVect(D_DECL(vect[0], vect[1], vect[2]));
+            
+            RealVect radius;
+            mPP.getarr("radius", vect, 0, SpaceDim);
+            radius = RealVect(D_DECL(vect[0], vect[1], vect[2]));            
+            
+            Real magnitude;
+            mPP.get("magnitude", magnitude);
             
             Real offset;
-      mPP.get("offset", offset);
-
-      RefCountedPtr<RealFunction<RealVect> > ptr(new GaussianFunction(center,
+            mPP.get("offset", offset);
+            
+            RefCountedPtr<RealFunction<RealVect> > ptr(new GaussianFunction(center,
                                                                             radius,
                                                                             magnitude,
                                                                             offset));
-      bedrockFunction[0] =  ptr;
-    }        
+            bedrockFunction[0] =  ptr;
+          }        
         else if (geometry == "regroundingTest")
           {
-      //inclined plane geometry with a Gaussian bump
+            //inclined plane geometry with a Gaussian bump
             bedrockFunction.resize(2);
-
-      RealVect basalSlope;
-      Vector<Real> vect(SpaceDim);
-      mPP.getarr("basal_slope", vect, 0, SpaceDim);
-      basalSlope = RealVect(D_DECL(vect[0], vect[1], vect[2]));
-      Real originElevation;
-      mPP.get("originElevation", originElevation);
-
+            
+            RealVect basalSlope;
+            Vector<Real> vect(SpaceDim);
+            mPP.getarr("basal_slope", vect, 0, SpaceDim);
+            basalSlope = RealVect(D_DECL(vect[0], vect[1], vect[2]));
+            Real originElevation;
+            mPP.get("originElevation", originElevation);
+            
             // compose flat plane with Gaussian hump
-      RefCountedPtr<RealFunction<RealVect> > ptr1(new InclinedPlaneFunction(originElevation, basalSlope));
-      bedrockFunction[0] =  ptr1;
+            RefCountedPtr<RealFunction<RealVect> > ptr1(new InclinedPlaneFunction(originElevation, basalSlope));
+            bedrockFunction[0] =  ptr1;
             
             Real bumpCenter;
             Real bumpRad;
@@ -552,71 +552,76 @@ FineInterp::s_default_boundary_limit_type = 0;
             mPP.get("bumpMag",bumpMag);
             RefCountedPtr<RealFunction<RealVect> > ptr2(new GaussianFunctionX(bumpCenter, bumpRad, bumpMag));
 
-      bedrockFunction[1] =  ptr2;
+            bedrockFunction[1] =  ptr2;
           }
-  else if (geometry == "Schoof")
-    {
-      //geometry of Schoof, 2007
-      Real originElevation;
-      mPP.get("originElevation", originElevation);
-      
-      Real lengthScaleFactor = 1.0;
-      mPP.query("schoofLengthScaleFactor",lengthScaleFactor);
-
-     
-      Real schoofCoeff2, schoofCoeff4, schoofCoeff6;
-      mPP.get("schoofCoeff2", schoofCoeff2);
-      mPP.get("schoofCoeff4", schoofCoeff4);
-      mPP.get("schoofCoeff6", schoofCoeff6);
-      
-      //RefCountedPtr<RealFunction<RealVect> > schoofBedrock
-      RefCountedPtr<RealFunction<RealVect> > ptr(new SchoofBedrockElevation(domainSize[SpaceDim-2] * lengthScaleFactor,
-                      originElevation,
-                      schoofCoeff2, schoofCoeff4, 
-                      schoofCoeff6));
-
-      bedrockFunction[0] = ptr;
-     
-
-    }
-
-  else if (geometry == "Katz")
-    {
-      //geometry of Katz and Worster, 2010
-      Real originElevation;
-      mPP.get("originElevation", originElevation);
-      
-      Real lengthScaleFactor = 1.0;
-      mPP.query("schoofLengthScaleFactor",lengthScaleFactor);
-
-      Real katzAlpha, katzSigma;
-      mPP.get("katzAlpha", katzAlpha);
-      mPP.get("katzSigma", katzSigma);
-
-      Real schoofCoeff2, schoofCoeff4, schoofCoeff6;
-      mPP.get("schoofCoeff2", schoofCoeff2);
-      mPP.get("schoofCoeff4", schoofCoeff4);
-      mPP.get("schoofCoeff6", schoofCoeff6);
-      
-      //RefCountedPtr<RealFunction<RealVect> > katzBedrock
-      RefCountedPtr<RealFunction<RealVect> > ptr(new KatzBedrockElevation(domainSize[SpaceDim-2],
-                    domainSize[SpaceDim-1],
-                    originElevation,
-                    katzAlpha, katzSigma,
-                    lengthScaleFactor,
-                    schoofCoeff2, schoofCoeff4, 
-                    schoofCoeff6));
-
-      bedrockFunction[0] = ptr;
-    
-
-    }
-  else
-    {
-      MayDay::Error("bad marineIceSheet.geometry");
-    }
-  
-  ibcPtr->setParameters(thicknessFunction, bedrockFunction ,  seaLevel);
+        else if (geometry == "Schoof")
+          {
+            //geometry of Schoof, 2007
+            Real originElevation;
+            mPP.get("originElevation", originElevation);
+            
+            Real lengthScaleFactor = 1.0;
+            mPP.query("schoofLengthScaleFactor",lengthScaleFactor);
+            
+            
+            Real schoofCoeff2, schoofCoeff4, schoofCoeff6;
+            mPP.get("schoofCoeff2", schoofCoeff2);
+            mPP.get("schoofCoeff4", schoofCoeff4);
+            mPP.get("schoofCoeff6", schoofCoeff6);
+            
+            //RefCountedPtr<RealFunction<RealVect> > schoofBedrock
+            RefCountedPtr<RealFunction<RealVect> > ptr(new SchoofBedrockElevation(domainSize[SpaceDim-2] * lengthScaleFactor,
+                                                                                  originElevation,
+                                                                                  schoofCoeff2, schoofCoeff4, 
+                                                                                  schoofCoeff6));
+            
+            bedrockFunction[0] = ptr;
+            
+            
+          }
+        
+        else if (geometry == "Katz")
+          {
+            //geometry of Katz and Worster, 2010
+            Real originElevation;
+            mPP.get("originElevation", originElevation);
+            
+            Real lengthScaleFactor = 1.0;
+            mPP.query("schoofLengthScaleFactor",lengthScaleFactor);
+            
+            Real katzAlpha, katzSigma;
+            mPP.get("katzAlpha", katzAlpha);
+            mPP.get("katzSigma", katzSigma);
+            
+            Real schoofCoeff2, schoofCoeff4, schoofCoeff6;
+            mPP.get("schoofCoeff2", schoofCoeff2);
+            mPP.get("schoofCoeff4", schoofCoeff4);
+            mPP.get("schoofCoeff6", schoofCoeff6);
+            
+            //RefCountedPtr<RealFunction<RealVect> > katzBedrock
+            RefCountedPtr<RealFunction<RealVect> > ptr(new KatzBedrockElevation(domainSize[SpaceDim-2],
+                                                                                domainSize[SpaceDim-1],
+                                                                                originElevation,
+                                                                                katzAlpha, katzSigma,
+                                                                                lengthScaleFactor,
+                                                                                schoofCoeff2, schoofCoeff4, 
+                                                                                schoofCoeff6));
+            
+            bedrockFunction[0] = ptr;
+            
+            
+          }
+        else if (geometry == "MISMIPplus")
+          {
+	    RefCountedPtr<RealFunction<RealVect> > ptr(new MISOMIPBedrockElevation());
+            bedrockFunction[0] = ptr;
+          }
+        else
+          {
+            MayDay::Error("bad marineIceSheet.geometry");
+          }
+        
+        ibcPtr->setParameters(thicknessFunction, bedrockFunction ,  seaLevel);
         thicknessIBC = static_cast<IceThicknessIBC*>(ibcPtr);
       }
      else if (problem_type == "hump")
@@ -669,15 +674,15 @@ FineInterp::s_default_boundary_limit_type = 0;
        }
      else if (problem_type == "LevelData")
        {
-   //read geometry from an AMR Hierarchy, store in LevelDataIBC
-   ParmParse ildPP("inputLevelData");
-   std::string infile;
-   ildPP.get("geometryFile",infile);
-   std::string thicknessName = "thck";
-   ildPP.query("thicknessName",thicknessName);
-   std::string topographyName = "topg";
-   ildPP.query("topographyName",topographyName);
-
+         //read geometry from an AMR Hierarchy, store in LevelDataIBC
+         ParmParse ildPP("inputLevelData");
+         std::string infile;
+         ildPP.get("geometryFile",infile);
+         std::string thicknessName = "thck";
+         ildPP.query("thicknessName",thicknessName);
+         std::string topographyName = "topg";
+         ildPP.query("topographyName",topographyName);
+         
          // default values (only relevant when LevelData input doesn't
          // cover the domain
          Real defaultThickness = 0.0;
@@ -687,22 +692,22 @@ FineInterp::s_default_boundary_limit_type = 0;
          bool setDefaultValues = false;
          ildPP.query("setDefaultValues", setDefaultValues);
          
-   RefCountedPtr<LevelData<FArrayBox> > levelThck
-     (new LevelData<FArrayBox>());
-   RefCountedPtr<LevelData<FArrayBox> > levelTopg
-     (new LevelData<FArrayBox>());
-
-   Real dx;
-
-   Vector<RefCountedPtr<LevelData<FArrayBox> > > vectData;
-   vectData.push_back(levelThck);
-   vectData.push_back(levelTopg);
-
-   Vector<std::string> names(2);
-   names[0] = thicknessName;
-   names[1] = topographyName;
-   readLevelData(vectData,dx,infile,names,1);
-
+         RefCountedPtr<LevelData<FArrayBox> > levelThck
+           (new LevelData<FArrayBox>());
+         RefCountedPtr<LevelData<FArrayBox> > levelTopg
+           (new LevelData<FArrayBox>());
+         
+         Real dx;
+         
+         Vector<RefCountedPtr<LevelData<FArrayBox> > > vectData;
+         vectData.push_back(levelThck);
+         vectData.push_back(levelTopg);
+         
+         Vector<std::string> names(2);
+         names[0] = thicknessName;
+         names[1] = topographyName;
+         readLevelData(vectData,dx,infile,names,1);
+         
          // this is about removing ice from regions which
          // don't affect the dynamics of the region, but which 
          // can cause our solvers problems. 
@@ -768,67 +773,67 @@ FineInterp::s_default_boundary_limit_type = 0;
 
            } // end if we're setting thickness to zero
        
-   RealVect levelDx = RealVect::Unit * dx;
-   LevelDataIBC* ptr = new LevelDataIBC(levelThck,levelTopg,levelDx,
+         RealVect levelDx = RealVect::Unit * dx;
+         LevelDataIBC* ptr = new LevelDataIBC(levelThck,levelTopg,levelDx,
                                               defaultThickness,
                                               defaultTopography,
                                               setDefaultValues
                                               );
-   thicknessIBC = static_cast<IceThicknessIBC*>( ptr);
+         thicknessIBC = static_cast<IceThicknessIBC*>( ptr);
        }
      else if (problem_type == "MultiLevelData")
        {
-   //read geometry from an AMR Hierarchy, store in MultiLevelDataIBC
-   ParmParse ildPP("inputLevelData");
-   std::string infile;
-   ildPP.get("geometryFile",infile);
-   std::string thicknessName = "thck";
-   ildPP.query("thicknessName",thicknessName);
-   std::string topographyName = "topg";
-   ildPP.query("topographyName",topographyName);
-  
-  
-   Real dx;
-   Vector<Vector<RefCountedPtr<LevelData<FArrayBox> > > > vectData;
-  
-
-   Vector<std::string> names(2);
-   names[0] = thicknessName;
-   names[1] = topographyName;
-   Vector<int> refRatio;
-   readMultiLevelData(vectData,dx,refRatio,infile,names,1);
-  
-   RealVect crseDx = RealVect::Unit * dx;
-   MultiLevelDataIBC* ptr = new MultiLevelDataIBC
-     (vectData[0],vectData[1],crseDx,refRatio);
-   thicknessIBC = static_cast<IceThicknessIBC*>( ptr);
-
+         //read geometry from an AMR Hierarchy, store in MultiLevelDataIBC
+         ParmParse ildPP("inputLevelData");
+         std::string infile;
+         ildPP.get("geometryFile",infile);
+         std::string thicknessName = "thck";
+         ildPP.query("thicknessName",thicknessName);
+         std::string topographyName = "topg";
+         ildPP.query("topographyName",topographyName);
+         
+         
+         Real dx;
+         Vector<Vector<RefCountedPtr<LevelData<FArrayBox> > > > vectData;
+         
+         
+         Vector<std::string> names(2);
+         names[0] = thicknessName;
+         names[1] = topographyName;
+         Vector<int> refRatio;
+         readMultiLevelData(vectData,dx,refRatio,infile,names,1);
+         
+         RealVect crseDx = RealVect::Unit * dx;
+         MultiLevelDataIBC* ptr = new MultiLevelDataIBC
+           (vectData[0],vectData[1],crseDx,refRatio);
+         thicknessIBC = static_cast<IceThicknessIBC*>( ptr);
+         
        }
 #ifdef HAVE_PYTHON
      else if (problem_type == "Python")
        {
-   
-   ParmParse pyPP("PythonIBC");
-   std::string module;
-   pyPP.get("module",module);
-   std::string thckFuncName = "thickness";
-   pyPP.query("thicknessFunction",thckFuncName);
-   std::string topgFuncName = "topography";
-   pyPP.query("topographyFunction",topgFuncName);
-   std::string rhsFuncName = "";
-   pyPP.query("RHSFunction",rhsFuncName);
-   std::string faceVelFuncName = "";
-   pyPP.query("faceVelFunction",faceVelFuncName);
-   PythonInterface::PythonIBC* ptr = new PythonInterface::PythonIBC
-     (module, thckFuncName, topgFuncName, rhsFuncName,faceVelFuncName);
-   thicknessIBC = static_cast<IceThicknessIBC*>( ptr);
+         
+         ParmParse pyPP("PythonIBC");
+         std::string module;
+         pyPP.get("module",module);
+         std::string thckFuncName = "thickness";
+         pyPP.query("thicknessFunction",thckFuncName);
+         std::string topgFuncName = "topography";
+         pyPP.query("topographyFunction",topgFuncName);
+         std::string rhsFuncName = "";
+         pyPP.query("RHSFunction",rhsFuncName);
+         std::string faceVelFuncName = "";
+         pyPP.query("faceVelFunction",faceVelFuncName);
+         PythonInterface::PythonIBC* ptr = new PythonInterface::PythonIBC
+           (module, thckFuncName, topgFuncName, rhsFuncName,faceVelFuncName);
+         thicknessIBC = static_cast<IceThicknessIBC*>( ptr);
        }
 #endif
      else 
        {
          MayDay::Error("bad problem type");
        }
-
+    
     amrObjectFine.setThicknessBC(thicknessIBC);
     amrObjectCrse.setThicknessBC(thicknessIBC);    
     

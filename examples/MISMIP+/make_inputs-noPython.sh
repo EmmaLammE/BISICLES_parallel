@@ -153,3 +153,5 @@ do
 done
 done
 
+cp -f .petscrc scripts-noPython
+
