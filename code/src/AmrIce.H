@@ -603,7 +603,14 @@ void  amrThickness(Vector<LevelData<FArrayBox>* >& a_vectH)
     a_vectH.resize(m_velocity.size() );
     for (int i=0; i<a_vectH.size(); i++)
       {
-        a_vectH[i] = &(m_vect_coordSys[i]->getH());
+        if (m_vect_coordSys[i] != NULL)
+          {
+            a_vectH[i] = &(m_vect_coordSys[i]->getH());
+          }
+        else
+          {
+            a_vectH[i] = NULL;
+          }
       }
 
   }

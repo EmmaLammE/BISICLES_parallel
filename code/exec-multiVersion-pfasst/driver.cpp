@@ -135,8 +135,10 @@ FineInterp::s_default_boundary_limit_type = 0;
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
         MPI_Comm_size(MPI_COMM_WORLD, &number_procs);
         if(number_procs<num_time_procs){
-          cout<<"The number of time processor greater than total mpi processor. Number of time processor input: ",
-                num_time_procs,". Number of total processor: ",number_procs;
+          pout()<<"The number of time processor greater than total mpi processor. Number of time processor input: "
+                << num_time_procs
+                << ". Number of total processor: "
+                << number_procs;
           MayDay::Error("Please check your input file and args for mpirun. Stop here.");
         }
         // split mpi into space mpi
@@ -1102,14 +1104,14 @@ FineInterp::s_default_boundary_limit_type = 0;
 
     ParmParse pcrse("crse.amr");
     string crse_plot_prefix;
-    bool pf_evolve_velocity;
+    bool pf_evolve_velocity = true;
     pcrse.get("plot_prefix",crse_plot_prefix);
-    pcrse.get("evolve_velocity",pf_evolve_velocity);
+    pcrse.query("evolve_velocity",pf_evolve_velocity);
 
     if (USE_PF){
-      cout <<"###########################################################################"<<endl;
-      cout <<"##############        EL - Start of PFASST simulation     ###################"<<endl;
-      cout <<"###########################################################################"<<endl;
+      pout() <<"###########################################################################"<<endl;
+      pout() <<"##############        EL - Start of PFASST simulation     ###################"<<endl;
+      pout() <<"###########################################################################"<<endl;
       // pout()<< "  dt passed in: "<<crseDt<<", max T passed in: "<<maxTime<<", max steps passed in:"<<maxStep<< endl;
 
       AmrIceHolderClass AmrIceHolderPtr;
@@ -1126,11 +1128,17 @@ FineInterp::s_default_boundary_limit_type = 0;
       int num_total_cells=0;
       for (int lvl=0; lvl < crseH.size(); lvl++)
       {
-         LevelData<FArrayBox>& ldf = *crseH[lvl];
-         DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-         DataIterator dit = ldf.dataIterator();
-         int num_cells_per_lvl = dbl.numCells();
-         num_total_cells += num_cells_per_lvl;
+        if (crseH[lvl] != NULL)
+          {
+            LevelData<FArrayBox>& ldf = *crseH[lvl];
+            DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+            if (dbl.isClosed())
+              {
+                DataIterator dit = ldf.dataIterator();
+                int num_cells_per_lvl = dbl.numCells();
+                num_total_cells += num_cells_per_lvl;
+              }
+          }
       }
       reshape(crsedHdtVect[0],crseH);
       

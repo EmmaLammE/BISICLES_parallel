@@ -7,9 +7,9 @@
 
 using namespace std;
 
-void Pf_Bisicles_setHolders(AmrIce* amrObjectPtr,\
-							AmrIceHolderClass* AmrIceHolderPtr, \
-							Vector<LevelData<FArrayBox>* > H,\
-							Vector<LevelData<FArrayBox>* > Vel);
+void Pf_Bisicles_setHolders(AmrIce* amrObjectPtr,
+                            AmrIceHolderClass* AmrIceHolderPtr,         
+                            const Vector<LevelData<FArrayBox>* >& H,           
+                            const Vector<LevelData<FArrayBox>* >& Vel);
 
 #endif

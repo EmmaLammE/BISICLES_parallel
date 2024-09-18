@@ -71,6 +71,7 @@ alltest: libbike ../lib/libBisicles$(config).a
 #include Makefile.fortran
 pfasst: 
 	mkdir -p include
+	touch phony.mod
 	mv *.mod include/
 
 

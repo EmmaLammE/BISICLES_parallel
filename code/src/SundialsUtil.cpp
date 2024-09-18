@@ -121,14 +121,17 @@ void reshapeAndFill(LevelData<FArrayBox>& a_dest,
   IntVect ghostVect = a_src.ghostVect();
   int nComp = a_src.nComp();
 
-  a_dest.define(grids, nComp, ghostVect);
-  // now do a fab-by-fab copy to get any ghost cells as well
-  DataIterator dit = grids.dataIterator();
-  for (dit.begin(); dit.ok(); ++dit)
+  // only do this if grids is defined
+  if (grids.isClosed())
     {
-      a_dest[dit].copy(a_src[dit]);
+      a_dest.define(grids, nComp, ghostVect);
+      // now do a fab-by-fab copy to get any ghost cells as well
+      DataIterator dit = grids.dataIterator();
+      for (dit.begin(); dit.ok(); ++dit)
+        {
+          a_dest[dit].copy(a_src[dit]);
+        }
     }
-
 }
 
 
@@ -158,8 +161,11 @@ void reshape(Vector<LevelData<FArrayBox>* >& a_dest,
         {
           a_dest[lev] = new LevelData<FArrayBox>;
         }
-      
-      reshape(*a_dest[lev], *a_src[lev]);
+
+      if (a_src[lev] != NULL)
+        {
+          reshape(*a_dest[lev], *a_src[lev]);
+        }
     }
 
   // if there are any extra levels in dest, delete them
@@ -180,7 +186,12 @@ void reshape(LevelData<FArrayBox>& a_dest,
   IntVect ghostVect = a_src.ghostVect();
   int nComp = a_src.nComp();
   // cout<<"  a_src.getBoxes "<<a_src.getBoxes()<<endl;
-  a_dest.define(grids, nComp, ghostVect);
+
+  // only do this if grids are defined
+  if (grids.isClosed())
+    {
+      a_dest.define(grids, nComp, ghostVect);
+    }
   // cout<<", a_dest box "<<a_dest.getBoxes()<<endl;
 
 }
