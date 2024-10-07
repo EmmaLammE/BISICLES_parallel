@@ -37,4 +37,10 @@
 *.json
 *.dat
 
+# bisicles executables
+*.o
+*.d
+*.f
+*.C
+*.cpre
 
