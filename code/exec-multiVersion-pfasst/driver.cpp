@@ -1164,41 +1164,41 @@ FineInterp::s_default_boundary_limit_type = 0;
 
 
     // ------- EL - commenting out the serial run for now -----------
-    // ParmParse pfine("fine.amr");
-    // string fine_plot_prefix;
-    // pfine.get("plot_prefix",fine_plot_prefix);
-    // cout<<"\n..............Updating fine-grained using serial................\n";
-    // cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
+    ParmParse pfine("fine.amr");
+    string fine_plot_prefix;
+    pfine.get("plot_prefix",fine_plot_prefix);
+    cout<<"\n..............Updating fine-grained using serial................\n";
+    cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
 
     // now do each fine-grained timestep
-    // auto start = high_resolution_clock::now();
-    // amrObjectFine.run(maxTime, maxStep);
-    // auto stop = high_resolution_clock::now();
-    // auto duration = duration_cast<microseconds>(stop - start);
-    // cout << "Time taken by serial run: "
-    //      << duration.count()/1e6<< " seconds" << endl;
+    auto start = high_resolution_clock::now();
+    amrObjectFine.run(maxTime, maxStep);
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    cout << "Time taken by serial run: "
+         << duration.count()/1e6<< " seconds" << endl;
     // don's really need the time interval loop, the loop is for illustration
-    // for (int i=0; i<numFineIntervals; i++) 
-    //   {
-    //     // first, set state
-    //     bool recalculateVelocity = true;
-    //     //amrObjectFine.setState(fineHVect[i], fineTimeVect[i], recalculateVelocity);
-    //     recalculateVelocity = false;
-    //     amrObjectFine.setState(fineStateVect[i],recalculateVelocity); 
+    for (int i=0; i<numFineIntervals; i++) 
+      {
+        // first, set state
+        bool recalculateVelocity = true;
+        //amrObjectFine.setState(fineHVect[i], fineTimeVect[i], recalculateVelocity);
+        recalculateVelocity = false;
+        amrObjectFine.setState(fineStateVect[i],recalculateVelocity); 
 
-    //     // reshape dH/dt and then call computeDhDt
-    //     reshape(finedHdtVect[i],fineH); // fineH
-    //     amrObjectFine.compute_dHdt(finedHdtVect[i],fineH,fineDt, false);    // fineH     
+        // reshape dH/dt and then call computeDhDt
+        reshape(finedHdtVect[i],fineH); // fineH
+        amrObjectFine.compute_dHdt(finedHdtVect[i],fineH,fineDt, false);    // fineH     
 
-    //     // now advance ice sheet
-    //     cout<<"time "<<fineStateVect[i+1].time<<endl;
-    //     // amrObjectFine.run(maxTime, maxStep);
+        // now advance ice sheet
+        cout<<"time "<<fineStateVect[i+1].time<<endl;
+        // amrObjectFine.run(maxTime, maxStep);
 
-    //     // now retrieve state and store
-    //     amrObjectFine.getState(fineStateVect[i+1]);
-    //     cout << "loop # " << i << std::endl;
+        // now retrieve state and store
+        amrObjectFine.getState(fineStateVect[i+1]);
+        cout << "loop # " << i << std::endl;
 
-      // }    
+      }    
 
         
 

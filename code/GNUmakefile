@@ -39,7 +39,7 @@ export makefiles+=bisicles
 SHELL = /bin/csh -f
 
 ## This variable specifies where to find the Chombo libraries and source dirs
-##export CHOMBO_HOME := ../../Chombo/lib
+export CHOMBO_HOME := ../../Chombo_parallel/lib
 
 ##
 ## Default values of configuration variables.

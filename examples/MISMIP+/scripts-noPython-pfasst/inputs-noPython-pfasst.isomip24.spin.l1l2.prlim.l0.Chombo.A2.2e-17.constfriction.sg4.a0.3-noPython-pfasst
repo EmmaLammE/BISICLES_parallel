@@ -1,0 +1,309 @@
+#inputs file for AMR Ice sheet solver using PFASST
+# template for two-model (coarse and fine) MISMIP+ runs
+
+#####################################################
+#  COMMON ATTRIBUTES (Coarse and fine integrator)
+#####################################################
+
+main.poutBaseName=pout.isomip24.spin.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst
+
+
+# time stepping
+main.maxTime = 50000  # maximum time to run to
+main.maxStep = 9999999   # maximum number of steps to runx
+
+
+#bulk constitutive relation and parameters
+main.constitutiveRelation = L1L2
+main.rateFactor = constRate
+constRate.epsSqr0 = 1.0e-12
+constRate.A =  2.2e-17
+
+#domain details
+main.domain_size = 800.0e+3 80.0e+3 1.0e+3
+
+#geometry,temperature & basal friction input data
+geometry.problem_type = marineIceSheet
+marineIceSheet.thickness_type = compactSupportConstant
+marineIceSheet.thickness = 100.0
+marineIceSheet.loBound = -100000000 -10000000
+marineIceSheet.hiBound = 640000 1000000000000
+marineIceSheet.geometry = MISMIPplus
+bc.new_bc = true
+bc.lo_bc = 0 2
+bc.hi_bc = 0 2 
+
+geometry.beta_type = constantBeta
+geometry.betaValue = 1.0e4
+
+temperature.type = constant
+temperature.value = 268
+
+amr.sigma = 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+
+#basal friction relation parameters
+main.basalFrictionRelation = pressureLimitedLaw
+
+BasalFrictionPressureLimitedLaw.coefficient = 0.5
+BasalFrictionPressureLimitedLaw.model = Tsai
+
+BasalFrictionPressureLimitedLaw.basalFrictionRelation = powerLaw
+BasalFrictionPowerLaw.m = 0.3333
+BasalFrictionPowerLaw.includeEffectivePressure = false
+
+#physical constants
+constants.ice_density=918.0
+constants.sea_water_density=1028.0
+
+surfaceFlux.type = constantFlux
+surfaceFlux.flux_value = 0.3
+
+basalFlux.type = maskedFlux
+basalFlux.grounded.type = zeroFlux
+
+basalFlux.floating.type = MISMIPmelt
+basalFlux.floating.experiment = spin
+
+#CalvingModel.type = FixedFrontCalvingModel
+#CalvingModel.min_thickness = 10.0
+#CalvingModel.min_thickness = 5.0
+
+CalvingModel.type = DomainEdgeCalvingModel
+CalvingModel.front_lo = 0 0
+CalvingModel.front_hi = 1 0 
+
+#####################################################
+#  CRSE-INTEGRATOR ATTRIBUTES 
+#####################################################
+
+main.numCrseIntervals = 4
+
+#AMR mesh options
+crse.amr.num_cells = 200 20 10 
+crse.amr.is_periodic = 0 0 0
+
+
+crse.amr.grounding_line_subdivision = 4
+
+crse.amr.maxLevel = 10 # finest level allowed in simulation
+crse.amr.ref_ratio = 2 2 2 2 2 2 2 2 2 2 2
+crse.amr.regrid_interval = 1  # number of timesteps between regridding
+crse.amr.blockFactor = 4      # block factor used in grid generation
+crse.amr.fill_ratio = 0.85    # how efficient are the grids
+crse.amr.nestingRadius = 4    # proper nesting radius required
+crse.amr.tags_grow = 4        # amount to buffer tags
+crse.amr.tagCap = -1
+
+crse.amr.interpolate_zb = 0 #go back to the IBC to regrid geometry
+crse.amr.max_box_size = 40 # largest box length allowed
+
+
+crse.amr.temporal_accuracy = 1
+crse.amr.cfl = 0.25 
+crse.amr.initial_cfl = 0.25 
+crse.amr.max_dt_grow_factor = 1.1 
+crse.amr.time_step_ticks = 0
+
+
+#AMR tagging
+crse.amr.tag_on_grad_velocity = 0
+
+crse.amr.tag_on_grounded_laplacian_velocity = 0
+crse.amr.lap_vel_tagging_val = 8.0
+
+crse.amr.tag_grounding_line = 1
+crse.amr.grounding_line_tagging_min_vel = 0
+
+#misc options
+crse.amr.verbosity = 5
+#crse.amr.velocity_solve_interval = 1
+
+
+#velocity solve type -- 0 = Picard, 1 = JFNK
+crse.amr.velocity_solver_type = 1
+
+#initial guess 
+crse.amr.do_initial_velocity_guess = 1
+crse.amr.do_initial_velocity_solve = 1
+crse.amr.initial_velocity_guess_type = 1 # linear PDE
+crse.amr.initial_velocity_guess_const_mu = 1.0e+6
+crse.amr.initial_velocity_guess_solver_type = 1 
+crse.amr.initial_velocity_guess_const_vel = 1.0 0.0
+
+#wall drag
+#crse.amr.wallDrag = true
+#crse.amr.wallDragExtra = 1.0e+6
+
+# shouldn't need this for MISMIP+ 
+crse.amr.eliminate_remote_ice = false
+
+#plotting options
+crse.amr.plot_time_interval = 1000
+crse.amr.plot_prefix = plot.crse.isomip24.spin.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst.
+
+crse.amr.write_solver_rhs = 0
+crse.amr.write_viscous_tensor = false
+crse.amr.write_thickness_sources = true
+
+#check points -- 
+crse.amr.check_interval = 1000
+
+crse.amr.check_prefix = chk.crse.isomip24.spin.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst.
+
+crse.amr.check_overwrite = 0
+crse.amr.verbosity = 5
+
+# uncomment these lines and fill in name of checkpoint file to restart
+# from checkpoint (for experiments rather than spinup)
+#crse.amr.restart_file = ../data/chk.isomip24.spin.l1l2.prlim.l4.Chombo.A2.2e-17.constfriction.sg4.a0.3.300000.2d.hdf5
+#crse.amr.restart_time = 0.0
+#crse.amr.restart_step = 0
+
+
+#####################################################
+#  FINE-INTEGRATOR ATTRIBUTES 
+#####################################################
+
+main.numFineIntervals = 4
+
+#AMR mesh options
+fine.amr.num_cells = 200 20 10 
+fine.amr.is_periodic = 0 0 0
+
+
+fine.amr.grounding_line_subdivision = 4
+
+fine.amr.maxLevel = 10 # finest level allowed in simulation
+fine.amr.ref_ratio = 2 2 2 2 2 2 2 2 2 2 2
+fine.amr.regrid_interval = 1  # number of timesteps between regridding
+fine.amr.blockFactor = 4      # block factor used in grid generation
+fine.amr.fill_ratio = 0.85    # how efficient are the grids
+fine.amr.nestingRadius = 4    # proper nesting radius required
+fine.amr.tags_grow = 4        # amount to buffer tags
+fine.amr.tagCap = -1
+
+fine.amr.interpolate_zb = 0 #go back to the IBC to regrid geometry
+fine.amr.max_box_size = 40 # largest box length allowed
+
+
+fine.amr.temporal_accuracy = 1
+fine.amr.cfl = 0.25 
+fine.amr.initial_cfl = 0.25 
+fine.amr.max_dt_grow_factor = 1.1 
+fine.amr.time_step_ticks = 0
+
+
+#AMR tagging
+fine.amr.tag_on_grad_velocity = 0
+
+fine.amr.tag_on_grounded_laplacian_velocity = 0
+fine.amr.lap_vel_tagging_val = 8.0
+
+fine.amr.tag_grounding_line = 1
+fine.amr.grounding_line_tagging_min_vel = 0
+
+#misc options
+fine.amr.verbosity = 5
+#fine.amr.velocity_solve_interval = 1
+
+
+#velocity solve type -- 0 = Picard, 1 = JFNK
+fine.amr.velocity_solver_type = 1
+
+#initial guess 
+fine.amr.do_initial_velocity_guess = 1
+fine.amr.do_initial_velocity_solve = 1
+fine.amr.initial_velocity_guess_type = 1 # linear PDE
+fine.amr.initial_velocity_guess_const_mu = 1.0e+6
+fine.amr.initial_velocity_guess_solver_type = 1 
+fine.amr.initial_velocity_guess_const_vel = 1.0 0.0
+
+#wall drag
+#fine.amr.wallDrag = true
+#fine.amr.wallDragExtra = 1.0e+6
+
+# shouldn't need this for MISMIP+ 
+fine.amr.eliminate_remote_ice = false
+
+#plotting options
+fine.amr.plot_time_interval = 1000
+fine.amr.plot_prefix = plot.fine.isomip24.spin.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst.
+
+fine.amr.write_solver_rhs = 0
+fine.amr.write_viscous_tensor = false
+fine.amr.write_thickness_sources = true
+
+#check points -- 
+fine.amr.check_interval = 1000
+
+fine.amr.check_prefix = chk.fine.isomip24.spin.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst.
+
+fine.amr.check_overwrite = 0
+fine.amr.verbosity = 5
+
+# uncomment these lines and fill in name of checkpoint file to restart
+# from checkpoint (for experiments rather than spinup)
+#fine.amr.restart_file = ../data/chk.isomip24.spin.l1l2.prlim.l4.Chombo.A2.2e-17.constfriction.sg4.a0.3.300000.2d.hdf5
+#fine.amr.restart_time = 0.0
+#fine.amr.restart_step = 0
+
+#####################################################
+#  PFASST related params
+#####################################################
+
+pf.USE_PF = true
+pf.PF_VERBOSE = TRUE
+pf.pf_plot_prefix = pf_
+pf.pf_num_procs_per_time = 1
+pf.pf_num_repeats = 1
+pf.num_time_procs = 1
+
+
+
+
+#####################################################
+#  SOLVER ATTRIBUTES (Coarse and fine integrator)
+$ (Currently treated as common)
+#####################################################
+
+#JFNK parameters
+JFNKSolver.vtopSafety = 0.95
+JFNKSolver.minPicardIterations = 2
+JFNKSolver.maxIter = 15
+JFNKSolver.absTol = 1.0e+0
+JFNKSolver.relTol = 2.0e-3
+
+JFNKSolver.solverType = 0 #Relax solver
+JFNKSolver.bottom_solver_type = 2 #Relax solver (since BiCGstab seems to have died in Chombo 3.2)
+
+#PETScJFNKSolver.solverType = 0 #Real  solver, since PETSC solver is not working well
+#PETScJFNKSolver.bottom_solver_type = 1  # petsc botton solver
+
+JFNKSolver.RelaxRelTol = 2.0e-4
+JFNKSolver.RelaxHang = 0.975
+JFNKSolver.maxRelaxIter = 20
+JFNKSolver.normType = 0
+JFNKSolver.verbosity = 5
+JFNKSolver.vtopRelaxTol = 0.005
+JFNKSolver.vtopRelaxMinIter = 8
+JFNKSolver.numMGSmooth = 8
+JFNKSolver.numMGIter = 1
+JFNKSolver.h = 0.025
+JFNKSolver.switchRate = 1.8
+#JFNKSolver.writeResiduals = true
+#JFNKSolver.muMin = 1.0e+6
+#JFNKSolver.uMaxAbs = 1.0e+6
+
+
+
+
+# --------------------------------------
+# untouched
+# --------------------------------------
+
+
+
+
+
+#END OF TEMPLATE
+
