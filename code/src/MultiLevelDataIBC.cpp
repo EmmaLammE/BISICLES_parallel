@@ -118,7 +118,10 @@ MultiLevelDataIBC::initializeIceGeometry(LevelSigmaCS& a_coords,
       MayDay::Error("MultiLevelDataIBC::initializeIceGeometry incompatible a_dx and m_dxCrse");
     }
 
-  // make use of existing flattening functions -- for now, don't alter source data
+  // make use of existing flattening functions
+  // note that to reduce reqirements on source grids, source data is modifed
+  // covered-region data is replaced by averaged-down fine-level data
+  
 
   // set up vector of dx (rather than nRef)
   Vector<RealVect> srcDxVect(m_nLevel,-1*RealVect::Unit);
