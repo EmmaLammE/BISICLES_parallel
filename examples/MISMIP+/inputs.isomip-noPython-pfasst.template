@@ -22,13 +22,32 @@ constRate.A =  @ACOEF
 #domain details
 main.domain_size = 800.0e+3 80.0e+3 1.0e+3
 
-#geometry,temperature & basal friction input data
-geometry.problem_type = marineIceSheet
-marineIceSheet.thickness_type = compactSupportConstant
-marineIceSheet.thickness = 100.0
-marineIceSheet.loBound = -100000000 -10000000
-marineIceSheet.hiBound = 640000 1000000000000
-marineIceSheet.geometry = MISMIPplus
+#-----------------------------------------
+#uncomment from here to do spinup from constant-thickness ice
+#-----------------------------------------
+##geometry,temperature & basal friction input data (this is a real comment)
+#geometry.problem_type = marineIceSheet
+#marineIceSheet.geometry = MISMIPplus
+
+## this initializes to a constant thickness for spinup
+#marineIceSheet.thickness_type = compactSupportConstant
+#marineIceSheet.thickness = 100.0
+#marineIceSheet.loBound = -100000000 -10000000
+#marineIceSheet.hiBound = 640000 1000000000000
+# --- end constant-thickness initialization
+
+# this initializes thickness from a plotfile (which can be AMR)
+# (comment out this block to initialize from constant thickness using
+# analytic bedrock geometry
+# Note that you will need to put in your specific hdf5 file path and name
+geometry.problem_type = MultiLevelData
+inputLevelData.geometryFile = ../data/plot.isomip24.melt0.l1l2.prlim.l3.orig.A2.2e-17.constfriction.sg4.a0.3.000000.2d.hdf5
+inputLevelData.thicknessName = "thickness"
+inputLevelData.topographyName = "Z_base"
+
+# end initialization from plotfile
+
+
 bc.new_bc = true
 bc.lo_bc = 0 2
 bc.hi_bc = 0 2 

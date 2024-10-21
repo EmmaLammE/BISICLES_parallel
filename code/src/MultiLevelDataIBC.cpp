@@ -91,12 +91,13 @@ MultiLevelDataIBC::velocitySolveBC()
   return m_velBCs;
 }
 
-void MultiLevelDataIBC::initializeIceGeometry(LevelSigmaCS& a_coords,
-					 const RealVect& a_dx,
-					 const RealVect& a_domainSize,
-					 const Real& a_time, 
-					 const LevelSigmaCS* a_crseCoords,
-					 const int a_refRatio)
+void
+MultiLevelDataIBC::initializeIceGeometry(LevelSigmaCS& a_coords,
+                                         const RealVect& a_dx,
+                                         const RealVect& a_domainSize,
+                                         const Real& a_time, 
+                                         const LevelSigmaCS* a_crseCoords,
+                                         const int a_refRatio)
 {
 
   CH_TIME("MultiLevelDataIBC::initializeIceGeometry");
@@ -117,62 +118,33 @@ void MultiLevelDataIBC::initializeIceGeometry(LevelSigmaCS& a_coords,
       MayDay::Error("MultiLevelDataIBC::initializeIceGeometry incompatible a_dx and m_dxCrse");
     }
 
-  //interpolate level from coarser data, or copy.
-  int nRef = int(refRatio);
-  RealVect dx = m_dxCrse;
-  for (int lev = 0; lev < m_nLevel; lev++)
+  // make use of existing flattening functions -- for now, don't alter source data
+
+  // set up vector of dx (rather than nRef)
+  Vector<RealVect> srcDxVect(m_nLevel,-1*RealVect::Unit);
+  srcDxVect[0] = m_dxCrse;
+  for (int lev=0; lev<m_nLevel-1; lev++)
     {
-      
-      if (nRef > 1)
-	{
-	  //required level is finer than the data level, so interpolate
-	  if ( (a_crseCoords != NULL) && a_refRatio <= nRef)
-	    {
-	      //we have a valid coarse level LevelSigmaCS, so we might as well interpolate from that
-	      if (m_verbose)
-		{
-		  pout() << "...interpolating from coarse LevelSigmaCS rather than reference data" << endl;
-		}
-	      a_coords.interpFromCoarse(*a_crseCoords, a_refRatio);
-	    }
-	  else
-	    {
-	      const DisjointBoxLayout& crseGrids = m_thck[lev]->disjointBoxLayout();
-	      LevelSigmaCS crseCoords(crseGrids, dx, a_coords.ghostVect());
-	      for (DataIterator dit(crseGrids); dit.ok(); ++dit)
-		{
-		  crseCoords.getH()[dit].copy ( (*m_thck[lev])[dit]);
-		  crseCoords.getTopography()[dit].copy ( (*m_topg[lev])[dit]);
-		}
-	      crseCoords.recomputeGeometry(NULL,0);
-	      a_coords.interpFromCoarse(crseCoords, nRef);
-	    }
-	  
-	}
-     
-      nRef /= m_refRatio[lev];
-      dx /= Real(m_refRatio[lev]);
-      
+      srcDxVect[lev+1] = srcDxVect[lev]/m_refRatio[lev];
     }
 
-  //coarse average level from finer data, or simple copies
-  Real oneOnRef = refRatio;
-  dx = m_dxCrse;
-  for (int lev = 0; lev < m_nLevel; lev++)
+  // make local non-refCounted versions to interact with flatten function
+  Vector<LevelData<FArrayBox>* > tmpThickness(m_thck.size(),NULL);
+  Vector<LevelData<FArrayBox>* > tmpTopography(m_topg.size(),NULL);
+  for (int i=0; i<m_thck.size(); i++)
     {
-      nRef = int(1.0/oneOnRef + 1.0e-6);
-      if (nRef >= 1)
-	{
-	  //required level is coarser than the current data level; coarsen from there
-	  FillFromReference(a_coords.getH(),*m_thck[lev],a_dx,dx,m_verbose);
-	  FillFromReference(a_coords.getTopography(),*m_topg[lev],a_dx,dx,m_verbose);
-	  //\todo reground if neeeded
-	  
-	}
-      oneOnRef /= Real(m_refRatio[lev]);
-      dx /= Real(m_refRatio[lev]);
-    } 
+      tmpThickness[i] = m_thck[i].getRefToThePointer();
+      tmpTopography[i] = m_topg[i].getRefToThePointer();
+    }
+      
 
+  // use non-const version of this function -- this will
+  // replace data in covered regions with averaged fine-level data, but
+  // this should be harmless in this context
+  flattenCellData(a_coords.getH(),a_dx, tmpThickness,srcDxVect, m_verbose);
+                       
+  flattenCellData(a_coords.getTopography(),a_dx,tmpTopography, srcDxVect,m_verbose);
+                       
   Real dt = 0.0;
   setGeometryBCs(a_coords, a_coords.grids().physDomain(), a_dx, a_time, dt);
 
@@ -277,7 +249,8 @@ IceThicknessIBC* MultiLevelDataIBC::new_thicknessIBC()
 
 
 /// set non-periodic ghost cells for surface height z_s. 
-void MultiLevelDataIBC::setSurfaceHeightBCs(LevelData<FArrayBox>& a_zSurface,
+void
+MultiLevelDataIBC::setSurfaceHeightBCs(LevelData<FArrayBox>& a_zSurface,
 				       LevelSigmaCS& a_coords,
 				       const ProblemDomain& a_domain,
 				       const RealVect& a_dx,
