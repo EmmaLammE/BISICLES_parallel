@@ -1,0 +1,59 @@
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+ max(vel) = 2.16658e+06 > amr.velocity_exit =  1e+06 || dt = 0.000461557 < TIME_EPS = 1e-12 !!!
+[sh03-14n17:108882] *** Process received signal ***
+ max(vel) = 2.16658e+06 > amr.velocity_exit =  1e+06 || dt = 0.000461557 < TIME_EPS = 1e-12 !!!
+[sh03-14n17:108883] *** Process received signal ***
+ max(vel) = 2.16658e+06 > amr.velocity_exit =  1e+06 || dt = 0.000461557 < TIME_EPS = 1e-12 !!!
+[sh03-14n17:108885] *** Process received signal ***
+[sh03-14n17:108882] Signal: Aborted (6)
+[sh03-14n17:108882] Signal code:  (-6)
+[sh03-14n17:108883] Signal: Aborted (6)
+[sh03-14n17:108883] Signal code:  (-6)
+[sh03-14n17:108885] Signal: Aborted (6)
+[sh03-14n17:108885] Signal code:  (-6)
+[sh03-14n17:108883] [ 0] /lib64/libpthread.so.0(+0xf630)[0x7f295a067630]
+[sh03-14n17:108885] [ 0] /lib64/libpthread.so.0(+0xf630)[0x7f7092767630]
+[sh03-14n17:108882] [ 0] /lib64/libpthread.so.0(+0xf630)[0x7f5a603a3630]
+[sh03-14n17:108882] [ 1] /lib64/libc.so.6(gsignal+0x37)[0x7f5a5fffc387]
+[sh03-14n17:108882] [ 2] /lib64/libc.so.6(abort+0x148)[0x7f5a5fffda78]
+[sh03-14n17:108883] [ 1] /lib64/libc.so.6(gsignal+0x37)[0x7f2959cc0387]
+[sh03-14n17:108883] [ 2] /lib64/libc.so.6(abort+0x148)[0x7f2959cc1a78]
+[sh03-14n17:108883] [ 3] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x653952]
+[sh03-14n17:108883] [ 4] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x46fbfc]
+[sh03-14n17:108883] [ 5] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x48476d]
+[sh03-14n17:108885] [ 1] /lib64/libc.so.6(gsignal+0x37)[0x7f70923c0387]
+[sh03-14n17:108885] [ 2] /lib64/libc.so.6(abort+0x148)[0x7f70923c1a78]
+[sh03-14n17:108885] [ 3] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x653952]
+[sh03-14n17:108885] [ 4] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x46fbfc]
+[sh03-14n17:108885] [ 5] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x48476d]
+[sh03-14n17:108885] [ 6] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x40e353]
+[sh03-14n17:108882] [ 3] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x653952]
+[sh03-14n17:108882] [ 4] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x46fbfc]
+[sh03-14n17:108882] [ 5] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x48476d]
+[sh03-14n17:108882] [ 6] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x40e353]
+[sh03-14n17:108882] [ 7] /lib64/libc.so.6(__libc_start_main+0xf5)[0x7f5a5ffe8555]
+[sh03-14n17:108882] [ 8] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x408989]
+[sh03-14n17:108882] *** End of error message ***
+[sh03-14n17:108883] [ 6] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x40e353]
+[sh03-14n17:108883] [ 7] /lib64/libc.so.6(__libc_start_main+0xf5)[0x7f2959cac555]
+[sh03-14n17:108883] [ 8] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x408989]
+[sh03-14n17:108883] *** End of error message ***
+[sh03-14n17:108885] [ 7] /lib64/libc.so.6(__libc_start_main+0xf5)[0x7f70923ac555]
+[sh03-14n17:108885] [ 8] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x408989]
+[sh03-14n17:108885] *** End of error message ***
+ max(vel) = 2.16658e+06 > amr.velocity_exit =  1e+06 || dt = 0.000461557 < TIME_EPS = 1e-12 !!!
+[sh03-14n17:108884] *** Process received signal ***
+[sh03-14n17:108884] Signal: Aborted (6)
+[sh03-14n17:108884] Signal code:  (-6)
+[sh03-14n17:108884] [ 0] /lib64/libpthread.so.0(+0xf630)[0x7fe51b752630]
+[sh03-14n17:108884] [ 1] /lib64/libc.so.6(gsignal+0x37)[0x7fe51b3ab387]
+[sh03-14n17:108884] [ 2] /lib64/libc.so.6(abort+0x148)[0x7fe51b3aca78]
+[sh03-14n17:108884] [ 3] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x653952]
+[sh03-14n17:108884] [ 4] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x46fbfc]
+[sh03-14n17:108884] [ 5] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x48476d]
+[sh03-14n17:108884] [ 6] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x40e353]
+[sh03-14n17:108884] [ 7] /lib64/libc.so.6(__libc_start_main+0xf5)[0x7fe51b397555]
+[sh03-14n17:108884] [ 8] /home/groups/jsuckale/liuwj/BISICLES_parallel/code/exec-multiVersion-pfasst/./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex[0x408989]
+[sh03-14n17:108884] *** End of error message ***
+srun: error: sh03-14n17: tasks 0-3: Aborted
+srun: Terminating StepId=54489946.0

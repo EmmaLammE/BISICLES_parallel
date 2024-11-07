@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=mmp
-#SBATCH --time=6:00:00
-#SBATCH --mem-per-cpu=10GB
+#SBATCH --time=1:00:00
+#SBATCH --mem-per-cpu=106GB
 #SBATCH -p serc
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
@@ -13,7 +13,7 @@
 start_time=$(date +%s)
 date +"Job started at: %Y-%m-%d %H:%M:%S"
 
-srun -n 1 ./driver2d.Linux.64.mpicxx.mpifort.DEBUG.MPI.ex inputs-noPython-pfasst.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst
+srun -n 1 ./driver2d.Linux.64.mpicxx.mpifort.DEBUG.OPTHIGH.MPI.ex inputs.mismip
 
 
 end_time=$(date +%s)
@@ -24,3 +24,4 @@ minutes=$(( (duration % 3600) / 60 ))
 seconds=$((duration % 60))
 
 echo "Job took $hours hours, $minutes minutes, and $seconds seconds to complete."
+

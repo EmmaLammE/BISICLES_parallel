@@ -207,7 +207,7 @@ DomainDiagnosticData::computeAreaFraction(LevelData<FArrayBox>& a_area,
 					  int a_level,
 					  int a_finestLevel) const
 {
-  CH_assert(a_level <= a_finestLevel)
+  CH_assert(a_level <= a_finestLevel);
     {
       const LevelData<BaseFab<int> >& levelMask = a_coordSys[a_level]->getFloatingMask();
       // set a_area = 1.0 where we have grounded ice
