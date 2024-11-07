@@ -37,6 +37,9 @@
 *.json
 *.dat
 
+# log
+pout.*
+
 # bisicles executables
 *.o
 *.d
