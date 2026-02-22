@@ -1,11 +1,10 @@
 #!/bin/bash
 #SBATCH --job-name=mmp
-#SBATCH --time=6:00:00
-#SBATCH --mem-per-cpu=10GB
+#SBATCH --time=2-00:00:00
 #SBATCH -p serc
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
+#SBATCH --mem-per-cpu=16GB
 #SBATCH --cpus-per-task=8
+#SBATCH --ntasks=1
 #SBATCH -o ./sbatch_outputs/out_pf_mmp_t1s1.out
 #SBATCH -e ./sbatch_outputs/err_pf_mmp_t1s1.err
 
@@ -13,8 +12,7 @@
 start_time=$(date +%s)
 date +"Job started at: %Y-%m-%d %H:%M:%S"
 
-srun -n 1 ./driver2d.Linux.64.mpicxx.mpifort.DEBUG.MPI.ex inputs-noPython-pfasst.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst
-
+srun -n 1 ./driver2d.Linux.64.mpicxx.mpifort.DEBUG.MPI.ex ../data/inputs-noPython-pfasst.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst
 
 end_time=$(date +%s)
 date +"Job ended at: %Y-%m-%d %H:%M:%S"
