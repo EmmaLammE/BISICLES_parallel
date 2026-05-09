@@ -2,10 +2,10 @@
 #include "bisicles_holder.hpp"
 
 // H passed in here is only for the coarsest level, not a vector of level data
-void Pf_Bisicles_setHolders(AmrIce* amrObjectPtr,\
-							AmrIceHolderClass* AmrIceHolderPtr, \
-							Vector<LevelData<FArrayBox>* > H,\
-							Vector<LevelData<FArrayBox>* > Vel)
+void Pf_Bisicles_setHolders(AmrIce* amrObjectPtr,
+                            AmrIceHolderClass* AmrIceHolderPtr,         
+                            const Vector<LevelData<FArrayBox>* >& H,          
+                            const Vector<LevelData<FArrayBox>* >& Vel)
 {
     AmrIceHolderPtr->SetAmrIceObjPtr(amrObjectPtr);
 
@@ -22,9 +22,11 @@ void Pf_Bisicles_setHolders(AmrIce* amrObjectPtr,\
     AmrIceHolderPtr->SetAmrdHdt(dHdtVect);
 
     // crseH
-    AmrIceHolderPtr->SetAmrHPtr(&H);
-    AmrIceHolderPtr->SetAmrH(H);
-    AmrIceHolderPtr->SetAmrHBackup(H);
+    Vector<LevelData<FArrayBox>* > nonConstH = H;
+    AmrIceHolderPtr->SetAmrHPtr(&nonConstH);
+    AmrIceHolderPtr->SetAmrH(nonConstH);
+    // 9/17/24 -- Emma says it's safe to comment this out
+    // AmrIceHolderPtr->SetAmrHBackup(nonConstH);
     // Vector<LevelData<FArrayBox>* > temp = AmrIceHolderPtr->GetAmrH(); // amr H is set corretely in all levels
 
     // set up max num of spatial level

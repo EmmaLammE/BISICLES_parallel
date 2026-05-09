@@ -38,8 +38,8 @@ public:
     m_till_water_max,
     m_ice_density,
     m_water_density,
-    m_gravity;
-  
+    m_gravity,
+    m_floating_base_max_heat_flux;
   
   static Real icepmeltfactor() {return m_ice_pressure_melt_factor;}
   static Real IceConductivity() {return m_ice_conductivity;}

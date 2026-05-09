@@ -281,7 +281,8 @@ public:
  */
 class PatersonRateFactor : public RateFactor  
 {
-  
+
+public:
   /// enhancement factor
   Real m_E;
   /// flow rate factor
@@ -382,13 +383,15 @@ public:
 
 };
 
+// $\f \tau^2 \tau _ij = 2 A \dot{\epsilon}_{ij} \f$ 
+
 
 /// Implements  ConstitutiveRelation to give Glen's flow law.
 /** 
     Glen's flow law. Computes an effective viscosity from strain-rate \f$ \dot{\epsilon}_{ij} \f$ 
     such that the stress \f$ \tau _ij \f$ satifies
     
-    \f $\tau^2 \tau _ij = 2 A \dot{\epsilon}_{ij} \f$ 
+    $\f \tau^2 \tau _ij = 2 A \cdot {\epsilon}_{ij} \f$ 
     
     Run-time configuration is carried out in ConstitutiveRelation::parse
     A  GlensFlowRelation object will be created if the string

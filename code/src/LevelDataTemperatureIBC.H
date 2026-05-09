@@ -26,23 +26,25 @@
  */
 class LevelDataTemperatureIBC : public ReflectionIceInternalEnergyIBC
 {  
-  RefCountedPtr<LevelData<FArrayBox> > m_temp;
-  Real m_defaultTemperature;
+  RefCountedPtr<LevelData<FArrayBox> > m_bulkData; // a temperature or internal energy
+  Real m_defaultTemperature, m_defaultE;
+  bool m_dataIsInternalEnergy;
 #if BISICLES_Z == BISICLES_LAYERED
-  RefCountedPtr<LevelData<FArrayBox> > m_surfaceTemp ;
-  RefCountedPtr<LevelData<FArrayBox> > m_basalHeatFlux ;
+  RefCountedPtr<LevelData<FArrayBox> > m_surfaceData ; // a temperature or internal energy
+  RefCountedPtr<LevelData<FArrayBox> > m_basalHeatFlux ; // usually a heat flux
 #endif
   RealVect m_dx;
 public:
   /// Constructor
   /**
    */
-  LevelDataTemperatureIBC(RefCountedPtr<LevelData<FArrayBox> > a_temp, 
+  LevelDataTemperatureIBC(RefCountedPtr<LevelData<FArrayBox> > a_bulkData, 
 #if BISICLES_Z == BISICLES_LAYERED
-			  RefCountedPtr<LevelData<FArrayBox> > a_surfaceT,
-			  RefCountedPtr<LevelData<FArrayBox> > a_basalT,
+			  RefCountedPtr<LevelData<FArrayBox> > a_surfaceData,
+			  RefCountedPtr<LevelData<FArrayBox> > a_basalHeatFlux,
 #endif
-			  const RealVect& a_dx,const Real& a_defaultTemperature );
+			  const RealVect& a_dx,const Real& a_defaultTemperature,
+			  const bool& a_dataIsInternalEnergy );
 
   /// Destructor
   /**
@@ -97,7 +99,7 @@ private:
 
   // Disallowed for all the usual reasons
   LevelDataTemperatureIBC(const LevelDataTemperatureIBC& a_input)
-    :m_temp(a_input.m_temp)
+    :m_bulkData(a_input.m_bulkData)
   {
     MayDay::Error("invalid operator");
   }

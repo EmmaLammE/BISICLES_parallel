@@ -34,13 +34,26 @@ class MISOMIPBedrockElevation : public RealFunction<RealVect>
   Real B2;
   Real B4;
   Real B6;
-
+  // hardwire this for now
+  RealVect domainLo = RealVect::Zero;
+  RealVect domainHi;
+  
+  
+  
 public:
-  MISOMIPBedrockElevation() :  B0(-150.0), B2(-728.8), B4(343.91), B6(-50.57)
+  MISOMIPBedrockElevation() :  B0(-150.0), B2(-728.8), B4(343.91), B6(-50.57), domainLo(RealVect::Zero), domainHi(800000.0,80000.0)
   {;}
 
-  Real operator()(const RealVect& x)
+  Real operator()(const RealVect& x_in)
   {
+    RealVect x = x_in;
+    // mirror topography reflection at domain boundaries
+    // which happens in the python version
+    if (x[0] < domainLo[0]) x[0] =-1.0*x[0];
+    if (x[1] < domainLo[1]) x[1] =-1.0*x[1];
+    if (x[0] > domainHi[0]) x[0] = domainHi[0] - (x[0]-domainHi[0]);
+    if (x[1] > domainHi[1]) x[1] = domainHi[1] - (x[1]-domainHi[1]);    
+    
     Real y = x[1] - 40e3;
     Real topography = Bx(x[0]) + By(y,4.0e+3,5.0e+2,24.0e+3);
     topography = max(topography, -720.0);

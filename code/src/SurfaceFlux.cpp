@@ -12,6 +12,7 @@
 #include "ComplexSurfaceFlux.H"
 #include "LevelDataSurfaceFlux.H"
 #include "ISMIP6OceanForcing.H"
+#include "MISMIPplus.H"
 #include "GroundingLineLocalizedFlux.H"
 #include "HotspotFlux.H"
 #include <map>
@@ -460,7 +461,13 @@ SurfaceFlux* SurfaceFlux::parse(const char* a_prefix)
       delete fluxptr;
       
     }
-  else if (type == "IMSIP6OceanForcing")
+  else if (type == "MISMIPmelt")
+    {
+      // parse experiment type inside of MISMIPmeltForcing object
+      ptr = static_cast<SurfaceFlux*>(new MISMIPmelt(pp));
+            
+    }
+  else if ((type == "IMSIP6OceanForcing") || (type == "ISMIP6OceanForcing"))
     {
       ptr = new ISMIP6OceanForcing(pp);
     }

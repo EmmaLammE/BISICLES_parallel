@@ -144,46 +144,46 @@ Vector<LevelData<FArrayBox>* > *AmrIceHolderClass::GetAmrHPtr(void)
 
 void AmrIceHolderClass::SetAmrH(Vector<LevelData<FArrayBox>* > HCrse)
 {
-	HHolder=HCrse; // HCrse is corretly intialized in different levels, passing in as pointer wil be updated in time
+	HHolder=HCrse; // HCrse is correctly intialized in different levels, passing in as pointer wil be updated in time
 }
 
 // deep copy of H holder into H holder backup
 void AmrIceHolderClass::SetAmrHBackup(Vector<LevelData<FArrayBox>* > HCrse)
 {
-	Vector<LevelData<FArrayBox>* > Htemp(HCrse.size(), NULL);
-	HHolderBackup = Htemp;
-
-	for (int lvl=0; lvl<HCrse.size();lvl++)
+  Vector<LevelData<FArrayBox>* > Htemp(HCrse.size(), NULL);
+  HHolderBackup = Htemp;
+  
+  for (int lvl=0; lvl<HCrse.size();lvl++)
     {
       const DisjointBoxLayout& current_grid_size=amrObjHolderPtr->grids(lvl);
       HHolderBackup[lvl] = new LevelData<FArrayBox>(current_grid_size,1,IntVect::Zero); // FIXED the num of component=1, i.e. one d?? only Vx no Vy??
-        
-     DataIterator dit = (*HHolderBackup[lvl]).dataIterator();
+      
+      DataIterator dit = (*HHolderBackup[lvl]).dataIterator();
       for (dit.begin(); dit.ok(); ++dit)
-      {
-         (*HHolderBackup[lvl])[dit].setVal(0.0);
-      }
+        {
+          (*HHolderBackup[lvl])[dit].setVal(0.0);
+        }
     }
-
+  
 	
-	// H Crse should be deep copied to HHolderBackup correctly
-	for (int lvl=0; lvl<HCrse.size();lvl++)
-	{
-		const DisjointBoxLayout& current_grid_size=amrObjHolderPtr->grids(lvl);
-		
-		LevelData<FArrayBox>& ldf = *HHolderBackup[lvl]; // dest
-		LevelData<FArrayBox>& xldf = *HCrse[lvl]; // src
-		DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-
-		DataIterator dit = ldf.dataIterator();
-		for (dit.begin(); dit.ok(); ++dit)
-		{
-			const Box& box = dbl[dit()];
-			FArrayBox& fab = ldf[dit()];
-			const FArrayBox& xfab = xldf[dit()];
-			fab.copy(xfab,box);
-		}
-	}
+  // H Crse should be deep copied to HHolderBackup correctly
+  for (int lvl=0; lvl<HCrse.size();lvl++)
+    {
+      const DisjointBoxLayout& current_grid_size=amrObjHolderPtr->grids(lvl);
+      
+      LevelData<FArrayBox>& ldf = *HHolderBackup[lvl]; // dest
+      LevelData<FArrayBox>& xldf = *HCrse[lvl]; // src
+      DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+      
+      DataIterator dit = ldf.dataIterator();
+      for (dit.begin(); dit.ok(); ++dit)
+        {
+          const Box& box = dbl[dit()];
+          FArrayBox& fab = ldf[dit()];
+          const FArrayBox& xfab = xldf[dit()];
+          fab.copy(xfab,box);
+        }
+    }
 }
 
 Vector<LevelData<FArrayBox>* > AmrIceHolderClass::GetAmrH(void)

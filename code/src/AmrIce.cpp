@@ -13,6 +13,7 @@
 #include <string>
 #include <cstdio>
 #include <cmath>
+#include <memory>
 
 using std::ifstream; 
 using std::ios;
@@ -207,6 +208,8 @@ AmrIce::setDefaults()
   m_solverType = JFNK;
   // at the moment, 1 is the only one which works
   m_temporalAccuracy = 1;
+
+  // 4 for PPM advection
   m_num_thickness_ghost = 4;
   // default is -1, which means use the solver's own defaults
   m_maxSolverIterations = -1;
@@ -306,7 +309,9 @@ AmrIce::setDefaults()
  
   m_basalLengthScale = 0.0; // don't mess about with the basal friction / rhs by default
 
-  m_newTimestep = true;  
+  m_newTimestep = true;
+  m_predict_H = true;  
+  m_use_ppm_for_face_values = true;  
   m_evolve_thickness = true;
   m_evolve_ice_frac = true;
   m_evolve_velocity = true;
@@ -868,10 +873,12 @@ AmrIce::initialize()
 
 
   ppAmr.query("isothermal",m_isothermal);
-
+#ifdef CH_USE_HDF5
   setOutputOptions(ppAmr);
+#endif
   
-  ppAmr.query("new_timestep", m_newTimestep);  
+  ppAmr.query("new_timestep", m_newTimestep);
+  ppAmr.query("predict_thickness", m_predict_H);  
   ppAmr.query("evolve_thickness", m_evolve_thickness);
   ppAmr.query("evolve_topography_fix_surface", m_evolve_topography_fix_surface);
   ppAmr.query("evolve_velocity", m_evolve_velocity);
@@ -1077,8 +1084,12 @@ AmrIce::initialize()
   // get temporal accuracy
   ppAmr.query("temporal_accuracy", m_temporalAccuracy);
 
+  // use ppm to compute face centered values, even if there's no prediction going on 
+  ppAmr.query("use_ppm_for_face_values", m_use_ppm_for_face_values);
+  
+  
   // number of ghost cells depends on what scheme we're using
-  if (m_temporalAccuracy < 3)
+  if (m_use_ppm_for_face_values)
     {
       m_num_thickness_ghost = 4;
     }
@@ -1303,7 +1314,8 @@ AmrIce::initialize()
 	broadcast(m_vectTagSubset[lev], uniqueProc(SerialTask::compute));
     }
   /// PatchGodunov used for thickness advection
-  if (m_temporalAccuracy < 3)
+  // (DFM -- 3/11/24) define this even if we're doing RK4 in case we want to do PPM for dHdt
+  //if (m_temporalAccuracy < 3)
     {
       // get PatchGodunov options -- first set reasonable defaults.
       // can over-ride from ParmParse
@@ -1316,6 +1328,7 @@ AmrIce::initialize()
       bool useFourthOrderSlopes = true;
       pph.query("fourth_order_slopes",useFourthOrderSlopes);
       bool usePrimLimiting = true;
+      pph.query("use_limiting", usePrimLimiting);
       bool useCharLimiting = false;
       bool useFlattening = false;
       Real artificialViscosity = 0.0;
@@ -1797,12 +1810,12 @@ AmrIce::run(Real a_max_time, int a_max_step)
 
 #ifdef CH_USE_HDF5
 	  // dump plotfile before regridding  
-	  if ( (m_cur_step%m_plot_interval == 0) && m_plot_interval > 0)
+	  if (m_plot_interval > 0 && (m_cur_step%m_plot_interval == 0) )
 	    {
 	      writePlotFile();
 	    }
 	  // dump checkpoint before regridding 
-	  if ((m_cur_step%m_check_interval == 0) && (m_check_interval > 0)
+	  if ((m_check_interval > 0) && (m_cur_step%m_check_interval == 0)
 	      && (m_cur_step != m_restart_step))
 	    {
 	      writeCheckpointFile();
@@ -1847,7 +1860,9 @@ AmrIce::run(Real a_max_time, int a_max_step)
 	  //m_dt = trueDt; 
 	  // restores the correct timestep in cases where it was chosen just to reach a plot file
 	  //update CF data mean
-	  if (m_plot_style_cf) accumulateCFData(dt);	  
+#ifdef CH_USE_HDF5            
+	  if (m_plot_style_cf) accumulateCFData(dt);
+#endif
 	  
 	} // end of plot_time_interval
 #ifdef CH_USE_HDF5
@@ -2193,6 +2208,11 @@ AmrIce::computeH_half(Vector<LevelData<FluxBox>* >& a_H_half, Real a_dt)
       const DisjointBoxLayout& levelGrids = m_amrGrids[lev];
       LevelData<FluxBox>& levelFaceVel = *m_faceVelAdvection[lev];
       LevelData<FArrayBox>& levelOldThickness = *m_old_thickness[lev];
+
+      /// DFM (8/28/25) -- copy current thickness into levelOldThickness
+      /// this ensures that we're using an up-do-date value     
+      m_vect_coordSys[lev]->getH().copyTo(levelOldThickness);
+      
       LevelData<FluxBox>& levelHhalf = *a_H_half[lev];
       
       LevelData<FArrayBox>& levelSTS = *m_surfaceThicknessSource[lev];
@@ -2255,11 +2275,16 @@ AmrIce::computeH_half(Vector<LevelData<FluxBox>* >& a_H_half, Real a_dt)
 	  f += TINY_NORM;
 	  he.copy(levelOldThickness[dit]);
 	  he /= f;
-          
+
+          Real dt = a_dt;
+          if (!m_predict_H)
+            {
+              dt = 0.0;
+            }
           patchGod->computeWHalf(levelHhalf[dit],
                                   levelOldThickness[dit],
                                  advectiveSource,
-                                 a_dt,
+                                 dt,
                                  levelGrids[dit]);
           
           
@@ -2584,8 +2609,13 @@ AmrIce::updateGeometry(Vector<RefCountedPtr<LevelSigmaCS> >& a_vect_coordSys_new
     }
   
   
+  // now call postUpdate
+  postUpdate();
+}
 
-
+void
+AmrIce::postUpdate()
+{
   // average down thickness and topography to coarser levels and fill in ghost cells
   // before calling recomputeGeometry. 
   int Hghost = 2;
@@ -2594,7 +2624,7 @@ AmrIce::updateGeometry(Vector<RefCountedPtr<LevelSigmaCS> >& a_vect_coordSys_new
   for (int lev=0; lev<vectH.size(); lev++)
     {
       IntVect HghostVect = Hghost*IntVect::Unit;
-      LevelSigmaCS& levelCoords = *(a_vect_coordSys_new[lev]);
+      LevelSigmaCS& levelCoords = *(m_vect_coordSys[lev]);
       vectH[lev] = &levelCoords.getH();
       vectB[lev] = &levelCoords.getTopography();
     }
@@ -2639,7 +2669,7 @@ AmrIce::updateGeometry(Vector<RefCountedPtr<LevelSigmaCS> >& a_vect_coordSys_new
   for (int lev=0; lev <= finestTimestepLevel()  ; ++lev)
     {
       RealVect levelDx = m_amrDx[lev]*RealVect::Unit;
-      m_thicknessIBCPtr->setGeometryBCs(*a_vect_coordSys_new[lev],
+      m_thicknessIBCPtr->setGeometryBCs(*m_vect_coordSys[lev],
                                         m_amrDomains[lev],levelDx, m_time, m_dt);
     }
   
@@ -2652,7 +2682,7 @@ AmrIce::updateGeometry(Vector<RefCountedPtr<LevelSigmaCS> >& a_vect_coordSys_new
 
       
       DisjointBoxLayout& levelGrids = m_amrGrids[lev];
-      LevelSigmaCS& levelCoords = *(a_vect_coordSys_new[lev]);
+      LevelSigmaCS& levelCoords = *(m_vect_coordSys[lev]);
       LevelData<FArrayBox>& levelH = levelCoords.getH();
 
       updateIceFrac(levelH, lev);
@@ -2914,7 +2944,14 @@ AmrIce::updateGeometryFromThickness(Vector<RefCountedPtr<LevelSigmaCS> >& a_vect
       LevelSigmaCS& levelCoords = *(a_vect_coordSys_new[lev]);
       LevelData<FArrayBox>& levelH = levelCoords.getH();
 
-      updateIceFrac(levelH, lev);
+      if (m_evolve_ice_frac)
+	{
+	  updateIceFrac(levelH, lev);
+	}
+      else
+	{
+	  setIceFrac(levelH, lev);
+	}
       
       DataIterator dit = levelGrids.dataIterator();
 
@@ -2973,6 +3010,8 @@ AmrIce::updateGeometryFromThickness(Vector<RefCountedPtr<LevelSigmaCS> >& a_vect
       levelCoords.recomputeGeometry(crseCoords, refRatio);            
     }
 
+  //the grounding line may have moved.
+  m_groundingLineProximity_valid = false;
 }
 
 
@@ -3134,7 +3173,7 @@ AmrIce::initData(Vector<RefCountedPtr<LevelSigmaCS> >& a_vectCoordSys,
 #endif
      
     }
-  // tempearture depends on internal energy
+  // temperature depends on internal energy
   updateTemperature();
 
   // this is a good time to check for remote ice
@@ -3148,6 +3187,13 @@ AmrIce::initData(Vector<RefCountedPtr<LevelSigmaCS> >& a_vectCoordSys,
   applyCalvingCriterion(CalvingModel::Initialization);
   
 
+  // DFM (2/23/25) -- recomputeGeometry yet again after calving
+  for (int lev=0; lev<=m_finest_level; lev++)
+    {
+      LevelSigmaCS* crsePtr = (lev > 0)?&(*m_vect_coordSys[lev-1]):NULL;
+      int refRatio = (lev > 0)?m_refinement_ratios[lev-1]:0;      
+      a_vectCoordSys[lev]->recomputeGeometry(crsePtr, refRatio);
+    }
   
   // now call velocity solver to initialize velocity field, force a solve no matter what the time step
   solveVelocityField(true);
@@ -3325,7 +3371,7 @@ AmrIce::solveVelocityField(bool a_forceSolve, Real a_convergenceMetric)
                   // saved in velSolverSave and will be swapped back after 
                   // the initial guess solve
 		  m_velSolver = NULL;
-		  defineSolver();
+		  this->defineSolver();
 		  JFNKSolver* jfnkSolver = dynamic_cast<JFNKSolver*>(m_velSolver);
 		  CH_assert(jfnkSolver != NULL);
 		  const bool linear = true;
@@ -3344,7 +3390,7 @@ AmrIce::solveVelocityField(bool a_forceSolve, Real a_convergenceMetric)
 		  // Picard is the best option.
 		  m_solverType = Picard;
 		  m_velSolver = NULL;
-		  defineSolver();
+		  this->defineSolver();
 
 		  pp.query("linearsolver_tolerance", tol );
 		  pp.query("max_picard_iterations", nits );
@@ -4461,7 +4507,9 @@ if (result != MPI_SUCCESS)
 	 << " < TIME_EPS = " << TIME_EPS;
         
       m_plot_prefix = m_plot_prefix + std::string("_error_.");
+#ifdef CH_USE_HDF5        
       writePlotFile();
+#endif
       pout() << " AmrIce::computeDt exit because " << ss.str() << endl;
       MayDay::Error(ss.str().c_str());
     }

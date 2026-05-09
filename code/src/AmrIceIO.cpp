@@ -77,7 +77,7 @@ using std::string;
 
 #include "NamespaceHeader.H"
 
-
+#ifdef CH_USE_HDF5
 void AmrIce::setOutputOptions(ParmParse& a_pp)
 {
 
@@ -1678,7 +1678,7 @@ AmrIce::readCheckpointFile(HDF5Handle& a_handle)
         }
 
       // Get the refinement ratio
-      if (lev < max_level_check)
+      if ((lev < max_level_check) && (lev < m_max_level))
         {
           int checkRefRatio;
           if (levheader.m_int.find("ref_ratio") == levheader.m_int.end())
@@ -2039,7 +2039,7 @@ AmrIce::readCheckpointFile(HDF5Handle& a_handle)
   
   //this is just to make sure the diffusivity is computed
   //(so I should improve that)
-  defineSolver();
+  this->defineSolver();
   m_doInitialVelSolve = false; // since we have just read the velocity field
   m_doInitialVelGuess = false; // ditto
 
@@ -2073,6 +2073,7 @@ AmrIce::readCheckpointFile(HDF5Handle& a_handle)
   
 }
 
+#endif
 #ifdef CH_USE_HDF5
 
 void AmrIce::writeMetaDataHDF5(HDF5Handle& a_handle) const

@@ -286,6 +286,7 @@ public:
                       const Vector<LevelData<FluxBox>* >& a_vectFluxes, 
                       Real a_dt);
 
+  void postUpdate();
 
   // update ice thickness *and* bedrock elevation based on new thickness
   void updateGeometryFromThickness(Vector<RefCountedPtr<LevelSigmaCS> >& a_vect_coordSys_new, 
@@ -311,9 +312,10 @@ public:
    */
   bool isDefined() const;
 
-#ifdef CH_USE_HDF5
+
 
 private:
+#ifdef CH_USE_HDF5  
   /// General purpose storage for (small) metadata.
   /**  
        Anything placed here will get written to the plot and 
@@ -323,8 +325,10 @@ private:
 
   /// write BISICLES specific metadata to HDF5 attributes
   void writeMetaDataHDF5(HDF5Handle& a_handle) const;
-
+#endif
+  
 public:
+#ifdef CH_USE_HDF5
   void setHeader(const std::string& a_key, const std::string& a_val)
   {
     m_headerData.m_string[a_key] = a_val;
@@ -398,6 +402,8 @@ public:
   /// set up for restart
   void restart(const string& a_restart_file);
 
+#endif
+  
   /// set a prefix for all interactions with ParmParse for this object
   void setParmParsePrefix(const string& a_prefix)
   {
@@ -410,7 +416,7 @@ public:
 
 
 private:
-
+#ifdef CH_USE_HDF5
   /// store CF output data on a uniform mesh 
   LevelData<FArrayBox> m_uniform_cf_data;
   /// mesh level for cf data
@@ -437,10 +443,12 @@ private:
 
   /// a number that represents the current time
   long outputNumbering(); 
-
+#endif
+  
   friend class DomainDiagnosticData;
   DomainDiagnosticData m_cf_domain_diagnostic_data;
 
+#ifdef CH_USE_HDF5  
   /// set options for plotfile,checkpoint IO
 
   void setOutputOptions(ParmParse& a_pp);
@@ -468,9 +476,11 @@ private:
 
   /// set up various run-long data for CF Output
   void initCFData();
+#endif
+
 public:
   
-#endif
+
 
   /// compute total ice and total grounded ice (volume, at this point)
   //Real computeTotalGroundedIce() const;
@@ -565,6 +575,20 @@ public:
 
   const Vector<Real>& amrDx() const {return m_amrDx;}
 
+
+  /// access to the ice density
+  virtual Real iceDensity() const
+  {
+    return m_iceDensity;
+  }
+
+  /// access to the sewater density
+  virtual Real seawaterDensity() const
+  {
+    return m_seaWaterDensity;
+  }
+
+  
   const LevelData<FArrayBox>* velocity(int a_level) const
   {
     return m_velocity[a_level];
@@ -580,7 +604,14 @@ void  amrThickness(Vector<LevelData<FArrayBox>* >& a_vectH)
     a_vectH.resize(m_velocity.size() );
     for (int i=0; i<a_vectH.size(); i++)
       {
-        a_vectH[i] = &(m_vect_coordSys[i]->getH());
+        if (m_vect_coordSys[i] != NULL)
+          {
+            a_vectH[i] = &(m_vect_coordSys[i]->getH());
+          }
+        else
+          {
+            a_vectH[i] = NULL;
+          }
       }
 
   }
@@ -1431,8 +1462,16 @@ protected:
   /// 
   int m_check_interval;
 
+  // if FALSE, don't predict thickness to half-time during prediction step
+  bool m_predict_H;
+  
   // if true, use new (SUNDIALS) timestep
   bool m_newTimestep;  
+
+  // if true, use PPM for face-centered values when computing temporal RHS, even for RK4 
+  /** if false, use simple cell->face averaging
+   */
+  bool m_use_ppm_for_face_values;
   
   // if true, allow thickness to change in time
   bool m_evolve_thickness; 

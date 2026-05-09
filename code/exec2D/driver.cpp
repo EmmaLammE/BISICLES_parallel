@@ -157,7 +157,37 @@ int main(int argc, char* argv[]) {
     else if (rateFactorType == "patersonRate")
       {
 	PatersonRateFactor rateFactor(seconds_per_unit_time);
+
+        // allow for changing parameters via parmparse
+        Real E = rateFactor.m_E;
+        /// flow rate factor
+        Real A0 = rateFactor.m_A0;
+        /// limit temperature in flow-rate factor
+        Real T0 = rateFactor.m_T0;
+        /// universal gas constant
+        Real R = rateFactor.m_R;
+        /// activation energies for creep 
+        // (insert funny comment about two lazy creeps here...)
+        Real Qm = rateFactor.m_Qm;
+        Real Qp = rateFactor.m_Qp;
+        
 	ParmParse arPP("PatersonRate");
+
+        arPP.query("E", E);
+        /// flow rate factor
+        arPP.query("A0", A0);
+        /// limit temperature in flow-rate factor
+        arPP.query("T0", T0);
+        /// universal gas constant
+        arPP.query("R", R);
+        /// activation energies for creep 
+        // (insert funny comment about two lazy creeps here...)
+        arPP.query("Qm", Qm);
+        arPP.query("Qp", Qp);
+
+        rateFactor.setParameters(E, A0, T0, R, Qm, Qp);
+                                 
+        
 	amrObject.setRateFactor(&rateFactor);
       }
     else if (rateFactorType == "zwingerRate")
@@ -362,6 +392,58 @@ int main(int argc, char* argv[]) {
 	    thicknessFunction =ptr;
             
           }
+        else if (thicknessType == "paraboloidThickness")
+          {
+	    Real thickness;
+	    mPP.get("thickness", thickness);
+
+	    //paraboloid thickness bedrock geometry, symmetric about center
+	    RealVect center;
+	    Vector<Real> vect(SpaceDim);
+	    mPP.getarr("center", vect, 0, SpaceDim);
+	    center = RealVect(D_DECL(vect[0], vect[1], vect[2]));
+
+	    RealVect radius;
+	    mPP.getarr("radius", vect, 0, SpaceDim);
+	    radius = RealVect(D_DECL(vect[0], vect[1], vect[2]));            
+
+            // use thickness as magnitude and as offset to produce
+            // H(x,y) = thickness*(1 - (x/r)^2 - (y/r)^2)) + thickness
+            // or H(x,y) = thickness*(2 - (x/r)^2 - (y/r)^2))
+
+	    RefCountedPtr<RealFunction<RealVect> > ptr(new ParaboloidThicknessFunction(center,
+                                                                                       radius,
+                                                                                       thickness,
+                                                                                       0.0));
+
+	    thicknessFunction =ptr;            
+          }        
+        else if (thicknessType == "cosSqrThickness")
+          {
+	    Real thickness;
+	    mPP.get("thickness", thickness);
+
+	    //cosSqr thickness bedrock geometry, symmetric about center
+	    RealVect center;
+	    Vector<Real> vect(SpaceDim);
+	    mPP.getarr("center", vect, 0, SpaceDim);
+	    center = RealVect(D_DECL(vect[0], vect[1], vect[2]));
+
+	    RealVect radius;
+	    mPP.getarr("radius", vect, 0, SpaceDim);
+	    radius = RealVect(D_DECL(vect[0], vect[1], vect[2]));            
+
+            // use thickness as magnitude and as offset to produce
+            // H(x,y) = thickness*(1 - (x/r)^2 - (y/r)^2)) + thickness
+            // or H(x,y) = thickness*(2 - (x/r)^2 - (y/r)^2))
+
+	    RefCountedPtr<RealFunction<RealVect> > ptr(new cosSqrThicknessFunction(center,
+                                                                                   radius,
+                                                                                   thickness,
+                                                                                   thickness));
+
+	    thicknessFunction =ptr;            
+          }
 	else if (thicknessType == "step")
 	  {
             int dir=0;
@@ -448,7 +530,56 @@ int main(int argc, char* argv[]) {
                                                                             magnitude,
                                                                             offset));
 	    bedrockFunction[0] =  ptr;
-	  }        
+	  }
+
+	else if (geometry == "paraboloidHump")
+	  {
+	    //paraboloid hump bedrock geometry, symmetric about center
+	    RealVect center;
+	    Vector<Real> vect(SpaceDim);
+	    mPP.getarr("center", vect, 0, SpaceDim);
+	    center = RealVect(D_DECL(vect[0], vect[1], vect[2]));
+
+	    RealVect radius;
+	    mPP.getarr("radius", vect, 0, SpaceDim);
+	    radius = RealVect(D_DECL(vect[0], vect[1], vect[2]));            
+
+	    Real magnitude;
+	    mPP.get("magnitude", magnitude);
+            
+            Real offset;
+	    mPP.get("offset", offset);
+
+	    RefCountedPtr<RealFunction<RealVect> > ptr(new ParaboloidFunction(center,
+                                                                              radius,
+                                                                              magnitude,
+                                                                              offset));
+	    bedrockFunction[0] =  ptr;
+	  }
+	else if (geometry == "cosSqrHump")
+	  {
+	    //cosSqr hump bedrock geometry, symmetric about center
+	    RealVect center;
+	    Vector<Real> vect(SpaceDim);
+	    mPP.getarr("center", vect, 0, SpaceDim);
+	    center = RealVect(D_DECL(vect[0], vect[1], vect[2]));
+
+	    RealVect radius;
+	    mPP.getarr("radius", vect, 0, SpaceDim);
+	    radius = RealVect(D_DECL(vect[0], vect[1], vect[2]));            
+
+	    Real magnitude;
+	    mPP.get("magnitude", magnitude);
+            
+            Real offset;
+	    mPP.get("offset", offset);
+
+	    RefCountedPtr<RealFunction<RealVect> > ptr(new cosSqrFunction(center,
+                                                                          radius,
+                                                                          magnitude,
+                                                                          offset));
+	    bedrockFunction[0] =  ptr;
+	  }
         else if (geometry == "regroundingTest")
           {
 	    //inclined plane geometry with a Gaussian bump
@@ -533,6 +664,11 @@ int main(int argc, char* argv[]) {
 	  
 
 	  }
+        else if (geometry == "MISMIPplus")
+          {
+	    RefCountedPtr<RealFunction<RealVect> > ptr(new MISOMIPBedrockElevation());
+            bedrockFunction[0] = ptr;
+          }
 	else
 	  {
 	    MayDay::Error("bad marineIceSheet.geometry");
@@ -989,9 +1125,14 @@ int main(int argc, char* argv[]) {
 
 	  Real tol = 1.0e-10;
 	  ppr.query("tol",tol);
-      	  if (tol < HDF5NormTest(result_hdf5, reference_hdf5))
+          Real norm = HDF5NormTest(result_hdf5, reference_hdf5);
+      	  if (tol < norm)
 	    {
 	      ierr = 1;
+              pout() << "FAILED HDF5NormTest!  norm = "
+                     << norm 
+                     << "   tolerance = " << tol 
+                     << endl;
 	    }
 	}
 

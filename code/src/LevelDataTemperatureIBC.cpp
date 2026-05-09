@@ -28,115 +28,116 @@
 LevelDataTemperatureIBC* 
 LevelDataTemperatureIBC::parse(ParmParse& a_pp)
 {
+  bool dataIsInternalEnergy(false);
+  a_pp.query("readInternalEnergy", dataIsInternalEnergy);
 
-  	std::string infile;
-	a_pp.get("temperatureFile",infile);
-	std::string temperatureName = "temp000000";
-	a_pp.query("temperatureName",temperatureName);
-	Real defaultTemperature = 258.0; // 
-	a_pp.query("value", defaultTemperature);
+  std::string infile;
+  std::string layer0Name(""); 
+  std::string surfaceName("");
+  
+  if (dataIsInternalEnergy)
+    {
+      a_pp.get("internalEnergyFile",infile);
+      layer0Name = "internalEnergy000000";
+      a_pp.query("internalEnergyName",layer0Name);
+      a_pp.query("surfaceInternalEnergyName",surfaceName);
+    }
+  else
+    {
+      a_pp.get("temperatureFile",infile);
+      layer0Name = "temp000000";
+      a_pp.query("temperatureName",layer0Name);
+      a_pp.query("surfaceTemperatureName",surfaceName);
+    }
+  	
+  Real defaultTemperature = 258.0; // 
+  a_pp.query("defaultTemperature", defaultTemperature);
 	
-	RefCountedPtr<LevelData<FArrayBox> > levelTemp
-	  (new LevelData<FArrayBox>());
-	Vector<RefCountedPtr<LevelData<FArrayBox> > > vectData;
-	vectData.push_back(levelTemp);
-	Vector<std::string> names(1);
-	names[0] = temperatureName;
-	Real dx;
-	ParmParse ppAmr ("amr");
-	Vector<int> ancells(3,0); 
-	ppAmr.queryarr("num_cells", ancells, 0, ancells.size());
-	if (ancells[0] == 0)
-	  {
-	    ParmParse ppGeo ("geometry");
-	    ppGeo.getarr("num_cells", ancells, 0, ancells.size());
-	  }
-	readLevelData(vectData,dx,infile,names,ancells[2]);
-	RealVect levelDx = RealVect::Unit * dx;
-
-	RefCountedPtr<LevelData<FArrayBox> > levelSurfaceTemp(new LevelData<FArrayBox>());
-	std::string surfaceTemperatureName = "";
-	a_pp.query("surfaceTemperatureName",surfaceTemperatureName);
-	if (surfaceTemperatureName == "")
-	  {
-	    //not ideal, but in this case copy the top layer temperature to the surface.
-	    levelSurfaceTemp->define( levelTemp->disjointBoxLayout(), 1, levelTemp->ghostVect());
-	    levelTemp->copyTo(Interval(0,0),*levelSurfaceTemp,Interval(0,0));
-	  }
-	else
-	  {
-	    names.resize(1);
-	    names[0] = surfaceTemperatureName;
-	    vectData[0] = levelSurfaceTemp;
-	    readLevelData(vectData,dx,infile,names,1);
-	    ; 
-	    if (dx != levelDx[0])
-	      {
-		pout() << "surface temperature dx = " << dx << " but bulk temperature mesh dx = " << levelDx[0] << endl;
-		CH_assert(dx == levelDx[0]);
-		MayDay::Error("dx != levelDx[0]");
-	      }
-	  }
-
-	RefCountedPtr<LevelData<FArrayBox> > levelBasalHeatFlux(new LevelData<FArrayBox>());
-	std::string basalHeatFluxName = "";
-	a_pp.query("basalHeatFluxName",basalHeatFluxName);
-	if (basalHeatFluxName == "")
-	  {
-	    //if no basal heat flux is given, assume zero flux
-	    levelBasalHeatFlux->define( levelTemp->disjointBoxLayout(), 1, levelTemp->ghostVect());
-	    for (DataIterator dit = levelBasalHeatFlux->dataIterator(); dit.ok(); ++dit)
-	      {
-		(*levelBasalHeatFlux)[dit].setVal(0.0);
-	      }
-	  }
-	else
-	  {
-	    names.resize(1);
-	    names[0] = basalHeatFluxName;
-	    vectData[0] = levelBasalHeatFlux;
-	    readLevelData(vectData,dx,infile,names,1);
-	    if (dx != levelDx[0])
-	      {
-		pout() << "basal temperature dx = " << dx << " but bulk temperature mesh dx = " << levelDx[0] << endl;
-		CH_assert(dx == levelDx[0]);
-		MayDay::Error("dx != levelDx[0]");
-	      }
-	  }
-	return new LevelDataTemperatureIBC
-	  (levelTemp,levelSurfaceTemp,levelBasalHeatFlux,levelDx, defaultTemperature);
+  RefCountedPtr<LevelData<FArrayBox> > levelBulkData
+      (new LevelData<FArrayBox>());
+  Vector<RefCountedPtr<LevelData<FArrayBox> > > vectData;
+  vectData.push_back(levelBulkData);
+  Vector<std::string> names(1);
+  names[0] = layer0Name;
+  Real dx;
+  ParmParse ppAmr ("amr");
+  Vector<int> ancells(3,0); 
+  ppAmr.queryarr("num_cells", ancells, 0, ancells.size());
+  if (ancells[0] == 0)
+    {
+      ParmParse ppGeo ("geometry");
+      ppGeo.getarr("num_cells", ancells, 0, ancells.size());
+    }
+  readLevelData(vectData,dx,infile,names,ancells[2]);
+  RealVect levelDx = RealVect::Unit * dx;
+  
+  RefCountedPtr<LevelData<FArrayBox> > levelSurfaceData(new LevelData<FArrayBox>());
+    
+  if (surfaceName == "")
+    {
+      //not ideal, but in this case copy the top layer data to the surface.
+      levelSurfaceData->define( levelBulkData->disjointBoxLayout(), 1, levelBulkData->ghostVect());
+      levelBulkData->copyTo(Interval(0,0),*levelSurfaceData,Interval(0,0));
+    }
+  else
+    {
+      names.resize(1);
+      names[0] = surfaceName;
+      vectData[0] = levelSurfaceData;
+      readLevelData(vectData,dx,infile,names,1);
+      ; 
+      if (dx != levelDx[0])
+	{
+	  pout() << "surface temperature dx = " << dx << " but bulk temperature mesh dx = " << levelDx[0] << endl;
+	  CH_assert(dx == levelDx[0]);
+	  MayDay::Error("dx != levelDx[0]");
+	}
+    }
+  
+  RefCountedPtr<LevelData<FArrayBox> > levelBasalHeatFlux(new LevelData<FArrayBox>());
+  std::string basalHeatFluxName = "";
+  a_pp.query("basalHeatFluxName",basalHeatFluxName);
+  if (basalHeatFluxName == "")
+    {
+      //if no basal heat flux is given, assume zero flux
+      levelBasalHeatFlux->define( levelBulkData->disjointBoxLayout(), 1, levelBulkData->ghostVect());
+      for (DataIterator dit = levelBasalHeatFlux->dataIterator(); dit.ok(); ++dit)
+	{
+	  (*levelBasalHeatFlux)[dit].setVal(0.0);
+	}
+    }
+  else
+    {
+      names.resize(1);
+      names[0] = basalHeatFluxName;
+      vectData[0] = levelBasalHeatFlux;
+      readLevelData(vectData,dx,infile,names,1);
+      if (dx != levelDx[0])
+	{
+	  pout() << "basal temperature dx = " << dx << " but bulk temperature mesh dx = " << levelDx[0] << endl;
+	  CH_assert(dx == levelDx[0]);
+	  MayDay::Error("dx != levelDx[0]");
+	}
+    }
+  return new LevelDataTemperatureIBC
+    (levelBulkData,levelSurfaceData,levelBasalHeatFlux,levelDx, defaultTemperature, dataIsInternalEnergy);
 
 }
 
 LevelDataTemperatureIBC::LevelDataTemperatureIBC
-(RefCountedPtr<LevelData<FArrayBox> > a_temp, 
- RefCountedPtr<LevelData<FArrayBox> > a_surfaceTemp,
+(RefCountedPtr<LevelData<FArrayBox> > a_bulkData, 
+ RefCountedPtr<LevelData<FArrayBox> > a_surfaceData,
  RefCountedPtr<LevelData<FArrayBox> > a_basalHeatFlux,
- const RealVect& a_dx, const Real& a_defaultTemperature)
+ const RealVect& a_dx, const Real& a_defaultTemperature,
+ const bool& a_dataIsInternalEnergy)
 {
-  m_temp = a_temp;
-  m_surfaceTemp = a_surfaceTemp;
+  m_bulkData = a_bulkData;
+  m_surfaceData = a_surfaceData;
   m_basalHeatFlux = a_basalHeatFlux;
   m_defaultTemperature =  a_defaultTemperature;
+  m_defaultE = IceThermodynamics::m_ice_heat_capacity * m_defaultTemperature ;
   m_dx = a_dx;
-  
-  for (DataIterator dit( m_temp->disjointBoxLayout());dit.ok();++dit)
-    {
-      Real bulkMaxTemperature = (*m_temp)[dit].max();
-      //CH_assert(bulkMaxTemperature <= triplepoint);
-   
-      Real bulkMinTemperature = (*m_temp)[dit].min();
-      CH_assert(bulkMinTemperature > 0);
-    }
-  for (DataIterator dit( m_surfaceTemp->disjointBoxLayout());dit.ok();++dit)
-    {
-      Real surfaceMaxTemperature = (*m_surfaceTemp)[dit].max();
-      //CH_assert(surfaceMaxTemperature <= triplepoint);
-     
-      Real surfaceMinTemperature = (*m_surfaceTemp)[dit].min();
-      CH_assert(surfaceMinTemperature > 0);
-    }
-  
+  m_dataIsInternalEnergy = a_dataIsInternalEnergy;
 }
 
 LevelDataTemperatureIBC::~LevelDataTemperatureIBC()
@@ -177,55 +178,72 @@ void LevelDataTemperatureIBC::initializeIceInternalEnergy(LevelData<FArrayBox>& 
 
   if (true)
     {
-      pout() << " LevelDataIBC::initializeIceTemperature" << endl;
+      pout() << " LevelDataIBC::initializeIceInternalEnergy" << endl;
     }
 
   
   const LevelSigmaCS& coordSys = *a_amrIce.geometry(a_level); 
   const DisjointBoxLayout dbl = coordSys.grids();
-  LevelData<FArrayBox> T(dbl, a_E.nComp(), a_E.ghostVect());
-  LevelData<FArrayBox> sT(dbl, 1, a_E.ghostVect());
 
-  // set default tempeature - applies to regions of the domain not
-  // covered by the data
-  for (DataIterator dit(dbl);dit.ok();++dit)
+  if (m_dataIsInternalEnergy)
     {
-      T[dit].setVal(m_defaultTemperature);
-      sT[dit].setVal(m_defaultTemperature);
+      //simple case
+      for (DataIterator dit(dbl);dit.ok();++dit)
+	{
+	  a_E[dit].setVal(m_defaultE);
+	  a_surfaceE[dit].setVal(m_defaultE);
+	}
+      FillFromReference(a_E,*m_bulkData,coordSys.dx(),m_dx,true);
+      FillFromReference(a_surfaceE,*m_surfaceData,coordSys.dx(),m_dx,true);
     }
-  
-  FillFromReference(T,*m_temp,coordSys.dx(),m_dx,true);
-  FillFromReference(sT,*m_surfaceTemp,coordSys.dx(),m_dx,true);
-  {
-  const ProblemDomain& domain = coordSys.grids().physDomain();
-  for (int dir = 0; dir < SpaceDim; ++dir)
+  else
     {
-      if (!(domain.isPeriodic(dir))){
-	ReflectGhostCells(T, domain, dir, Side::Lo);
-	ReflectGhostCells(T, domain, dir, Side::Hi);
-	ReflectGhostCells(sT, domain, dir, Side::Lo);
-	ReflectGhostCells(sT, domain, dir, Side::Hi);
+      // need to convert to internal energy
+      LevelData<FArrayBox> T(dbl, a_E.nComp(), a_E.ghostVect());
+      LevelData<FArrayBox> sT(dbl, 1, a_E.ghostVect());
+      
+      // set default tempeature - applies to regions of the domain not
+      // covered by the data
+      for (DataIterator dit(dbl);dit.ok();++dit)
+	{
+	  T[dit].setVal(m_defaultTemperature);
+	  sT[dit].setVal(m_defaultTemperature);
+	}
+      
+      FillFromReference(T,*m_bulkData,coordSys.dx(),m_dx,true);
+      FillFromReference(sT,*m_surfaceData,coordSys.dx(),m_dx,true);
+      {
+	const ProblemDomain& domain = coordSys.grids().physDomain();
+	for (int dir = 0; dir < SpaceDim; ++dir)
+	  {
+	    if (!(domain.isPeriodic(dir))){
+	      ReflectGhostCells(T, domain, dir, Side::Lo);
+	      ReflectGhostCells(T, domain, dir, Side::Hi);
+	      ReflectGhostCells(sT, domain, dir, Side::Lo);
+	      ReflectGhostCells(sT, domain, dir, Side::Hi);
+	    }
+	  }
       }
-    }
-  }
-
+      
+      for (DataIterator dit(dbl);dit.ok();++dit)
+	{
+	  FArrayBox w( a_E[dit].box(), a_E[dit].nComp()); //water fraction, set to zero for now
+	  w.setVal(0.0);
+	  IceThermodynamics::composeInternalEnergy(a_E[dit],T[dit],w, a_E[dit].box() );
+	}
+      
+      
+      for (DataIterator dit(dbl);dit.ok();++dit)
+	{
+	  FArrayBox w( a_surfaceE[dit].box(), 1); //water fraction, set to zero for now 
+	  w.setVal(0.0);
+	  IceThermodynamics::composeInternalEnergy(a_surfaceE[dit],sT[dit],w,a_surfaceE[dit].box() );
+	}
+    } // end conversion
+  
   for (DataIterator dit(dbl);dit.ok();++dit)
     {
-      FArrayBox w( a_E[dit].box(), a_E[dit].nComp()); //water fraction, set to zero for now
-      w.setVal(0.0);
-      IceThermodynamics::composeInternalEnergy(a_E[dit],T[dit],w, a_E[dit].box() );
-    }
-
- 
-   for (DataIterator dit(dbl);dit.ok();++dit)
-    {
-      FArrayBox w( a_surfaceE[dit].box(), 1); //water fraction, set to zero for now 
-      w.setVal(0.0);
-      IceThermodynamics::composeInternalEnergy(a_surfaceE[dit],sT[dit],w,a_surfaceE[dit].box() );
-    }
-   
-  for (DataIterator dit(dbl);dit.ok();++dit)
-    {
+      //todo : read this also
       a_tillWaterDepth[dit].setVal(0.0);
     }
    
@@ -249,7 +267,8 @@ void LevelDataTemperatureIBC::initializeIceInternalEnergy(LevelData<FArrayBox>& 
 LevelDataTemperatureIBC* 
 LevelDataTemperatureIBC::new_internalEnergyIBC()
 {
-  return new LevelDataTemperatureIBC(m_temp,m_surfaceTemp,m_basalHeatFlux,m_dx,m_defaultTemperature);
+  return new LevelDataTemperatureIBC(m_bulkData,m_surfaceData,m_basalHeatFlux,
+				     m_dx,m_defaultTemperature,m_dataIsInternalEnergy);
 }
 
 
