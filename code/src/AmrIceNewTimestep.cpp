@@ -374,8 +374,14 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
   setToZero(m_volumeThicknessSource);
   
   Vector<LevelData<FluxBox>* > faceH(a_dHdt.size(), NULL);
-  Vector<LevelData<FluxBox>* > vectFluxes(a_dHdt.size(), NULL); 
-  for (int lev=0; lev<faceH.size(); lev++)
+  Vector<LevelData<FluxBox>* > vectFluxes(a_dHdt.size(), NULL);  
+  
+  // can either use PPM or cell-to-face averaging to generate face-centered
+  // thickness values
+  //bool usePPM = false;
+  
+  // allocate storage and compute fluxes
+  for (int lev=0; lev<= m_finest_level; lev++)
     {
 
       // allocate storage
@@ -403,23 +409,34 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
       LevelData<FArrayBox>& nonConstH = *(const_cast<LevelData<FArrayBox>*>(&currentH));
       // ensure that ghost cells for thickness  are filled in
       if (lev > 0)
-        {         
+        {
+          const LevelData<FArrayBox>& coarseH = *a_H[lev-1];
+          //const DisjointBoxLayout& fineGrids = nonConstH.getBoxes();
+          const DisjointBoxLayout& coarseGrids = coarseH.getBoxes();
+          const LevelSigmaCS& levelCoords = *m_vect_coordSys[lev];
+          const RealVect& dx = levelCoords.dx();              
+          int refRatio = m_refinement_ratios[lev-1];
+
+          const ProblemDomain& fineDomain = levelGrids.physDomain();
+          const ProblemDomain& crseDomain = coarseGrids.physDomain();          
+          int ncomp = 1;
+          
           int nGhost = nonConstH.ghostVect()[0];
           PiecewiseLinearFillPatch thicknessFiller(levelGrids, 
-                                                   m_amrGrids[lev-1],
+                                                   coarseGrids,
                                                    1, 
-                                                   m_amrDomains[lev-1],
-                                                   m_refinement_ratios[lev-1],
+                                                   crseDomain,
+                                                   refRatio,
                                                    nGhost);
           
           // since we're not subcycling, don't need to interpolate in time
           Real time_interp_coeff = 0.0;
           thicknessFiller.fillInterp(nonConstH,
-                                     *a_H[lev-1],
-                                     *a_H[lev-1],
+                                     coarseH,
+                                     coarseH,
                                      time_interp_coeff,
                                      0, 0, 1);
-        }
+        } // end if lev > 0
         // just in case, do an exchange here
         // cast away const-ness just for the exchange
         nonConstH.exchange(); // what does this line do? periodic BC for ghost cells to exchange values on two ends of domain
@@ -590,9 +607,9 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   CH_TIME("AmrIce::setState");
 
   if (s_verbosity > 3)
-  {
-      pout() << "AmrIce::setState" << endl;
-  }
+    {
+      pout() << "AmrIce::setState(time=" << a_cur_time << ")" << endl;
+    }
 
 
   // first, reset time
@@ -676,6 +693,13 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   for (dit.begin(); dit.ok(); ++dit)
   {
       thisLevelH[dit].copy((*a_thicknessVect[0])[dit]); // copy a_thick to this level H
+      // ensure that thickness doesn't go negative
+      BoxIterator bit(thisLevelH[dit].box());
+      for (bit.begin(); bit.ok(); ++bit)
+        {
+          IntVect iv = bit();
+          if (thisLevelH[dit](iv,0) < 0.0) thisLevelH[dit](iv,0) = 0.0;
+        }      
   }
   
   /// recompute geometry
@@ -684,6 +708,12 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
     int refRatio = -1;
     m_vect_coordSys[0]->recomputeGeometry(crseCoords,refRatio);
   }
+
+  // (DFM 8/28/25) -- set this to current thickness
+  m_vect_coordSys[0]->getH().copyTo(*m_old_thickness[0]);
+
+
+
   
   /// overwrite velocity if needed
   if (a_velocityVect.size() > 0)
@@ -783,6 +813,13 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
         for (dit.begin(); dit.ok(); ++dit)
         {
             thisLevelH[dit].copy((*a_thicknessVect[lev])[dit]);
+            // ensure that thickness doesn't go negative
+            BoxIterator bit(thisLevelH[dit].box());
+            for (bit.begin(); bit.ok(); ++bit)
+              {
+                IntVect iv = bit();
+                if (thisLevelH[dit](iv,0) < 0.0) thisLevelH[dit](iv,0) = 0.0;
+              }          
         }
        
             // DisjointBoxLayout dbl = thisLevelH.disjointBoxLayout();
@@ -821,6 +858,10 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
       // (DFM 7/15/22) -- we may want to pass these in
       m_old_thickness[lev] = destructiveRegrid(m_old_thickness[lev], newDBL, m_old_thickness[lev-1], m_refinement_ratios[lev-1]) ;
 
+      // (DFM 8/28/25) -- set this to current thickness
+      m_vect_coordSys[lev]->getH().copyTo(*m_old_thickness[lev]);
+
+      
       ///  DFM (7/15/22) -- will want to pass this in once we're doing marine ice sheets
       m_iceFrac[lev] = destructiveRegrid( m_iceFrac[lev], newDBL, m_iceFrac[lev-1],	m_refinement_ratios[lev-1]);
       // if we're not passing in a velocity, treat this like a regular regrid
@@ -1136,7 +1177,7 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
       //velocity solver needs to be re-defined
       if (!gridsSame)
         {
-          defineSolver();
+          this->defineSolver();
         }
       //solve velocity field, but use the previous initial residual norm in place of this one
       //and force a solve even if other conditions (e.g the timestep interval condition) are not met

@@ -534,7 +534,7 @@ AmrIce::regrid()
 	if (m_evolve_velocity)
 	  {
 	    //velocity solver needs to be re-defined
-	    defineSolver();
+	    this->defineSolver();
 	    //solve velocity field, but use the previous initial residual norm in place of this one
 	    //and force a solve even if other conditions (e.g the timestep interval condition) are not met
 	    solveVelocityField(true, m_velocitySolveInitialResidualNorm);
@@ -1088,7 +1088,7 @@ AmrIce::initGrids(int a_finest_level)
     }
 
   // define solver before calling initData
-  defineSolver();
+  this->defineSolver();
 
   // initialize base level data
   initData(m_vect_coordSys,
@@ -1195,7 +1195,7 @@ AmrIce::initGrids(int a_finest_level)
       // only do this if we've created new levels
       if (m_finest_level > 0) 
         {
-          defineSolver();
+          this->defineSolver();
 
           initData(m_vect_coordSys,
                    m_velocity);
@@ -1334,7 +1334,7 @@ AmrIce::setupFixedGrids(const std::string& a_gridFile)
   m_finest_level = gridvect.size() -1;
 
   // define solver before calling initData
-  defineSolver();
+  this->defineSolver();
   
   initData(m_vect_coordSys, m_velocity);
 

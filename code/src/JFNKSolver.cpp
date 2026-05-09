@@ -350,6 +350,8 @@ JFNKSolver::Configuration::Configuration()
   int mgProlongType = ViscousTensorOp::linearInterp;
   ViscousTensorOp::s_prolongType = mgProlongType;
 
+  ViscousTensorOp::s_lazy_gsrb = false; // true default 
+  
 }
 
 

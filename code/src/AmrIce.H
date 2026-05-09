@@ -286,6 +286,7 @@ public:
                       const Vector<LevelData<FluxBox>* >& a_vectFluxes, 
                       Real a_dt);
 
+  void postUpdate();
 
   // update ice thickness *and* bedrock elevation based on new thickness
   void updateGeometryFromThickness(Vector<RefCountedPtr<LevelSigmaCS> >& a_vect_coordSys_new, 
@@ -567,8 +568,8 @@ public:
     return m_vect_coordSys;
   }
 
-  /// nearly direct access to the ice thickness 
-  void incrementIceThickness(Vector<LevelData<FArrayBox>*> a_thk);
+  /// increment ice thickness by delta_thk
+  void incrementIceThickness(Vector<LevelData<FArrayBox>*> a_delta_thk);
   
   const Vector<int>& refRatios() const { return m_refinement_ratios;}
 
@@ -1461,6 +1462,9 @@ protected:
   /// 
   int m_check_interval;
 
+  // if FALSE, don't predict thickness to half-time during prediction step
+  bool m_predict_H;
+  
   // if true, use new (SUNDIALS) timestep
   bool m_newTimestep;  
 
