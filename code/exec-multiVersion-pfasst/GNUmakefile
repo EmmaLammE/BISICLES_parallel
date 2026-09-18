@@ -1,5 +1,7 @@
 # -*- Mode: Makefile -*- 
-LIBPFASST = /global/homes/e/emmaliu/PFASST_icesheet
+#LIBPFASST = /pscratch/sd/d/dmartin/parallelInTime/PFASST_icesheet
+LIBPFASST = ../../../PFASST_icesheet
+
 USE_PFASST = TRUE
 MPI = TRUE
 HDF5 = TRUE
@@ -24,8 +26,8 @@ driver:  libbike
 
 include ../mk/Make.defs
 FFLAGS  += -I$(LIBPFASST)/include
-FFLAGS  += -I$(LIBPFASST)/build
-FFLAGS  += -I./include
+FFLAGS  += -I$(LIBPFASST)/build 
+# FFLAGS  += -I/include
 LDFLAGS += -lstdc++ -lquadmath #-lmpi_mpifh #
 # LDFLAGS += -L/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/13/gcc/aarch64-apple-darwin22/13 -lgcc
 LDFLAGS +=  -L$(LIBPFASST)/lib -lpfasst -lmpi
@@ -71,7 +73,6 @@ alltest: libbike ../lib/libBisicles$(config).a
 #include Makefile.fortran
 pfasst: 
 	mkdir -p include
-	touch phony.mod
 	mv *.mod include/
 
 
