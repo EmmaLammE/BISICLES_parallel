@@ -9,7 +9,7 @@ main.poutBaseName=pout.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfrictio
 
 
 # time stepping
-main.maxTime = 1500  # maximum time to run to
+main.maxTime = 2000  # maximum time to run to
 main.maxStep = 9999999   # maximum number of steps to runx
 
 
@@ -139,6 +139,7 @@ crse.amr.verbosity = 5
 crse.amr.velocity_solver_type = 1
 
 #initial guess 
+crse.amr.evolve_velocity = false
 crse.amr.do_initial_velocity_guess = 1
 crse.amr.do_initial_velocity_solve = 1
 crse.amr.initial_velocity_guess_type = 1 # linear PDE
@@ -180,7 +181,7 @@ crse.amr.verbosity = 5
 #  FINE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numFineIntervals = 4
+main.numFineIntervals = 10
 
 #AMR mesh options
 fine.amr.num_cells = 200 20 10 
@@ -242,7 +243,7 @@ fine.amr.initial_velocity_guess_const_vel = 1.0 0.0
 fine.amr.eliminate_remote_ice = false
 
 #plotting options
-fine.amr.plot_time_interval = 10
+fine.amr.plot_time_interval = 1
 fine.amr.plot_prefix = plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst.
 
 fine.amr.write_solver_rhs = 0
@@ -267,7 +268,7 @@ fine.amr.verbosity = 5
 #  PFASST related params
 #####################################################
 
-pf.USE_PF = false
+pf.USE_PF = True
 pf.PF_VERBOSE = TRUE
 pf.pf_plot_prefix = pf_
 pf.pf_num_procs_per_time = 1

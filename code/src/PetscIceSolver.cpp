@@ -64,6 +64,18 @@ PetscIceSolver::PetscIceSolver()
   // set default to be linear prolongation in multigrid
   int mgProlongType = ViscousTensorOp::linearInterp;
   ViscousTensorOp::s_prolongType = mgProlongType;
+
+#ifdef CHOMBO_TRUNK  
+  /// default is "lazy gsrb"
+  ParmParse pp3("solver");
+  if (pp3.contains("lazyGSRB"))
+    {
+      bool lazyGSRB;
+      pp.get("lazyGSRB", lazyGSRB);
+      ViscousTensorOp::s_lazy_gsrb = lazyGSRB;
+    }
+#endif
+  
 }
 ////////////////////////////////////////////////////////////////////////
 //  PetscIceSolver::~PetscIceSolver() 

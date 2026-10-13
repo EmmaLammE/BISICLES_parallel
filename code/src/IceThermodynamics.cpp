@@ -46,6 +46,7 @@
 
 
 //default defs for static data members
+// common physical constants
 Real IceThermodynamics::m_ice_conductivity(ICECONDUCTIVITY);
 Real IceThermodynamics::m_ice_heat_capacity(ICEHEATCAPACITY);
 Real IceThermodynamics::m_ice_latent_heat_fusion(ICELATENTHEAT);
@@ -56,13 +57,13 @@ Real IceThermodynamics::m_ice_density(ICE_DENSITY);
 Real IceThermodynamics::m_water_density(SEA_WATER_DENSITY);
 Real IceThermodynamics::m_gravity(GRAVITY);
 Real IceThermodynamics::m_seconds_per_unit_time(SECONDS_PER_TROPICAL_YEAR);
-
-
-Real IceThermodynamics::m_water_fraction_drain(0.01);
+// idiosyncratic parameters 
+Real IceThermodynamics::m_water_fraction_drain(0.01); 
 Real IceThermodynamics::m_water_fraction_max(0.05);
 Real IceThermodynamics::m_water_drain_factor(0.02);
 Real IceThermodynamics::m_till_water_drain_factor(0.001);
 Real IceThermodynamics::m_till_water_max(4.0);
+Real IceThermodynamics::m_floating_base_max_heat_flux(1.2345678e+300);
 
 ///compose internal energy F(T,w) from temperature T and water fraction  
 void IceThermodynamics::composeInternalEnergy
@@ -213,6 +214,9 @@ void IceThermodynamics::setConstants(Real a_rhoi, Real a_rhow, Real a_gravity, R
   m_till_water_max = 4.0;
   
   pp.query("till_water_max", m_till_water_max);
+
+  // limit heat flux across the ice shelf base (useful when e.g ice shelf geometry is fixed)
+  pp.query("floating_base_max_heat_flux",m_floating_base_max_heat_flux);
   
   
   FORT_COLUMNTHERMODYAMICSSETCONSTANTS
@@ -230,7 +234,8 @@ void IceThermodynamics::setConstants(Real a_rhoi, Real a_rhow, Real a_gravity, R
      CHF_CONST_REAL(m_water_fraction_max),
      CHF_CONST_REAL(m_water_drain_factor),
      CHF_CONST_REAL(m_till_water_drain_factor),
-     CHF_CONST_REAL(m_till_water_max));				       
+     CHF_CONST_REAL(m_till_water_max),
+     CHF_CONST_REAL(m_floating_base_max_heat_flux));			       
    
 }
 

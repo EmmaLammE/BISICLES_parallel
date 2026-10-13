@@ -1039,30 +1039,78 @@ FineInterp::s_default_boundary_limit_type = 0;
     
 
     // initialize each time interval from initial time
-    // Vector<LevelData<FArrayBox>* > crseH;
-    // amrObjectCrse.amrThickness(crseH);
-    ParmParse ppcrse("crse"); int crselevel=0;
+    // // Vector<LevelData<FArrayBox>* > crseH;
+    // // amrObjectCrse.amrThickness(crseH);
+    // ParmParse ppcrse("crse"); int crselevel=0;
+    // ppcrse.get("amr.maxLevel", crselevel);
+    // int finestLevel = 0;
+    // Vector<LevelData<FArrayBox>* > crseH(crselevel+1, NULL);
+    // for (int lvl=0; lvl<crselevel+1;lvl++)
+    //   {
+    //     const DisjointBoxLayout& current_grid_size=amrObjectCrse.grids(lvl);
+    //     // only do this if the level is defined
+    //     if (current_grid_size.isClosed())
+    //       {
+    //         // keep track of the finest defined level
+    //         finestLevel = lvl;
+    //         crseH[lvl] = new LevelData<FArrayBox>(current_grid_size,1,IntVect::Zero); 
+    //         DataIterator dit = (*crseH[lvl]).dataIterator();
+    //         for (dit.begin(); dit.ok(); ++dit)
+    //           {
+    //             (*crseH[lvl])[dit].setVal(1000.0);
+    //           }
+    //       }
+    //   }
+    // EL 5.15.2026
+    ParmParse ppcrse("crse");
+    int crselevel = 0;
     ppcrse.get("amr.maxLevel", crselevel);
-    int finestLevel = 0;
-    Vector<LevelData<FArrayBox>* > crseH(crselevel+1, NULL);
-    for (int lvl=0; lvl<crselevel+1;lvl++)
-      {
-        const DisjointBoxLayout& current_grid_size=amrObjectCrse.grids(lvl);
-        // only do this if the level is defined
-        if (current_grid_size.isClosed())
-          {
-            // keep track of the finest defined level
+    // Temporary full vector, may contain NULL entries.
+    Vector<LevelData<FArrayBox>* > crseH_raw(crselevel + 1, NULL);
+    int finestLevel = -1;
+    for (int lvl = 0; lvl <= crselevel; ++lvl)
+    {
+        const DisjointBoxLayout& grids = amrObjectCrse.grids(lvl);
+        if (grids.isClosed())
+        {
             finestLevel = lvl;
-            crseH[lvl] = new LevelData<FArrayBox>(current_grid_size,1,IntVect::Zero); 
-            DataIterator dit = (*crseH[lvl]).dataIterator();
+            crseH_raw[lvl] = new LevelData<FArrayBox>(
+                grids,
+                1,
+                IntVect::Zero
+            );
+            DataIterator dit = crseH_raw[lvl]->dataIterator();
             for (dit.begin(); dit.ok(); ++dit)
-              {
-                (*crseH[lvl])[dit].setVal(1000.0);
-              }
-          }
-      }
+            {
+                (*crseH_raw[lvl])[dit].setVal(1000.0);
+            }
+        }
+    }
+    CH_assert(finestLevel >= 0);
+    const int numActiveLevels = finestLevel + 1;
+    // Compact H vector: no NULL entries.
+    Vector<LevelData<FArrayBox>* > crseH(numActiveLevels, NULL);
+    for (int lvl = 0; lvl < numActiveLevels; ++lvl)
+    {
+        CH_assert(crseH_raw[lvl] != NULL);
+        crseH[lvl] = crseH_raw[lvl];
+    }
+    // Compact velocity vector the same way.
+    const Vector<LevelData<FArrayBox>* >& crseVel_raw = amrObjectCrse.amrVelocity();
+    Vector<LevelData<FArrayBox>* > crseVel(numActiveLevels, NULL);
+    for (int lvl = 0; lvl < numActiveLevels; ++lvl)
+    {
+        CH_assert(crseVel_raw[lvl] != NULL);
+        crseVel[lvl] = crseVel_raw[lvl];
+    }
+    pout() << "PFASST active BISICLES AMR levels = "
+          << numActiveLevels
+          << ", crse.amr.maxLevel = "
+          << crselevel
+          << endl;  
 
-    const Vector<LevelData<FArrayBox>* >& crseVel = amrObjectCrse.amrVelocity();
+
+    // const Vector<LevelData<FArrayBox>* >& crseVel = amrObjectCrse.amrVelocity();
     for (int i=0; i<numCrseIntervals; i++)
       {
         reshapeAndFill(crseStateVect[i].ice_thickness, crseH);

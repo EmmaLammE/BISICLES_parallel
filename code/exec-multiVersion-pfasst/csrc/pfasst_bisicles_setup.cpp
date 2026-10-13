@@ -9,6 +9,15 @@ void Pf_Bisicles_setHolders(AmrIce* amrObjectPtr,
 {
     AmrIceHolderPtr->SetAmrIceObjPtr(amrObjectPtr);
 
+    // EL 5.15.2026
+    CH_assert(H.size() > 0);
+    CH_assert(Vel.size() >= H.size());
+    for (int lvl = 0; lvl < H.size(); ++lvl)
+    {
+        CH_assert(H[lvl] != NULL);
+        CH_assert(Vel[lvl] != NULL);
+    }
+
     IceSheetState iceState;
     reshapeAndFill(iceState.ice_thickness, H);
     reshapeAndFill(iceState.ice_velocity,Vel);

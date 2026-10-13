@@ -22,8 +22,9 @@
 
 SurfaceFlux* ISMIP6OceanForcing::new_surfaceFlux() 
 {
-    ISMIP6OceanForcing* ptr = new ISMIP6OceanForcing(*this);
-    return static_cast<SurfaceFlux*>(ptr);
+  // relies on the default copy constructor
+  ISMIP6OceanForcing* ptr = new ISMIP6OceanForcing(*this);
+  return static_cast<SurfaceFlux*>(ptr);
 }
 
 
@@ -67,20 +68,29 @@ ISMIP6OceanForcing::ISMIP6OceanForcing(ParmParse& a_pp)
   m_dz = 60.0; // ISMIP6 default (metres)
   a_pp.query("dz",m_dz);
 
+  m_basin_mean_min_thickness = 0.0;
+  a_pp.query("basin_mean_min_thickness", m_basin_mean_min_thickness);
+
+  
   m_local = true;
   a_pp.query("local", m_local);
 
-  if (m_local)
-    {
-      m_gamma0 = 11075.4506451341 ; // ISMIP6 local default
-    }
-  else
-    {
-      m_gamma0 = 14477.3367602277 ; // ISMIP6 non-local default
-      CH_assert( m_basin_file != "");
-    }
+  {
+    // default value for factor in the formula
+    // src = factor * |Tf + delta_T|(Tf + delta_T)
+    //ISMIP6 local/non-local defaults for gamma
+    Real gamma0 = (m_local)?11075.4506451341:14477.3367602277;
+    a_pp.query("gamma0", gamma0);
+    // \todo something sensible with constants
+    Real rhoi = 918.0;
+    Real rhoo = 1028.0;
+    Real L = 3.34e+5;
+    Real Cp = 3974.0;
+    m_factor = - gamma0 * std::pow( (rhoo * Cp) / (rhoi * L), 2);
+  }
 
-  a_pp.query("gamma0", m_gamma0);
+  // allow user to set factor directly
+  a_pp.query("factor", m_factor);
   
   /// populate the time -> file map
   for (int year = m_start_year; year <= m_end_year; year++)
@@ -98,55 +108,14 @@ ISMIP6OceanForcing::ISMIP6OceanForcing(ParmParse& a_pp)
   m_uniform_source = RefCountedPtr<LevelData<FArrayBox> >(new LevelData<FArrayBox>);
 }
 
-ISMIP6OceanForcing::ISMIP6OceanForcing(const ISMIP6OceanForcing& a)
-{
-  //the assumption here is that we are creating
-  //aliases of the large data,
-  //rather than deep copies. I think that should work out.
-
-  m_anomaly = a.m_anomaly;
-  m_gamma0 = a.m_gamma0;
-  m_dx = a.m_dx;
-
-  //TF data
-  m_year_file = a.m_year_file;
-  m_start_year = a.m_start_year;
-  m_end_year = a.m_end_year;
-  m_name = a.m_name;
-  m_n_layer = a.m_n_layer;
-  m_dz = a.m_dz;
-  
-  // basin mask data
-  m_basin_file = a.m_basin_file;
-  m_basin_var_name = a.m_basin_var_name;
-  m_n_basin = a.m_n_basin;
-  m_basin_mask = a.m_basin_mask;
-
-  // deltaT data
-  m_deltaT_file = a.m_deltaT_file;
-  m_deltaT_var_name = a.m_deltaT_var_name;
-  m_deltaT = a.m_deltaT;
-
-  // source (= -melt) on uniform mesh (level 0)
-  m_uniform_source = a.m_uniform_source;
-  m_uniform_source_year = a.m_uniform_source_year;
-   
-}
-
 void ISMIP6OceanForcing::computeSource
 (LevelData<FArrayBox>& a_source,
  LevelData<FArrayBox>& a_TFb,
  LevelData<FArrayBox>& a_TFb_basin_mean,
  LevelData<FArrayBox>& a_deltaT,
- Real a_gamma0)
+ Real a_factor)
 {
-  // \todo something sensible with constants
-  Real rhoi = 918.0;
-  Real rhoo = 1028.0;
-  Real L = 3.34e+5;
-  Real Cp = 3974.0;
-  
-  Real factor = - a_gamma0 * std::pow( (rhoo * Cp) / (rhoi * L), 2);
+
   
   const DisjointBoxLayout& grids = a_source.disjointBoxLayout(); 			      
   for (DataIterator dit(grids); dit.ok(); ++dit)
@@ -155,9 +124,9 @@ void ISMIP6OceanForcing::computeSource
       for (BoxIterator bit(b); bit.ok(); ++bit)
 	{
 	  const IntVect& iv = bit();
-	  a_source[dit](iv) = factor
+	  a_source[dit](iv) = a_factor
 	    * (a_TFb[dit](iv) + a_deltaT[dit](iv))
-	    * (a_TFb_basin_mean[dit](iv) + a_deltaT[dit](iv));
+	    * Abs(a_TFb_basin_mean[dit](iv) + a_deltaT[dit](iv));
 	}
     }
 }
@@ -309,7 +278,7 @@ void ISMIP6OceanForcing::readUniformSource
     }
   else
     {
-      computeSource(*a_source, *TFb, *TFb_basin_mean, deltaT,  m_gamma0);
+      computeSource(*a_source, *TFb, *TFb_basin_mean, deltaT,  m_factor);
     }
   
 }
@@ -362,7 +331,7 @@ void ISMIP6OceanForcing::computeBasinMeans(LevelData<FArrayBox>&a_TFb_basin_mean
 	  for (BoxIterator bit(bx); bit.ok(); ++bit)
 	    {
 	      const IntVect& iv = bit();
-	      if ( (h[dit](iv) > 0.0)
+	      if ( (h[dit](iv) > m_basin_mean_min_thickness)
 		   && (s[dit](iv) > h[dit](iv) + b[dit](iv) ) )
 		{
 		  basin_shelf_mask[dit](iv) = a_basin_mask[dit](iv,i_basin);

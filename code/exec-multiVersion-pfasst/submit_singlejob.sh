@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=mmp
-#SBATCH --time=2-00:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH -p serc
 #SBATCH --mem-per-cpu=16GB
 #SBATCH --cpus-per-task=8
@@ -8,6 +8,13 @@
 #SBATCH -o ./sbatch_outputs/out_pf_mmp_t1s1.out
 #SBATCH -e ./sbatch_outputs/err_pf_mmp_t1s1.err
 
+# unset unnecessary mem flag
+echo "Before unset:"
+env | grep -E 'SLURM_MEM' | sort
+unset SLURM_MEM_PER_NODE
+unset SLURM_MEM_PER_GPU
+echo "After unset:"
+env | grep -E 'SLURM_MEM' | sort
 
 start_time=$(date +%s)
 date +"Job started at: %Y-%m-%d %H:%M:%S"

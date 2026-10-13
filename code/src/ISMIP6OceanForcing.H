@@ -59,9 +59,10 @@ protected:
   std::string m_basin_file, m_basin_var_name;
   std::string m_deltaT_file,  m_deltaT_var_name;
   bool m_anomaly, m_local;
-  Real m_gamma0;
+  Real m_factor, m_basin_mean_min_thickness;
   bool m_tf_is_source;
   
+
   //- 1.0 * melt rate on a uniform mesh
   RefCountedPtr<LevelData<FArrayBox> > m_uniform_source;
   // mesh spacing of m_uniform_source
@@ -108,23 +109,7 @@ protected:
 			   int a_year,
 			   const AmrIceBase& a_amrIce);
     
-  
-
-
-  
-private:
-
-
-  
-  // Disallowed for all the usual reasons
-  void operator=(const ISMIP6OceanForcing& a_input)
-  {
-    MayDay::Error("invalid operator");
-  }
-  
-  // public interfaces disallowed for all the usual reasons
-  ISMIP6OceanForcing(const ISMIP6OceanForcing& a);
-
+   
 };
 
 

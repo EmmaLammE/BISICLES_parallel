@@ -107,7 +107,8 @@ void FORTRAN_NAME( COLUMNTHERMODYAMICSSETCONSTANTS ,columnthermodyamicssetconsta
       ,CHFp_CONST_REAL(a_water_fraction_max)
       ,CHFp_CONST_REAL(a_water_drain_factor)
       ,CHFp_CONST_REAL(a_till_water_drain_factor)
-      ,CHFp_CONST_REAL(a_till_water_max) );
+      ,CHFp_CONST_REAL(a_till_water_max)
+      ,CHFp_CONST_REAL(a_floating_base_max_heat_flux) );
 
 #define FORT_COLUMNTHERMODYAMICSSETCONSTANTS FORTRAN_NAME( inlineCOLUMNTHERMODYAMICSSETCONSTANTS, inlineCOLUMNTHERMODYAMICSSETCONSTANTS)
 #define FORTNT_COLUMNTHERMODYAMICSSETCONSTANTS FORTRAN_NAME( COLUMNTHERMODYAMICSSETCONSTANTS, columnthermodyamicssetconstants)
@@ -127,7 +128,8 @@ inline void FORTRAN_NAME(inlineCOLUMNTHERMODYAMICSSETCONSTANTS, inlineCOLUMNTHER
       ,CHFp_CONST_REAL(a_water_fraction_max)
       ,CHFp_CONST_REAL(a_water_drain_factor)
       ,CHFp_CONST_REAL(a_till_water_drain_factor)
-      ,CHFp_CONST_REAL(a_till_water_max) )
+      ,CHFp_CONST_REAL(a_till_water_max)
+      ,CHFp_CONST_REAL(a_floating_base_max_heat_flux) )
 {
  CH_TIMELEAF("FORT_COLUMNTHERMODYAMICSSETCONSTANTS");
  FORTRAN_NAME( COLUMNTHERMODYAMICSSETCONSTANTS ,columnthermodyamicssetconstants )(
@@ -145,7 +147,8 @@ inline void FORTRAN_NAME(inlineCOLUMNTHERMODYAMICSSETCONSTANTS, inlineCOLUMNTHER
       ,CHFt_CONST_REAL(a_water_fraction_max)
       ,CHFt_CONST_REAL(a_water_drain_factor)
       ,CHFt_CONST_REAL(a_till_water_drain_factor)
-      ,CHFt_CONST_REAL(a_till_water_max) );
+      ,CHFt_CONST_REAL(a_till_water_max)
+      ,CHFt_CONST_REAL(a_floating_base_max_heat_flux) );
 }
 #endif  // GUARDCOLUMNTHERMODYAMICSSETCONSTANTS 
 

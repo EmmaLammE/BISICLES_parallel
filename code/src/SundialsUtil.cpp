@@ -76,38 +76,38 @@ void reshapeAndFill(Vector<LevelData<FArrayBox>* >& a_dest,
   
   for (int lev=0; lev<a_src.size(); lev++)
     {
-      // eventually can be clever and not reshape level 0, just do a copy
-      // (since level 0 grids never change)
-
-      // don't do anything if a_src[lev] is NULL
-      if (a_src[lev] == NULL)
+      // only do any of this if a_src[lev] exists
+      if (a_src[lev] != NULL)
         {
-          if (a_dest[lev] != NULL)
-            {
-              delete a_dest[lev];
-              a_dest[lev] = NULL;
-            }
-        } // end if src[lev] is NULL
-      else
-        {
+          // eventually can be clever and not reshape level 0, just do a copy
+          // (since level 0 grids never change)
           // if we need to, allocate a LevelData here
           if (a_dest[lev] == NULL)
             {
               a_dest[lev] = new LevelData<FArrayBox>;
             }
-          
-          reshapeAndFill(*a_dest[lev], *a_src[lev]);
-        }
-    } // end loop over levels
+          if (a_src[lev]->isDefined())
+            {
+              reshapeAndFill(*a_dest[lev], *a_src[lev]);
+            }
+        } // end if a_src[lev] isn't NULL
+      else
+        {
+          // if a_src is null but a_dest isn't go ahead and free that
+          // to bring src and dest into sync
+          if (a_dest[lev] != NULL)
+            {
+              delete a_dest[lev];
+              a_dest[lev] = NULL;
+            }
+        } // end if a_src[lev] is NULL
+    }
 
   // if there are any extra levels in dest, delete them
   for (int lev=a_src.size(); lev<a_dest.size(); lev++)
     {
-      if (a_dest[lev] != NULL)
-        {
-          delete a_dest[lev];
-          a_dest[lev] = NULL;
-        }
+      delete a_dest[lev];
+      a_dest[lev] = NULL;
     }
 }
 
@@ -121,17 +121,14 @@ void reshapeAndFill(LevelData<FArrayBox>& a_dest,
   IntVect ghostVect = a_src.ghostVect();
   int nComp = a_src.nComp();
 
-  // only do this if grids is defined
-  if (grids.isClosed())
+  a_dest.define(grids, nComp, ghostVect);
+  // now do a fab-by-fab copy to get any ghost cells as well
+  DataIterator dit = grids.dataIterator();
+  for (dit.begin(); dit.ok(); ++dit)
     {
-      a_dest.define(grids, nComp, ghostVect);
-      // now do a fab-by-fab copy to get any ghost cells as well
-      DataIterator dit = grids.dataIterator();
-      for (dit.begin(); dit.ok(); ++dit)
-        {
-          a_dest[dit].copy(a_src[dit]);
-        }
+      a_dest[dit].copy(a_src[dit]);
     }
+
 }
 
 
@@ -148,7 +145,7 @@ void reshape(Vector<LevelData<FArrayBox>* >& a_dest,
     }
 
   // if a_dest was defined, it needs to be at least as big as src
-  CH_assert(a_dest.size() >= a_src.size()); // check if dest size >= src size
+  CH_assert(a_dest.size() >= a_src.size());
   // if a_dest size > a_src size, do we need to resize, or can we just
   // delete finer levels (assume the latter for now)
   // cout<<"in reshape in sundial, asrc size "<<a_src.size()<<", adest size "<<a_dest.size()<<endl;
@@ -185,7 +182,6 @@ void reshape(LevelData<FArrayBox>& a_dest,
   const DisjointBoxLayout& grids = a_src.getBoxes();
   IntVect ghostVect = a_src.ghostVect();
   int nComp = a_src.nComp();
-  // cout<<"  a_src.getBoxes "<<a_src.getBoxes()<<endl;
 
   // only do this if grids are defined
   if (grids.isClosed())

@@ -92,10 +92,12 @@ module pfasst_main
      call pf_mpi_create(comm, pf_comm_fromBisicles)
      !>  Create the pfasst structure
      call pf_pfasst_create(pf, comm, fname=pf_fname) !< o
+     print *, 'created pf pfasst '
      
      !> ----- initialize the vectors & solvers for later, not initial condition of setting values -----
-      call PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,evolve_velocity_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
-
+     call PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,evolve_velocity_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
+     print *, 'initilized pfasst bisicles '
+     
      if (PF_VERBOSE) then
        call print_loc_options(pf, pf_comm_fromBisicles)
      end if
@@ -103,17 +105,18 @@ module pfasst_main
      
      !>  Add some hooks for output
      call pf_add_hook(pf, -1, PF_POST_ITERATION, echo_error)
+     print *, 'added hook '
      !> setup initial condition
      level_index = 1
      !> Set the initial condition
      call bvf%create_single(y_0_base, level_index, lev_shape(level_index,:))
      call bvf%create_single(y_end_base, level_index, lev_shape(level_index,:))
      call bvf%create_single(y_test_base, level_index, lev_shape(level_index,:))
- 
+     print *, 'created single init condition '
      y_0 = cast_as_bisicles_vector(y_0_base)
      y_end = cast_as_bisicles_vector(y_end_base)
      y_test = cast_as_bisicles_vector(y_test_base)
- 
+     print *, 'casted as bisicles vector '
      !> intialize y_0 and y_end to some value
      y_0_IC = 1.0_pfdp
      y_end_IC = 10.7_pfdp

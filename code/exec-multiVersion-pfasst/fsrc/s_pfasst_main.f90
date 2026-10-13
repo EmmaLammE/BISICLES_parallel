@@ -41,7 +41,8 @@ module pfasst_bisicles
     logical(c_bool), intent(in)               :: evolve_velocity_bisicles
    
     type(pf_comm_t) :: comm
-    type(my_sweeper_t) :: sw_finest, sw_lev
+    type(my_sweeper_t) :: sw_finest
+    type(my_sweeper_t), pointer :: sw_lev
     type(my_level_t) :: my_lev
     class(pf_level_t),  pointer :: lev
  
@@ -59,10 +60,10 @@ module pfasst_bisicles
     !> call mpi ??
     call mpi_comm_size(MPI_COMM_WORLD, nproc, error)
     call mpi_comm_rank(MPI_COMM_WORLD, rank,  error)
- 
+    ! print *, 'in PfasstBisiclesInit called mpi '
     !> first update the params from bisicles
     call update_bisicles_params(pf,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,numGridPointsBisicles,evolve_velocity_bisicles, AmrIceHolderPtr)
- 
+    ! print *, 'in PfasstBisiclesInit updated bisibles params '
     !> Loop over levels and set some level specific parameters
     allocate(lev_shape(pf%nlevels,1))
     ! print *, 'in pfasst bisicles init'
@@ -80,10 +81,10 @@ module pfasst_bisicles
        allocate(my_sweeper_t::pf%levels(l)%ulevel%sweeper)
  
        !> setup sweeper solver??
-       sw_lev = cast_as_my_sweeper_t(pf%levels(l)%ulevel%sweeper)
-       call BisiclesSolverInit(sw_lev%c_bisicles_solver_ptr, &
-                         l, &
-                         lev_shape(l,1),cptr_AmrIceHolder)
+      !  sw_lev => cast_as_my_sweeper_t(pf%levels(l)%ulevel%sweeper)
+      !  call BisiclesSolverInit(sw_lev%c_bisicles_solver_ptr, &
+      !                   l, &
+      !                   lev_shape(l,1), cptr_AmrIceHolder)
       !  print *, 'after bisicles solver init'
       !  call pf%levels(pf%state%finest_level)%Q(1)%eprint()
        !>  Set the size of the data on this level (here just one)
@@ -93,12 +94,13 @@ module pfasst_bisicles
     end do
     !>  Set up some pfasst stuff
     ! level = 1 -> tauQ=8; level = 2 -> tauQ=16, no third level???
-    ! print *, 'before pfasst set up'
+    print *, 'before pfasst set up'
     ! call pf%levels(pf%nlevels)%Q(1)%eprint()
+    ! print *, 'print out levels'
     call pf_pfasst_setup(pf)
     ! print *, '--------------------------- done pf additional setup ---------------------------------'
     ! lev => pf%levels(2)
-    ! print *, 'after pfasst set up, tauQ allocated ',allocated(pf%levels(2)%tauQ),'  print Q(1)'
+    print *, 'after pfasst set up, tauQ allocated ', allocated(pf%levels(pf%nlevels)%tauQ)
     ! call pf%levels(pf%nlevels)%Q(1)%eprint()
  
   end subroutine PfasstBisiclesInit
@@ -127,7 +129,12 @@ module pfasst_bisicles
     Tfin = Tfin_bisicles
     maxStep = maxStep_bisicles
     evolve_velocity = evolve_velocity_bisicles
- 
+    
+    ! EL 5.15.2026
+    if (numGridPointsBisicles <= 0) then
+       print *, 'ERROR: numGridPointsBisicles passed from driver is ', numGridPointsBisicles
+       call pf_stop(__FILE__, __LINE__, 'invalid numGridPointsBisicles=', numGridPointsBisicles)
+    endif
     num_grid_points=numGridPointsBisicles
  
  
