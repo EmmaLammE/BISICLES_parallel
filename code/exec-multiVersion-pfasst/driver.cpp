@@ -94,7 +94,7 @@ int ierr = 0;
 int rank, number_procs;
 int new_space_rank, new_space_size, new_time_rank, new_time_size;
 #ifdef CH_USE_PETSC
-  ierr = PetscInitialize(&argc, &argv,PETSC_NULL,PETSC_NULL); CHKERRQ(ierr);
+  ierr = PetscInitialize(&argc, &argv,PETSC_NULLPTR,PETSC_NULLPTR); CHKERRQ(ierr);
 #else
   #ifdef CH_MPI
     // MPI_Comm sub_comm;

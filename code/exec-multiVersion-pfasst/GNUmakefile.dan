@@ -1,5 +1,5 @@
 # -*- Mode: Makefile -*- 
-LIBPFASST = /global/homes/e/emmaliu/PFASST_icesheet
+LIBPFASST = ../../../PFASST_icesheet
 USE_PFASST = TRUE
 MPI = TRUE
 HDF5 = TRUE
@@ -24,7 +24,8 @@ driver:  libbike
 
 include ../mk/Make.defs
 FFLAGS  += -I$(LIBPFASST)/include
-FFLAGS  += -I$(LIBPFASST)/build 
+FFLAGS  += -I$(LIBPFASST)/build
+FFLAGS  += -I/usr/lib/x86_64-linux-gnu/mpich/include
 # FFLAGS  += -I/include
 LDFLAGS += -lstdc++ -lquadmath #-lmpi_mpifh #
 # LDFLAGS += -L/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/13/gcc/aarch64-apple-darwin22/13 -lgcc
@@ -37,7 +38,7 @@ LDFLAGS += "-Wl,--copy-dt-needed-entries"
 # LDFLAGS += -L$(LIBOMP)/lib -fopenmp
 # CPPFLAGS+= -I$(LIBOMP)/include
 
-FFLAGS  += -ffree-line-length-none
+FFLAGS  += -ffree-line-length-none -I/usr/lib/x86_64-linux-gnu/mpich/include
 include .depend
 include $(LIBPFASST)/.depend
 # LIBFLAGS  +=  -L$(LIBBISICLE)/d/2d.Darwin.64.mpicxx.mpifort.DEBUG.MPI/
@@ -59,8 +60,8 @@ libclean:
 
 #LIBFLAGS := -L../lib/ -lBisicles$(config)  $(LIBFLAGS)
 LIBFLAGS := -L../lib/ -lBisicles$(config)  $(LIBFLAGS) -L$(LIBPFASST)/lib -lpfasst -L$(LIBGFORTRAN) -lgfortran
-LIBFLAGS += -I$(LIBPFASST)/build -I$(LIBPFASST)/include -I/include
-LIBFLAGS += -lstdc++ $(LIBPFASST)/lib/libpfasst.a
+LIBFLAGS += -I$(LIBPFASST)/build -I$(LIBPFASST)/include -I/include -I/usr/lib/x86_64-linux-gnu/mpich/include
+LIBFLAGS += -lstdc++ $(LIBPFASST)/lib/libpfasst.a 
 
 
 
