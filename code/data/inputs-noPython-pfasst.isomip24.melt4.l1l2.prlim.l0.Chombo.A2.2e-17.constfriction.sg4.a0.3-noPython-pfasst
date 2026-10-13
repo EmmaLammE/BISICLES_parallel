@@ -67,6 +67,10 @@ BasalFrictionPressureLimitedLaw.basalFrictionRelation = powerLaw
 BasalFrictionPowerLaw.m = 0.3333
 BasalFrictionPowerLaw.includeEffectivePressure = false
 
+#this should be consistent for both coarse and fine (and is read
+# in a way which means we have to be this way)
+amr.grounding_line_subdivision = 4
+
 #physical constants
 constants.ice_density=918.0
 constants.sea_water_density=1028.0
@@ -98,8 +102,9 @@ main.numCrseIntervals = 4
 crse.amr.num_cells = 200 20 10 
 crse.amr.is_periodic = 0 0 0
 
-
-crse.amr.grounding_line_subdivision = 4
+#this should be consistent for both coarse and fine (and is read
+# in a way which means we have to be this way)
+#crse.amr.grounding_line_subdivision = 4
 
 crse.amr.maxLevel = 10 # finest level allowed in simulation
 crse.amr.ref_ratio = 2 2 2 2 2 2 2 2 2 2 2
@@ -139,7 +144,7 @@ crse.amr.verbosity = 5
 crse.amr.velocity_solver_type = 1
 
 #initial guess 
-crse.amr.evolve_velocity = false
+#crse.amr.evolve_velocity = false
 crse.amr.do_initial_velocity_guess = 1
 crse.amr.do_initial_velocity_solve = 1
 crse.amr.initial_velocity_guess_type = 1 # linear PDE
@@ -170,6 +175,8 @@ crse.amr.check_prefix = chk.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.co
 crse.amr.check_overwrite = 0
 crse.amr.verbosity = 5
 
+crse.amr.use_ppm_for_face_values = true
+
 # uncomment these lines and fill in name of checkpoint file to restart
 # from checkpoint (for experiments rather than spinup)
 #crse.amr.restart_file = ../data/chk.isomip24.spin.l1l2.prlim.l4.Chombo.A2.2e-17.constfriction.sg4.a0.3.300000.2d.hdf5
@@ -181,14 +188,15 @@ crse.amr.verbosity = 5
 #  FINE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numFineIntervals = 10
+main.numFineIntervals = 4
 
 #AMR mesh options
 fine.amr.num_cells = 200 20 10 
 fine.amr.is_periodic = 0 0 0
 
 
-fine.amr.grounding_line_subdivision = 4
+# this is defined outside of coarse and fine
+#fine.amr.grounding_line_subdivision = 4
 
 fine.amr.maxLevel = 10 # finest level allowed in simulation
 fine.amr.ref_ratio = 2 2 2 2 2 2 2 2 2 2 2
@@ -222,7 +230,7 @@ fine.amr.grounding_line_tagging_min_vel = 0
 #misc options
 fine.amr.verbosity = 5
 #fine.amr.velocity_solve_interval = 1
-
+fine.amr.use_ppm_for_face_values = true
 
 #velocity solve type -- 0 = Picard, 1 = JFNK
 fine.amr.velocity_solver_type = 1
