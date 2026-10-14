@@ -80,7 +80,7 @@ module encap
          type(c_ptr), value :: x ! vector to be packed
          type(c_ptr), value :: c_AmrIceHolderPtr
          type(c_ptr) :: z ! packed x is stored in z
-         integer, value :: level_id
+         integer(c_int), value :: level_id
       end function
  
       subroutine BisiclesVectorUnpack(x, z, c_AmrIceHolderPtr) bind(c, name="BisiclesVectorUnpack")
@@ -260,11 +260,13 @@ contains
     type(c_ptr) :: z_ptr_test
     type(c_ptr) :: z_c_ptr
     integer(c_int) :: num_grid_points
-    integer :: level_id
+    integer(c_int) :: level_id
 
    !  do level_id = 1, 1
     ! EL - packing should be correct now, without amr
-      z_c_ptr = BisiclesVectorPack(this%c_encap_ptr,cptr_AmrIceHolder,flags)
+      level_id = 0_c_int
+      if (present(flags)) level_id = int(flags, c_int)
+      z_c_ptr = BisiclesVectorPack(this%c_encap_ptr,cptr_AmrIceHolder,level_id)
       num_grid_points = BisiclesCurrentVectorSize(this%c_encap_ptr)
       call c_f_pointer(z_c_ptr, z_ptr, [num_grid_points]) ! convert z_c_ptr to z_ptr
    !  end do

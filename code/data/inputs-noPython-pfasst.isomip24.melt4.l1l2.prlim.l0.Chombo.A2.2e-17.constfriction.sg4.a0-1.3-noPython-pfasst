@@ -191,7 +191,7 @@ crse.amr.use_ppm_for_face_values = true
 main.numFineIntervals = 4
 
 #AMR mesh options
-fine.amr.num_cells = 200 20 10 
+fine.amr.num_cells = 400 40 20 
 fine.amr.is_periodic = 0 0 0
 
 
@@ -212,8 +212,8 @@ fine.amr.max_box_size = 40 # largest box length allowed
 
 
 fine.amr.temporal_accuracy = 1
-fine.amr.cfl = 0.1 
-fine.amr.initial_cfl = 0.1 
+fine.amr.cfl = 0.01 
+fine.amr.initial_cfl = 0.01 
 fine.amr.max_dt_grow_factor = 1.0 
 fine.amr.time_step_ticks = 0
 
@@ -276,12 +276,12 @@ fine.amr.verbosity = 5
 #  PFASST related params
 #####################################################
 
-pf.USE_PF = false
+pf.USE_PF = TRUE
 pf.PF_VERBOSE = TRUE
 pf.pf_plot_prefix = pf_
-pf.pf_num_procs_per_time = 1
+pf.pf_num_procs_per_time = 4
 pf.pf_num_repeats = 1
-pf.num_time_procs = 1
+pf.num_time_procs = 2
 
 
 

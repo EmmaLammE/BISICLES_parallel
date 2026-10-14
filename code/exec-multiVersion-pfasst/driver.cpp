@@ -1082,7 +1082,20 @@ FineInterp::s_default_boundary_limit_type = 0;
             DataIterator dit = crseH_raw[lvl]->dataIterator();
             for (dit.begin(); dit.ok(); ++dit)
             {
-                (*crseH_raw[lvl])[dit].setVal(1000.0);
+                // (*crseH_raw[lvl])[dit].setVal(1000.0); // setting whole thickness field to 1000 m
+                
+               // Get the thickness already initialized from the input.      
+                Vector<LevelData<FArrayBox>* > inputH;
+                amrObjectCrse.amrThickness(inputH);
+                
+                const int numActiveLevels = amrObjectCrse.finestLevel() + 1;
+                // Keep an independent snapshot of the active AMR levels.
+                Vector<LevelData<FArrayBox>* > crseH(numActiveLevels, NULL);
+                for (int lvl = 0; lvl < numActiveLevels; ++lvl)
+                {
+                    crseH[lvl] = new LevelData<FArrayBox>;
+                    reshapeAndFill(*crseH[lvl], *inputH[lvl]);
+                }
             }
         }
     }

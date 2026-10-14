@@ -96,7 +96,7 @@ CalvingModel.front_hi = 1 0
 #  CRSE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numCrseIntervals = 4
+main.numCrseIntervals = 4000
 
 #AMR mesh options
 crse.amr.num_cells = 200 20 10 
@@ -198,7 +198,7 @@ fine.amr.is_periodic = 0 0 0
 # this is defined outside of coarse and fine
 #fine.amr.grounding_line_subdivision = 4
 
-fine.amr.maxLevel = 10 # finest level allowed in simulation
+fine.amr.maxLevel = 4 #10 # finest level allowed in simulation
 fine.amr.ref_ratio = 2 2 2 2 2 2 2 2 2 2 2
 fine.amr.regrid_interval = 1  # number of timesteps between regridding
 fine.amr.blockFactor = 4      # block factor used in grid generation
@@ -276,7 +276,7 @@ fine.amr.verbosity = 5
 #  PFASST related params
 #####################################################
 
-pf.USE_PF = True
+pf.USE_PF = TRUE
 pf.PF_VERBOSE = TRUE
 pf.pf_plot_prefix = pf_
 pf.pf_num_procs_per_time = 1

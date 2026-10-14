@@ -30,6 +30,7 @@ FFLAGS  += -I$(LIBPFASST)/include
 FFLAGS  += -I$(LIBPFASST)/build 
 FFLAGS  += -I/share/software/user/open/openmpi/4.1.2/lib
 FFLAGS  += -MD -MP -cpp
+FFLAGS += -I./include
 LDFLAGS += -lstdc++ -lquadmath -lmpi_mpifh #
 # LDFLAGS += -L/opt/homebrew/Cellar/gcc/13.1.0/lib/gcc/13/gcc/aarch64-apple-darwin22/13 -lgcc
 LDFLAGS +=  -L$(LIBPFASST)/lib -lpfasst -lmpi

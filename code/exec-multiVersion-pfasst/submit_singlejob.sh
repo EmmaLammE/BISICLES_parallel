@@ -1,12 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=mmp
-#SBATCH --time=3-00:00:00
+#SBATCH --time=1-01:00:00
 #SBATCH -p serc
-#SBATCH --mem-per-cpu=16GB
-#SBATCH --cpus-per-task=8
-#SBATCH --ntasks=1
-#SBATCH -o ./sbatch_outputs/out_pf_mmp_t1s1.out
-#SBATCH -e ./sbatch_outputs/err_pf_mmp_t1s1.err
+#SBATCH --mem-per-cpu=2GB
+#SBATCH --cpus-per-task=2
+#SBATCH --ntasks=8
+#SBATCH -o ./sbatch_outputs/out_pf_mmp_t2s4.out
 
 # unset unnecessary mem flag
 echo "Before unset:"
@@ -19,7 +18,9 @@ env | grep -E 'SLURM_MEM' | sort
 start_time=$(date +%s)
 date +"Job started at: %Y-%m-%d %H:%M:%S"
 
-srun -n 1 ./driver2d.Linux.64.mpicxx.mpifort.DEBUG.MPI.ex ../data/inputs-noPython-pfasst.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst
+# srun -n 1 ./driver2d.Linux.64.mpicxx.mpifort.DEBUG.MPI.ex ../data/inputs-noPython-pfasst.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst
+srun -n 8 ./driver2d.Linux.64.mpicxx.mpifort.DEBUG.MPI.ex ../data/inputs-noPython-pfasst.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0-1-1.3-noPython-pfasst
+
 
 end_time=$(date +%s)
 date +"Job ended at: %Y-%m-%d %H:%M:%S"

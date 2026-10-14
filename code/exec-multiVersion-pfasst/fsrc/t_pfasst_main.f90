@@ -121,8 +121,10 @@ module pfasst_main
      y_0_IC = 1.0_pfdp
      y_end_IC = 10.7_pfdp
      
-     call y_end%setval(1000.0_pfdp)
-     call y_0%setval(1000.0_pfdp)
+     !call y_end%setval(1000.0_pfdp)
+     !call y_0%setval(1000.0_pfdp)
+     call BisiclesVectorSetHIC(y_0%c_encap_ptr, AmrIceHolderPtr)
+     call y_end%setval(0.0_pfdp)
      z_c_ptr=pf%cptr_AmrIceHolder
  
      !call y_end%savesnap()

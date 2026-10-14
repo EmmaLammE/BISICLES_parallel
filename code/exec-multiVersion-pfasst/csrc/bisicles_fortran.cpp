@@ -315,6 +315,41 @@ void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, Real* flattened_level
     {
       Vector<LevelData<FArrayBox>* > constH=c_AmrIceHolderPtr->GetAmrH();
       cout<< "bisicles_fortran.cpp done assign H IC size of H "<<constH.size()<< std::endl;
+    
+      CH_assert(bisicles_vector != NULL);
+      CH_assert(c_AmrIceHolderPtr != NULL);
+
+      AmrIce* amr = c_AmrIceHolderPtr->GetAmrIceObjPtr();
+      CH_assert(amr != NULL);
+
+      Vector<LevelData<FArrayBox>* > inputH;
+      amr->amrThickness(inputH);
+
+      const Vector<LevelData<FArrayBox>* >& initialH =
+              bisicles_vector->GetHVector();
+
+      CH_assert(initialH.size() == amr->finestLevel() + 1);
+      CH_assert(inputH.size() >= initialH.size());
+
+      for (int lvl = 0; lvl < initialH.size(); ++lvl)
+      {
+           CH_assert(inputH[lvl] != NULL);
+           CH_assert(initialH[lvl] != NULL);
+           
+           const LevelData<FArrayBox>& src = *inputH[lvl];
+           LevelData<FArrayBox>& dst = *initialH[lvl];
+           
+           CH_assert(src.getBoxes() == dst.getBoxes());
+           CH_assert(src.nComp() == dst.nComp());
+           
+           for (DataIterator dit = dst.dataIterator(); dit.ok(); ++dit)
+           {
+                // Source must cover all destination cells, including ghosts.
+                CH_assert(src[dit].box().contains(dst[dit].box()));
+                dst[dit].copy(src[dit]);
+           }
+      } 
+    
     }
 
 
