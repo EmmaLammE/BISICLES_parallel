@@ -9,7 +9,7 @@ main.poutBaseName=pout.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfrictio
 
 
 # time stepping
-main.maxTime = 100  # maximum time to run to
+main.maxTime = 50  # maximum time to run to
 main.maxStep = 9999999   # maximum number of steps to runx
 
 
@@ -96,7 +96,7 @@ CalvingModel.front_hi = 1 0
 #  CRSE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numCrseIntervals = 4
+main.numCrseIntervals = 16
 
 #AMR mesh options
 crse.amr.num_cells = 200 20 10 
