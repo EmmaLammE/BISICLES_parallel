@@ -1,0 +1,128 @@
+Before unset:
+SLURM_MEM_PER_CPU=1024
+After unset:
+SLURM_MEM_PER_CPU=1024
+Job started at: 2026-10-14 12:22:58
+No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
+ opening file pfasst_params.nml  for input
+ opening file pfasst_params.nml  for input
+ opening file pfasst_params.nml  for input
+ opening file pfasst_params.nml  for input
+ opening file pfasst_params.nml  for input
+ opening file pfasst_params.nml  for input
+ opening file pfasst_params.nml  for input
+ opening file pfasst_params.nml  for input
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ created pf pfasst 
+ before pfasst set up
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+ created pf pfasst 
+ created pf pfasst 
+ before pfasst set up
+ before pfasst set up
+ created pf pfasst 
+ before pfasst set up
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+ created pf pfasst 
+ before pfasst set up
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+ created pf pfasst 
+ before pfasst set up
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+ created pf pfasst 
+ before pfasst set up
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+ created pf pfasst 
+ before pfasst set up
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+[2026-10-15T13:23:21.141] error: *** JOB 47808550 ON sh04-03n14 CANCELLED AT 2026-10-15T13:23:21 DUE TO TIME LIMIT ***
+[sh04-09n31:12478:0:12478] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7fc32d7a3950)
+[sh04-06n29:13786:0:13786] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7f26a0fa2950)
+[sh04-06n21:28468:0:28468] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7fca9f56d950)
+[sh04-10n15:40064:0:40064] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7f6a9694d950)
+[sh04-03n15:41309:0:41309] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7f891bb85950)
+[2026-10-15T13:23:21.141] error: *** STEP 47808550.0 ON sh04-03n14 CANCELLED AT 2026-10-15T13:23:21 DUE TO TIME LIMIT ***
+[sh04-06n13:69014:0:69014] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7f95af983950)
+[sh04-06n13:69013:0:69013] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7fd0c2f60950)
+[sh04-09n31:12479:0:12479] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7fcdc3983950)
+[sh04-10n22:19939:0:19939] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7f03a3b85950)
+[sh04-06n15:9798 :0:9798] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7fa1799c9950)
+[sh04-04n14:3298 :0:3298] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7fdd2ab52950)
+[sh04-07n14:28369:0:28369] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7f1b40350950)
+[sh04-10n31:14910:0:14910] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7f8155395950)
+[sh04-03n14:20681:0:20681] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7f3298b94950)
+[sh04-10n22:19940:0:19940] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7ff3457a3950)
+[sh04-10n31:14911:0:14911] Caught signal 11 (Segmentation fault: invalid permissions for mapped object at address 0x7fb947368950)

@@ -1,0 +1,86 @@
+Before unset:
+SLURM_MEM_PER_CPU=16384
+After unset:
+SLURM_MEM_PER_CPU=16384
+Job started at: 2026-10-12 09:40:55
+ opening file pfasst_params.nml  for input
+ time communicator in pfasst, num of procs for one time step            1 , rank            0
+ created pf pfasst 
+ before pfasst set up
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ ================================================
+ ----------- LibPFASST Parameters ---------------
+ date:        20261012
+ time:        094135.972
+ method:         PFASST
+ double precision:              8   bytes
+ quad precision:             16   bytes
+ Output directory: outdirP0001
+ Nprocs:                 1 ! number of pfasst "time" processors
+ Nlevels:                2 ! number of levels
+ Niters:                 5 ! maximum number of sdc/pfasst iterations
+ MINiters:               0 ! Minimum number of sdc/pfasst iterations
+                           ! since 1 time proc is being used, this is a serial sdc run
+ Nnodes:                 2           3 ! number of sdc nodes per level
+ Nsweeps:                1           1 ! number of sdc sweeps performed per visit to each level
+ Nsweeps_pred:                1           1 ! number of sdc sweeps in predictor
+ qtype:           1 ! Gauss Lobatto nodes are used
+ Implicit matrix is LU  
+ The Qmat form of stepping is being done
+ taui0:              -99 ! cutoff for tau correction
+ abs_res_tol:   1.0000000000000000E-014 ! absolute residual tolerance: 
+ rel_res_tol:   1.0000000000000000E-014 ! relative residual tolerance: 
+ mpibuflen:           4000        4000 ! size of data send between time steps
+ V-cycling is on
+ Predictor pipelining is ON    
+ PFASST Predictor style  
+ ==================================================
+  
+ Local Variables
+ ----------------
+ num spatial procs per temporal proc:              1
+ num temporal procs:              1 , rank            0
+ Compute velocity:    F
+ Number of spacial dimensions:              2
+ PFASST parameters read from input file pfasst_params.nml                                                                                                               
+ ==================================================
+ added hook 
+ created single init condition 
+ casted as bisicles vector 
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+Global average run time =    1.866, max =    1.866, min =    1.866 seconds.
+
+#################################################################################
+Summary of performance statistics
+-------------------------------
+  Total num of procs       = 1
+  Total num of time procs  = 1
+  Total num of space procs = 1
+  Proc rank for this instance:  time = 0  space =  0
+Parameters that influence the run speeds (a lot)
+  Compute velocity? = 0
+  Num of time steps = 4
+  Final time        = 2000 years
+  
+Total simulation time using PFASST: ! 2.17131 ! sec
+________________________________________________________________________________________________________
+| Function name (short) |        call counts |     Total duration (sec) |   Ratio of total time (%) |
+--------------------------------------------------------------------------------------------------------
+| Pack                  |                  0 |               0.00000000 |                0.00000000 |
+| Unpack                |                  0 |               0.00000000 |                0.00000000 |
+| setState(FEval)       |                256 |               0.80077879 |               36.88003451 |
+| dHdt(FEval)           |                256 |               0.88340250 |               40.68528689 |
+________________________________________________________________________________________________________
+--------------------------------------------------------------------------------------------------------
+  EL - results saved as: plot.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
+###########################################################################
+##############        EL - End of PFASST simulation     ###################
+###########################################################################
+
+..............Updating fine-grained using serial................
+  results saved as: plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
+
+
