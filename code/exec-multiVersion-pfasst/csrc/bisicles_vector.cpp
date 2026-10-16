@@ -101,7 +101,7 @@ BisiclesVector::BisiclesVector(int num_grid_points, AmrIceHolderClass *c_AmrIceH
    }
 
    reshapeAndFill(iceState.ice_thickness, HVector);
-
+   iceState.time = 0.0;
    // InitGrid(num_grid_points);
    // exit(0);
 }
@@ -445,15 +445,21 @@ void BisiclesVector::HAxpy(double a, BisiclesVector *x,AmrIceHolderClass *c_AmrI
    }
 }
 
-void BisiclesVector::SaveSnapshot(AmrIceHolderClass *c_AmrIceHolderPtr)
+// void BisiclesVector::SaveSnapshot(AmrIceHolderClass *c_AmrIceHolderPtr)
+// {
+//    AmrIce *amrObjHolderPtr;
+//    reshapeAndFill(iceState.ice_thickness, HVector);
+//    c_AmrIceHolderPtr->SetAmrIceState(iceState);
+//    amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
+//    amrObjHolderPtr->writePlotFile(); 
+//    // AmrIO.cpp 192, the prefix is read in at the beginning of the AmrIO as plot_prefix, later edited to filename
+//    // the actual write is in 1015
+// }
+void BisiclesVector::SaveSnapshot(AmrIceHolderClass *c_AmrIceHolderPtr,
+                                  double t_out, double dt_out, int step_out)
 {
-   AmrIce *amrObjHolderPtr;
-   reshapeAndFill(iceState.ice_thickness, HVector);
-   c_AmrIceHolderPtr->SetAmrIceState(iceState);
-   amrObjHolderPtr=c_AmrIceHolderPtr->GetAmrIceObjPtr();
-   amrObjHolderPtr->writePlotFile(); 
-   // AmrIO.cpp 192, the prefix is read in at the beginning of the AmrIO as plot_prefix, later edited to filename
-   // the actual write is in 1015
+   AmrIce* amr = c_AmrIceHolderPtr->GetAmrIceObjPtr();
+   amr->writeExternalStatePlot(HVector, t_out, dt_out, step_out);
 }
 
 void BisiclesVector::PrintLevelData(Vector<LevelData<FArrayBox>* > level_data_to_print)
