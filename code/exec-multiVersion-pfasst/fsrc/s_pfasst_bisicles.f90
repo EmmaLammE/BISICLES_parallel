@@ -10,6 +10,7 @@ module pfasst_bisicles
   use pf_mod_mpi
   use pf_mod_comm_mpi
   use pf_mod_comm
+  use, intrinsic :: iso_c_binding, only: c_double, c_int
   implicit none
  
  
@@ -154,32 +155,61 @@ module pfasst_bisicles
    end subroutine update_bisicles_params
  
  
-  subroutine pfasst_bisicles_save_results(pf, AmrIceHolderPtr)
-    type(pf_pfasst_t), intent(in),target           :: pf
-    type(c_ptr), intent(in)                 :: AmrIceHolderPtr
-    integer :: temp_level_to_save
-    integer :: snapshot_to_save
+  ! subroutine pfasst_bisicles_save_results(pf, AmrIceHolderPtr)
+  !   type(pf_pfasst_t), intent(in),target           :: pf
+  !   type(c_ptr), intent(in)                 :: AmrIceHolderPtr
+  !   integer :: temp_level_to_save
+  !   integer :: snapshot_to_save
  
-    type(pf_level_t), pointer :: lev    !!  points to current level
-    class(bisicles_vector_encap), pointer :: y_encap
-    type(c_ptr)      :: c_AmrIceHolderPtr
+  !   type(pf_level_t), pointer :: lev    !!  points to current level
+  !   class(bisicles_vector_encap), pointer :: y_encap
+  !   type(c_ptr)      :: c_AmrIceHolderPtr
  
-    temp_level_to_save=pf%state%finest_level    ! 3 is the finest level
-    snapshot_to_save=3 ! lev%nnodes is some huge num, need to be fixed
+  !   temp_level_to_save=pf%state%finest_level    ! 3 is the finest level
+  !   snapshot_to_save=3 ! lev%nnodes is some huge num, need to be fixed
  
-    lev => pf%levels(temp_level_to_save)   !  Assign level pointer
-    c_AmrIceHolderPtr=pf%cptr_AmrIceHolder
+  !   lev => pf%levels(temp_level_to_save)   !  Assign level pointer
+  !   c_AmrIceHolderPtr=pf%cptr_AmrIceHolder
  
-    y_encap => cast_as_bisicles_vector(lev%Q(snapshot_to_save))
-    !print *, ' saving results... y_encap ID y_encap%c_encap_ptr,',y_encap%c_encap_ptr
-    ! print *, '                    temp_level_to_save,snapshot_to_save',temp_level_to_save,snapshot_to_save
-    ! call y_encap%eprint()
+  !   y_encap => cast_as_bisicles_vector(lev%Q(snapshot_to_save))
+  !   !print *, ' saving results... y_encap ID y_encap%c_encap_ptr,',y_encap%c_encap_ptr
+  !   ! print *, '                    temp_level_to_save,snapshot_to_save',temp_level_to_save,snapshot_to_save
+  !   ! call y_encap%eprint()
    
  
-    call y_encap%savesnap()
-    !call PfasstBisiclesSaveResults(y_encap%c_encap_ptr,c_AmrIceHolderPtr)
+  !   call y_encap%savesnap()
+  !   !call PfasstBisiclesSaveResults(y_encap%c_encap_ptr,c_AmrIceHolderPtr)
  
-  end subroutine pfasst_bisicles_save_results
+  ! end subroutine pfasst_bisicles_save_results
+    subroutine pfasst_bisicles_save_results(pf, AmrIceHolderPtr)
+      type(pf_pfasst_t), intent(in),target           :: pf
+      type(c_ptr), intent(in)                 :: AmrIceHolderPtr
+      integer :: completed_step
+      real(pfdp) :: t_out, time_tolerance
+      type(pf_level_t), pointer :: lev
+      class(bisicles_vector_encap), pointer :: y_encap
+
+      ! Final-only output: select the temporal group holding the last step.
+      ! Every spatial rank in that group must participate in the HDF5 write.
+      completed_step = pf%state%step + 1
+      if (completed_step /= pf%state%nsteps) return
+
+      t_out = pf%state%t0 + pf%state%dt
+      time_tolerance = 100.0_pfdp * epsilon(1.0_pfdp) * &
+                      max(1.0_pfdp, abs(Tfin), abs(t_out))
+      if (.not. (abs(t_out - Tfin) <= time_tolerance)) then
+        print *, 'ERROR: PFASST endpoint time=', t_out, ' expected Tfin=', Tfin
+        call pf_stop(__FILE__, __LINE__, 'invalid final output step=', completed_step)
+      end if
+
+      lev => pf%levels(pf%state%finest_level)
+      y_encap => cast_as_bisicles_vector(lev%qend)
+      ! qend is the computed endpoint; convergence is assessed separately.
+      call y_encap%savesnap(real(t_out, c_double), &
+                          real(pf%state%dt, c_double), &
+                          int(completed_step, c_int))
+  
+    end subroutine pfasst_bisicles_save_results
  
  
   subroutine BisiclesAssignIC(pf,y_0,y_end,y_0_IC,y_end_IC)

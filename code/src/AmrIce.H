@@ -382,6 +382,10 @@ public:
       <plot_root>.<step>.<DIM>d.hdf5
    */
   void writePlotFile();
+  /// Install an external time integrator's endpoint and write a plot file.
+  /// All spatial ranks in this AmrIce object's communicator must call this.
+  void writeExternalStatePlot(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
+                              Real a_time, Real a_dt, int a_completedStep);
   void writeAMRPlotFile();
   /// write checkpoint file out for later restarting
   /** writes checkpoint data to the standard location; filename is

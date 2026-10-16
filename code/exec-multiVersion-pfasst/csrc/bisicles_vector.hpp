@@ -59,7 +59,9 @@ class BisiclesVector:  public AmrIceHolderClass{
       void defineMask(Vector<LevelData<FArrayBox>* > m_amrData, Vector<int> refRatio);
       void PrintHL2norm(void);
       void PrintL2norm(Vector<LevelData<FArrayBox>* > Vect2Print);
-      void SaveSnapshot(AmrIceHolderClass *c_AmrIceHolderPtr);
+      // void SaveSnapshot(AmrIceHolderClass *c_AmrIceHolderPtr);
+      void SaveSnapshot(AmrIceHolderClass *c_AmrIceHolderPtr,
+                        double t_out, double dt_out, int step_out);
       void PrintLevelData(Vector<LevelData<FArrayBox>* > level_data_to_print);
       void PFPrintLevelData(BisiclesVector *x);
       void PrintAllFArray(Vector<LevelData<FArrayBox>* > level_data_to_print);

@@ -75,6 +75,7 @@ using std::string;
 #include "PythonInterface.H"
 #endif
 
+#include "SPMD.H"
 #include "NamespaceHeader.H"
 
 #ifdef CH_USE_HDF5
@@ -193,6 +194,92 @@ AmrIce::writePlotFile()
 {
   if (m_plot_style_cf && m_cur_step > 0 ) flushCFData();
   if (m_plot_style_amr) writeAMRPlotFile();
+}
+
+void
+AmrIce::writeExternalStatePlot(
+    Vector<LevelData<FArrayBox>* >& a_thicknessVect,
+    Real a_time, Real a_dt, int a_completedStep)
+{
+  if (!std::isfinite(a_time) || !std::isfinite(a_dt) ||
+      a_dt <= 0.0 || a_completedStep < 1)
+    {
+      MayDay::Error("Invalid external time-integrator output metadata");
+    }
+
+  // Reject invalid endpoints before the velocity solve.  In particular,
+  // setState must not silently replace negative endpoint thickness by zero.
+  int invalidLocal = (a_thicknessVect.size() != m_finest_level + 1);
+  for (int lev = 0; lev < a_thicknessVect.size(); ++lev)
+    {
+      if (lev > m_finest_level || a_thicknessVect[lev] == NULL ||
+          !a_thicknessVect[lev]->isDefined() ||
+          a_thicknessVect[lev]->nComp() != 1)
+        {
+          invalidLocal = 1;
+          continue;
+        }
+      const LevelData<FArrayBox>& H = *a_thicknessVect[lev];
+      const DisjointBoxLayout& grids = H.disjointBoxLayout();
+      if (!(grids == m_amrGrids[lev]))
+        {
+          invalidLocal = 1;
+          continue;
+        }
+      for (DataIterator dit = H.dataIterator(); dit.ok(); ++dit)
+        for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
+          if (!std::isfinite(H[dit()](bit(), 0)) || H[dit()](bit(), 0) < 0.0)
+            invalidLocal = 1;
+    }
+  int invalidGlobal = invalidLocal;
+#ifdef CH_MPI
+  MPI_Allreduce(&invalidLocal, &invalidGlobal, 1, MPI_INT, MPI_MAX,
+                Chombo_MPI::comm);
+#endif
+  if (invalidGlobal)
+    MayDay::Error("Cannot export PFASST endpoint: invalid/nonfinite/negative "
+                  "thickness or inconsistent fixed-grid layout");
+
+  // setState uses m_dt for boundary conditions.  Set output metadata first.
+  m_dt = a_dt;
+  m_cur_step = a_completedStep;
+
+  // Install the selected endpoint instead of writing the last RHS stage.
+  // Recompute velocity when velocity evolution is enabled, then verify
+  // that BISICLES' geometry/calving handling preserved all valid H values.
+  setState(a_thicknessVect, a_time, true);
+  invalidLocal = 0;
+  for (int lev = 0; lev < a_thicknessVect.size(); ++lev)
+    {
+      const LevelData<FArrayBox>& H = *a_thicknessVect[lev];
+      const LevelData<FArrayBox>& installedH = m_vect_coordSys[lev]->getH();
+      const DisjointBoxLayout& grids = H.disjointBoxLayout();
+      CH_assert(installedH.disjointBoxLayout() == grids);
+      for (DataIterator dit = H.dataIterator(); dit.ok(); ++dit)
+        for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
+          if (!std::isfinite(installedH[dit()](bit(), 0)) ||
+              installedH[dit()](bit(), 0) != H[dit()](bit(), 0))
+            invalidLocal = 1;
+    }
+  invalidGlobal = invalidLocal;
+#ifdef CH_MPI
+  MPI_Allreduce(&invalidLocal, &invalidGlobal, 1, MPI_INT, MPI_MAX,
+                Chombo_MPI::comm);
+#endif
+  if (invalidGlobal)
+    MayDay::Error("Cannot export PFASST endpoint: setState/velocity/calving "
+                  "changed valid-cell thickness");
+
+  // The serial old_thickness field is not PFASST's previous endpoint;
+  // its finite difference would give a misleading dThickness/dt component.
+  const bool write_dHDt = m_write_dHDt;
+  m_write_dHDt = false;
+  writePlotFile();
+  m_write_dHDt = write_dHDt;
+  pout() << "Wrote PFASST endpoint: time=" << a_time
+         << ", dt=" << a_dt << ", completed step=" << a_completedStep
+         << "; installed valid-cell thickness matches qend exactly."
+         << std::endl;
 }
 
 /// write hdf5 plotfile to the standard location
