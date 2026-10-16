@@ -18,10 +18,14 @@ extern "C"
    void BisiclesVectorCopy(BisiclesVector *dest, BisiclesVector *src, \
                           AmrIceHolderClass *c_AmrIceHolderPtr);
    int BisiclesCurrentVectorSize(BisiclesVector *bisicles_vector);
-   Real* BisiclesVectorPack(BisiclesVector *bisicles_vector,\
-                          AmrIceHolderClass *c_AmrIceHolderPtr, int level_id);
-   void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, Real* flattened_array, \
-                          AmrIceHolderClass *c_AmrIceHolderPtr);
+   // Real* BisiclesVectorPack(BisiclesVector *bisicles_vector,\
+   //                        AmrIceHolderClass *c_AmrIceHolderPtr, int level_id);
+   // void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, Real* flattened_array, \
+   //                        AmrIceHolderClass *c_AmrIceHolderPtr);
+   void BisiclesVectorPack(BisiclesVector *bisicles_vector, double *buffer,
+                           int nbuf, AmrIceHolderClass *c_AmrIceHolderPtr);
+   void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, const double *buffer,
+                             int nbuf, AmrIceHolderClass *c_AmrIceHolderPtr);
    double BisiclesVectorNorm(BisiclesVector *bisicles_vector, \
                           AmrIceHolderClass *c_AmrIceHolderPtr);
    void BisiclesVectorAxpy(BisiclesVector *y, double a, BisiclesVector *x, \
@@ -44,9 +48,11 @@ extern "C"
    void BisiclesSolverFEval(BisiclesdHdtSolver *BisiclesdHdtSolver, BisiclesVector *y, double t, \
       int pfasst_level_index, BisiclesVector *f, double dt,int maxStep,bool evolve_velocity, AmrIceHolderClass *c_AmrIceHolderPtr);
 
-   void PfasstBisiclesSaveResults(BisiclesVector *bisicles_vector, \
-                          AmrIceHolderClass *c_AmrIceHolderPtr);
-   
+   // void PfasstBisiclesSaveResults(BisiclesVector *bisicles_vector, \
+   //                        AmrIceHolderClass *c_AmrIceHolderPtr);
+   void PfasstBisiclesSaveResults(BisiclesVector *bisicles_vector,
+                                 AmrIceHolderClass *c_AmrIceHolderPtr,
+                                 double t_out, double dt_out, int step_out);
    // print out for debugging
    void PfasstPrintAmr(BisiclesVector *y, AmrIceHolderClass *c_AmrIceHolderPtr);
 

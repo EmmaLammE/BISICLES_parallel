@@ -64,6 +64,7 @@
 #include "chombo_pfasst.hpp"
 #include "bisicles_vector.hpp"
 #include "bisicles_fortran.hpp"
+#include "bisicles_packing.hpp"
 #include "bisicles_holder.hpp"
 #include "pfasst_bisicles_setup.hpp"
 #include <chrono>
@@ -1182,33 +1183,38 @@ FineInterp::s_default_boundary_limit_type = 0;
       
       
       // set up vector size (including all amr levels), i.e. total num of cells in all levels
-      ParmParse ppcrseamr("crse.amr");
-      Vector<int> ancells(3); 
-      ppcrseamr.getarr("num_cells", ancells, 0, ancells.size());\
-      int num_of_grids=ancells[0]*ancells[1];
-      int num_total_cells=0;
-      for (int lvl=0; lvl < crseH.size(); lvl++)
-      {
-        if (crseH[lvl] != NULL)
-          {
-            LevelData<FArrayBox>& ldf = *crseH[lvl];
-            DisjointBoxLayout dbl = ldf.disjointBoxLayout();
-            if (dbl.isClosed())
-              {
-                DataIterator dit = ldf.dataIterator();
-                int num_cells_per_lvl = dbl.numCells();
-                num_total_cells += num_cells_per_lvl;
-              }
-          }
-      }
+      // ParmParse ppcrseamr("crse.amr");
+      // Vector<int> ancells(3); 
+      // ppcrseamr.getarr("num_cells", ancells, 0, ancells.size());\
+      // int num_of_grids=ancells[0]*ancells[1];
+      // int num_total_cells=0;
+      // for (int lvl=0; lvl < crseH.size(); lvl++)
+      // {
+      //   if (crseH[lvl] != NULL)
+      //     {
+      //       LevelData<FArrayBox>& ldf = *crseH[lvl];
+      //       DisjointBoxLayout dbl = ldf.disjointBoxLayout();
+      //       if (dbl.isClosed())
+      //         {
+      //           DataIterator dit = ldf.dataIterator();
+      //           int num_cells_per_lvl = dbl.numCells();
+      //           num_total_cells += num_cells_per_lvl;
+      //         }
+      //     }
+      // }
+      // Only local valid cells travel along this spatial rank's time
+      // communicator.  Validate matching ownership and order across time.
+      const int num_local_values = BisiclesPfasstBufferSize(crseH, pf_comm);
       reshape(crsedHdtVect[0],crseH);
       
 
       // call pfasst to solve
       Vector<LevelData<FArrayBox>* > ice_thick=crseStateVect[1].ice_thickness;
       auto start_pf = std::chrono::high_resolution_clock::now();
-      Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,pf_evolve_velocity,\
-              num_total_cells,pf_num_repeats,PF_VERBOSE);
+      // Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,pf_evolve_velocity,\
+      //         num_total_cells,pf_num_repeats,PF_VERBOSE);
+      Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,pf_evolve_velocity,
+              num_local_values,pf_num_repeats,PF_VERBOSE);
       auto end_pf = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> duration_pf = end_pf - start_pf;
       (&AmrIceHolderPtr)->printStatistics(number_procs,new_time_size, new_space_size,new_time_rank,\

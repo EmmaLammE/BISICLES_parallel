@@ -75,19 +75,31 @@ module encap
          integer(c_int) :: vector_size
       end function
       
-      function BisiclesVectorPack(x,c_AmrIceHolderPtr,level_id) result(z) bind(c, name="BisiclesVectorPack")
+      ! function BisiclesVectorPack(x,c_AmrIceHolderPtr,level_id) result(z) bind(c, name="BisiclesVectorPack")
+      !    use iso_c_binding
+      !    type(c_ptr), value :: x ! vector to be packed
+      !    type(c_ptr), value :: c_AmrIceHolderPtr
+      !    type(c_ptr) :: z ! packed x is stored in z
+      !    integer(c_int), value :: level_id
+      ! end function
+      subroutine BisiclesVectorPack(x, z, nbuf, c_AmrIceHolderPtr) bind(c, name="BisiclesVectorPack")
          use iso_c_binding
-         type(c_ptr), value :: x ! vector to be packed
-         type(c_ptr), value :: c_AmrIceHolderPtr
-         type(c_ptr) :: z ! packed x is stored in z
-         integer(c_int), value :: level_id
-      end function
+         type(c_ptr), value :: x, c_AmrIceHolderPtr
+         real(c_double), intent(out) :: z(*)
+         integer(c_int), value :: nbuf
+      end subroutine BisiclesVectorPack
  
-      subroutine BisiclesVectorUnpack(x, z, c_AmrIceHolderPtr) bind(c, name="BisiclesVectorUnpack")
+      ! subroutine BisiclesVectorUnpack(x, z, c_AmrIceHolderPtr) bind(c, name="BisiclesVectorUnpack")
+      !    use iso_c_binding
+      !    type(c_ptr), value :: x
+      !    type(c_ptr), value :: z
+      !    type(c_ptr), value :: c_AmrIceHolderPtr
+      ! end subroutine BisiclesVectorUnpack
+      subroutine BisiclesVectorUnpack(x, z, nbuf, c_AmrIceHolderPtr) bind(c, name="BisiclesVectorUnpack")
          use iso_c_binding
-         type(c_ptr), value :: x
-         type(c_ptr), value :: z
-         type(c_ptr), value :: c_AmrIceHolderPtr
+         type(c_ptr), value :: x, c_AmrIceHolderPtr
+         real(c_double), intent(in) :: z(*)
+         integer(c_int), value :: nbuf
       end subroutine BisiclesVectorUnpack
     
       function BisiclesVectorNorm(x, c_AmrIceHolderPtr) result(norm) bind(c, name="BisiclesVectorNorm")
@@ -121,10 +133,18 @@ module encap
         real(c_double) :: val
       end function
 
-      subroutine PfasstBisiclesSaveResults(y, c_AmrIceHolderPtr) bind(c, name="PfasstBisiclesSaveResults")
-          use iso_c_binding
-          type(c_ptr), value :: y
-          type(c_ptr), value :: c_AmrIceHolderPtr
+      ! subroutine PfasstBisiclesSaveResults(y, c_AmrIceHolderPtr) bind(c, name="PfasstBisiclesSaveResults")
+      !     use iso_c_binding
+      !     type(c_ptr), value :: y
+      !     type(c_ptr), value :: c_AmrIceHolderPtr
+      ! end subroutine PfasstBisiclesSaveResults
+      subroutine PfasstBisiclesSaveResults(y, c_AmrIceHolderPtr, &
+               t_out, dt_out, step_out) &
+         bind(c, name="PfasstBisiclesSaveResults")
+         use iso_c_binding
+         type(c_ptr), value :: y, c_AmrIceHolderPtr
+         real(c_double), value :: t_out, dt_out
+         integer(c_int), value :: step_out
       end subroutine PfasstBisiclesSaveResults
 
       integer function MPI_Comm_c2f(c_handle) bind(C, name="PfasstBisicles_MPI_Comm_c2f")
@@ -252,45 +272,61 @@ contains
   end subroutine bisicles_vector_copy
 
   !> Subroutine to pack into a flat array for sending
+!   subroutine bisicles_vector_pack(this, z, flags)
+!      class(bisicles_vector_encap), intent(in) :: this
+!     real(pfdp), intent(out) :: z(:)
+!     integer, intent(in), optional :: flags
+!     real(pfdp), pointer :: z_ptr(:)
+!     type(c_ptr) :: z_ptr_test
+!     type(c_ptr) :: z_c_ptr
+!     integer(c_int) :: num_grid_points
+!     integer(c_int) :: level_id
+
+!    !  do level_id = 1, 1
+!     ! EL - packing should be correct now, without amr
+!       level_id = 0_c_int
+!       if (present(flags)) level_id = int(flags, c_int)
+!       z_c_ptr = BisiclesVectorPack(this%c_encap_ptr,cptr_AmrIceHolder,level_id)
+!       num_grid_points = BisiclesCurrentVectorSize(this%c_encap_ptr)
+!       call c_f_pointer(z_c_ptr, z_ptr, [num_grid_points]) ! convert z_c_ptr to z_ptr
+!    !  end do
+!       ! print *,'in packing num_grid_points ',num_grid_points,", size of z ",size(z_ptr)
+      
+!       ! do i = 1,1024
+!       ! print *,'size of z_ptr ',i,z_ptr(i)
+!       ! end do
+!     z = z_ptr
+!    !  print *, size(z)
+!   end subroutine bisicles_vector_pack
   subroutine bisicles_vector_pack(this, z, flags)
      class(bisicles_vector_encap), intent(in) :: this
-    real(pfdp), intent(out) :: z(:)
-    integer, intent(in), optional :: flags
-    real(pfdp), pointer :: z_ptr(:)
-    type(c_ptr) :: z_ptr_test
-    type(c_ptr) :: z_c_ptr
-    integer(c_int) :: num_grid_points
-    integer(c_int) :: level_id
+     real(pfdp), intent(out) :: z(:)
+     integer, intent(in), optional :: flags
 
-   !  do level_id = 1, 1
-    ! EL - packing should be correct now, without amr
-      level_id = 0_c_int
-      if (present(flags)) level_id = int(flags, c_int)
-      z_c_ptr = BisiclesVectorPack(this%c_encap_ptr,cptr_AmrIceHolder,level_id)
-      num_grid_points = BisiclesCurrentVectorSize(this%c_encap_ptr)
-      call c_f_pointer(z_c_ptr, z_ptr, [num_grid_points]) ! convert z_c_ptr to z_ptr
-   !  end do
-      ! print *,'in packing num_grid_points ',num_grid_points,", size of z ",size(z_ptr)
-      
-      ! do i = 1,1024
-      ! print *,'size of z_ptr ',i,z_ptr(i)
-      ! end do
-    z = z_ptr
-   !  print *, size(z)
+     ! PFASST owns z.  C++ fills it directly; no allocated C pointer is returned.
+     call BisiclesVectorPack(this%c_encap_ptr, z, size(z, kind=c_int), cptr_AmrIceHolder)
   end subroutine bisicles_vector_pack
 
   !> Subroutine to unpack  after receiving
-  subroutine bisicles_vector_unpack(this, z, flags)
-     class(bisicles_vector_encap), intent(inout) :: this
-     real(pfdp),     intent(in   ) :: z(:)
-     integer,     intent(in   ), optional :: flags
-     real(pfdp), target :: z2(size(z))
-     type(c_ptr) :: z_c_ptr
-      ! print *, "before unpacking z in ",size(z)
-     z2 = z
-     z_c_ptr = c_loc(z2(1))
+!   subroutine bisicles_vector_unpack(this, z, flags)
+!      class(bisicles_vector_encap), intent(inout) :: this
+!      real(pfdp),     intent(in   ) :: z(:)
+!      integer,     intent(in   ), optional :: flags
+!      real(pfdp), target :: z2(size(z))
+!      type(c_ptr) :: z_c_ptr
+!       ! print *, "before unpacking z in ",size(z)
+!      z2 = z
+!      z_c_ptr = c_loc(z2(1))
      
-     call BisiclesVectorUnpack(this%c_encap_ptr, z_c_ptr, cptr_AmrIceHolder);
+!      call BisiclesVectorUnpack(this%c_encap_ptr, z_c_ptr, cptr_AmrIceHolder);
+!   end subroutine bisicles_vector_unpack
+
+  subroutine bisicles_vector_unpack(this, z, flags)
+      class(bisicles_vector_encap), intent(inout) :: this
+      real(pfdp), intent(in) :: z(:)
+      integer, intent(in), optional :: flags
+
+      call BisiclesVectorUnpack(this%c_encap_ptr, z, size(z, kind=c_int), cptr_AmrIceHolder)
   end subroutine bisicles_vector_unpack
 
   !> Subroutine to define the norm of the array (here the abs value)
@@ -362,10 +398,19 @@ contains
 
 
   !> Subroutine to save the snapshot 
-  subroutine savesnap(this) 
-    class(bisicles_vector_encap), intent(inout) :: this
-    call PfasstBisiclesSaveResults(this%c_encap_ptr, cptr_AmrIceHolder)
-  end subroutine savesnap
+!   subroutine savesnap(this) 
+!     class(bisicles_vector_encap), intent(inout) :: this
+!     call PfasstBisiclesSaveResults(this%c_encap_ptr, cptr_AmrIceHolder)
+!   end subroutine savesnap
+   subroutine savesnap(this, t_out, dt_out, step_out)
+      class(bisicles_vector_encap), intent(inout) :: this
+      real(c_double), intent(in) :: t_out, dt_out
+      integer(c_int), intent(in) :: step_out
+
+      call PfasstBisiclesSaveResults(this%c_encap_ptr, &
+                                    cptr_AmrIceHolder, &
+                                    t_out, dt_out, step_out)
+   end subroutine savesnap
 
   function cast_as_pf_bisicles_t(level_polymorph) result(pf_bisicles_obj)
     class(pf_pfasst_t), intent(in), target :: level_polymorph
