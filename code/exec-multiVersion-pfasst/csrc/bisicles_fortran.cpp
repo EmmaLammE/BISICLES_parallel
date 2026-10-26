@@ -2,6 +2,7 @@
 #include "bisicles_vector.hpp"
 #include "bisicles_holder.hpp"
 #include "bisicles_packing.hpp"
+#include "bisicles_thickness_constraint.hpp"
 
 #include "Misc.H"
 #include "MayDay.H"
@@ -60,7 +61,30 @@ MPI_Comm glob_space_comm = MPI_COMM_NULL;
 
 extern "C"
 {
+// pfasst thickness constraint
+void BisiclesProjectThickness(BisiclesVector* y)
+{
+    if (y == NULL) BisiclesThicknessConstraint::fail("null solution vector");
+    BisiclesThicknessConstraint::project(y->GetHVector());
+}
 
+void BisiclesThicknessSolve(BisiclesVector* y, BisiclesVector* rhs,
+                            BisiclesVector* g, double dtq)
+{
+    if (y == NULL || rhs == NULL || g == NULL)
+        BisiclesThicknessConstraint::fail("null implicit-solve vector");
+    BisiclesThicknessConstraint::solve(y->GetHVector(), rhs->GetHVector(),
+                                      g->GetHVector(), dtq);
+}
+
+void BisiclesThicknessReaction(BisiclesVector* y, BisiclesVector* f_exp,
+                               BisiclesVector* g, bool at_start)
+{
+    if (y == NULL || f_exp == NULL || g == NULL)
+        BisiclesThicknessConstraint::fail("null reaction vector");
+    BisiclesThicknessConstraint::refresh(y->GetHVector(), f_exp->GetHVector(),
+                                        g->GetHVector(), at_start);
+}
 // bisicles vector functions
 void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, \
                           AmrIceHolderClass *c_AmrIceHolderPtr)

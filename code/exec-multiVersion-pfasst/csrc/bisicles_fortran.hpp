@@ -9,6 +9,12 @@
 
 extern "C"
 {
+   // pfasst thickness constraint
+   void BisiclesProjectThickness(BisiclesVector* y);
+   void BisiclesThicknessSolve(BisiclesVector* y, BisiclesVector* rhs,
+                               BisiclesVector* g, double dtq);
+   void BisiclesThicknessReaction(BisiclesVector* y, BisiclesVector* f_exp,
+                                  BisiclesVector* g, bool at_start);
    // bisicles Vector functions
    void BisiclesVectorCreate(BisiclesVector **bisicles_vector,int num_grid_points, \
                               AmrIceHolderClass *c_AmrIceHolderPtr);

@@ -14,6 +14,7 @@
 //===========================================================================
 #include <iostream>
 #include <fstream>
+#include <string>
 #include "ParmParse.H"
 #include "AMRIO.H"
 #include "SPMD.H"
@@ -65,6 +66,7 @@
 #include "bisicles_vector.hpp"
 #include "bisicles_fortran.hpp"
 #include "bisicles_packing.hpp"
+#include "pfasst_constraint_input_check.H"
 #include "bisicles_holder.hpp"
 #include "pfasst_bisicles_setup.hpp"
 #include <chrono>
@@ -92,8 +94,12 @@ enum basalFrictionTypes {constantBeta = 0,
 int main(int argc, char* argv[]) {
   
 int ierr = 0;
-int rank, number_procs;
-int new_space_rank, new_space_size, new_time_rank, new_time_size;
+// int rank, number_procs;
+// int new_space_rank, new_space_size, new_time_rank, new_time_size;
+// initialize rank defaults
+int rank = 0, number_procs = 1;
+int new_space_rank = 0, new_space_size = 1;
+int new_time_rank = 0, new_time_size = 1;
 #ifdef CH_USE_PETSC
   ierr = PetscInitialize(&argc, &argv,PETSC_NULL,PETSC_NULL); CHKERRQ(ierr);
 #else
@@ -122,6 +128,13 @@ FineInterp::s_default_boundary_limit_type = 0;
     int num_time_procs;
     ppfasst.get("USE_PF", USE_PF);  
     ppfasst.get("num_time_procs", num_time_procs); 
+    if (USE_PF)
+      {
+        checkPFASSTThicknessOnlyInput();
+        if (rank == 0)
+          std::cout << "[PFASST constraint] nonnegative thickness; fixed level-0 grid; "
+                    << "ice fraction derived from H; prescribed front sink retained" << std::endl;
+      }
     // SYSTEM_INFO siSysInfo;
     // GetSystemInfo(&siSysInfo); 
     // int num_hardware_cores = siSysInfo.dwNumberOfProcessors;
@@ -171,10 +184,24 @@ FineInterp::s_default_boundary_limit_type = 0;
 
 
     ParmParse pp2("main");
+    bool run_serial_reference = true;
+    pp2.query("run_serial_reference", run_serial_reference);
 
+    // std::string poutBaseName = "pout";
+    // pp2.query("poutBaseName",poutBaseName);
+    // setPoutBaseName(poutBaseName);
+    // give each temporal group a separate Chombo pout prefix
     std::string poutBaseName = "pout";
     pp2.query("poutBaseName",poutBaseName);
+#ifdef CH_MPI
+    if (USE_PF)
+    {
+      // Chombo appends the spatial rank; supply the missing temporal rank.
+      poutBaseName += ".time" + std::to_string(new_time_rank);
+    }
+#endif
     setPoutBaseName(poutBaseName);
+
     //make use of number_procs and rank for at least something.
     pout() << "number_procs = " << number_procs << ", rank = " << rank << std::endl;
 
@@ -1213,16 +1240,39 @@ FineInterp::s_default_boundary_limit_type = 0;
       auto start_pf = std::chrono::high_resolution_clock::now();
       // Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,pf_evolve_velocity,\
       //         num_total_cells,pf_num_repeats,PF_VERBOSE);
+      // Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,pf_evolve_velocity,
+      //         num_local_values,pf_num_repeats,PF_VERBOSE);
+      // auto end_pf = std::chrono::high_resolution_clock::now();
+      // std::chrono::duration<double> duration_pf = end_pf - start_pf;
+      // (&AmrIceHolderPtr)->printStatistics(number_procs,new_time_size, new_space_size,new_time_rank,\
+      //                                     new_space_rank,duration_pf,pf_evolve_velocity,numCrseIntervals,maxTime);
+      // cout <<"  EL - results saved as: "<<crse_plot_prefix<<"...\n";
+      // cout <<"###########################################################################"<<endl;
+      // cout <<"##############        EL - End of PFASST simulation     ###################"<<endl;
+      // cout <<"###########################################################################"<<endl;
+
       Pf_Main(&AmrIceHolderPtr,pf_comm_world,numCrseIntervals,crseDt,maxTime,maxStep,pf_evolve_velocity,
               num_local_values,pf_num_repeats,PF_VERBOSE);
+      // Pf_Main includes the final endpoint write on its owning time group.
+      // Other time groups must wait for that write before continuing.
+#ifdef CH_MPI
+      MPI_Barrier(MPI_COMM_WORLD);
+#endif
       auto end_pf = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> duration_pf = end_pf - start_pf;
-      (&AmrIceHolderPtr)->printStatistics(number_procs,new_time_size, new_space_size,new_time_rank,\
-                                          new_space_rank,duration_pf,pf_evolve_velocity,numCrseIntervals,maxTime);
-      cout <<"  EL - results saved as: "<<crse_plot_prefix<<"...\n";
-      cout <<"###########################################################################"<<endl;
-      cout <<"##############        EL - End of PFASST simulation     ###################"<<endl;
-      cout <<"###########################################################################"<<endl;
+      if (rank == 0)
+      {
+        // These counters are local to this representative process.
+        cout << "PFASST performance counters below are for world rank 0." << endl;
+        (&AmrIceHolderPtr)->printStatistics(number_procs, new_time_size,
+            new_space_size, new_time_rank, new_space_rank, duration_pf,
+            pf_evolve_velocity, numCrseIntervals, maxTime);
+        cout << "PFASST endpoint export returned on all ranks; plot prefix: "
+             << crse_plot_prefix << endl;
+        cout << "###########################################################################" << endl;
+        cout << "##############        EL - End of PFASST simulation     ###################" << endl;
+        cout << "###########################################################################" << endl;
+      }
     } else {
     cout<<"\nUpdating crse-grained using serial................\n";
     cout<<"  results saved as: "<<crse_plot_prefix<<"...\n";
@@ -1230,43 +1280,76 @@ FineInterp::s_default_boundary_limit_type = 0;
     }
 
 
-    // ------- EL - commenting out the serial run for now -----------
-    ParmParse pfine("fine.amr");
-    string fine_plot_prefix;
-    pfine.get("plot_prefix",fine_plot_prefix);
-    cout<<"\n..............Updating fine-grained using serial................\n";
-    cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
+    // // ------- EL - commenting out the serial run for now -----------
+    // ParmParse pfine("fine.amr");
+    // string fine_plot_prefix;
+    // pfine.get("plot_prefix",fine_plot_prefix);
+    // cout<<"\n..............Updating fine-grained using serial................\n";
+    // cout<<"  results saved as: "<<fine_plot_prefix<<"...\n\n\n";
+    // // now do each fine-grained timestep
+    // auto start = high_resolution_clock::now();
+    // amrObjectFine.run(maxTime, maxStep);
+    // auto stop = high_resolution_clock::now();
+    // auto duration = duration_cast<microseconds>(stop - start);
+    // cout << "Time taken by serial run: "
+    //      << duration.count()/1e6<< " seconds" << endl;
+    // // don's really need the time interval loop, the loop is for illustration
+    // // for (int i=0; i<numFineIntervals; i++) 
+    // //   {
+    // //     // first, set state
+    // //     bool recalculateVelocity = true;
+    // //     //amrObjectFine.setState(fineHVect[i], fineTimeVect[i], recalculateVelocity);
+    // //     recalculateVelocity = false;
+    // //     amrObjectFine.setState(fineStateVect[i],recalculateVelocity); 
+    // //     // reshape dH/dt and then call computeDhDt
+    // //     reshape(finedHdtVect[i],fineH); // fineH
+    // //     amrObjectFine.compute_dHdt(finedHdtVect[i],fineH,fineDt, false);    // fineH     
+    // //     // now advance ice sheet
+    // //     cout<<"time "<<fineStateVect[i+1].time<<endl;
+    // //     // amrObjectFine.run(maxTime, maxStep);
+    // //     // now retrieve state and store
+    // //     amrObjectFine.getState(fineStateVect[i+1]);
+    // //     cout << "loop # " << i << std::endl;
+    // //   }    
 
-    // now do each fine-grained timestep
-    auto start = high_resolution_clock::now();
-    amrObjectFine.run(maxTime, maxStep);
-    auto stop = high_resolution_clock::now();
-    auto duration = duration_cast<microseconds>(stop - start);
-    cout << "Time taken by serial run: "
-         << duration.count()/1e6<< " seconds" << endl;
-    // don's really need the time interval loop, the loop is for illustration
-    // for (int i=0; i<numFineIntervals; i++) 
-    //   {
-    //     // first, set state
-    //     bool recalculateVelocity = true;
-    //     //amrObjectFine.setState(fineHVect[i], fineTimeVect[i], recalculateVelocity);
-    //     recalculateVelocity = false;
-    //     amrObjectFine.setState(fineStateVect[i],recalculateVelocity); 
+    // Run the reference solve on one COMPLETE spatial communicator.
+    // Each other temporal group waits below and does not write serial files.
+    bool serial_group = true;
+#ifdef CH_MPI
+    serial_group = (!USE_PF || new_time_rank == 0);
+#endif
+    if (run_serial_reference && serial_group)
+    {
+      ParmParse pfine("fine.amr");
+      string fine_plot_prefix;
+      pfine.get("plot_prefix", fine_plot_prefix);
+      if (rank == 0)
+      {
+        cout << "\n..............Updating fine-grained using serial................\n";
+        cout << "Serial output prefix: " << fine_plot_prefix << endl;
+      }
 
-    //     // reshape dH/dt and then call computeDhDt
-    //     reshape(finedHdtVect[i],fineH); // fineH
-    //     amrObjectFine.compute_dHdt(finedHdtVect[i],fineH,fineDt, false);    // fineH     
+      auto start = high_resolution_clock::now();
+      // ALL spatial ranks in time group 0 enter this collective solve/write.
+      amrObjectFine.run(maxTime, maxStep);
+      auto stop = high_resolution_clock::now();
+      auto duration = duration_cast<microseconds>(stop - start);
+      if (rank == 0)
+      {
+        cout << "Time taken by serial run: "
+             << duration.count()/1e6 << " seconds" << endl;
+      }
+    }
+    else if (!run_serial_reference && rank == 0)
+    {
+      cout << "Serial reference disabled by main.run_serial_reference = false"
+           << endl;
+    }
 
-    //     // now advance ice sheet
-    //     cout<<"time "<<fineStateVect[i+1].time<<endl;
-    //     // amrObjectFine.run(maxTime, maxStep);
-
-    //     // now retrieve state and store
-    //     amrObjectFine.getState(fineStateVect[i+1]);
-    //     cout << "loop # " << i << std::endl;
-
-    //   }    
-
+    // Keep non-reference groups alive until the reference solve has finished.
+#ifdef CH_MPI
+    MPI_Barrier(MPI_COMM_WORLD);
+#endif
         
 
     

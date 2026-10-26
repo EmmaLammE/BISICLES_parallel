@@ -19,6 +19,8 @@ module pf_my_sweeper
  
      procedure :: f_eval    !  Computes the explicit rhs terms
      procedure :: f_comp    !  Does implicit solves
+     procedure :: project_solution
+     procedure :: f_eval_implicit
  
  
      procedure :: initialize !  Overwrites imex sweeper initialize
@@ -71,6 +73,24 @@ module pf_my_sweeper
  
  
  
+
+    subroutine BisiclesProjectThickness(y) bind(c, name="BisiclesProjectThickness")
+      use iso_c_binding
+      type(c_ptr), value :: y
+    end subroutine
+
+    subroutine BisiclesThicknessSolve(y, rhs, g, dtq) bind(c, name="BisiclesThicknessSolve")
+      use iso_c_binding
+      type(c_ptr), value :: y, rhs, g
+      real(c_double), value :: dtq
+    end subroutine
+
+    subroutine BisiclesThicknessReaction(y, f_exp, g, at_start) bind(c, name="BisiclesThicknessReaction")
+      use iso_c_binding
+      type(c_ptr), value :: y, f_exp, g
+      logical(c_bool), value :: at_start
+    end subroutine
+
   end interface
  
  
@@ -86,12 +106,30 @@ module pf_my_sweeper
     type(c_ptr) :: c_AmrIceHolderPtr
  
  
-    !>  Call the imex sweeper initialization
+    ! Nonnegative thickness is an implicit constraint; use positive BE weights.
+    this%use_LUq = .false.
+    pf%use_LUq = .false.
+    pf%Finterp = .false.
+    pf%levels(:)%Finterp = .false.
+    if (pf%nlevels /= 2) &
+      call pf_stop(__FILE__, __LINE__, 'Validated constraint setup requires two PFASST levels')
+    if (pf%levels(1)%nnodes /= 2 .or. pf%levels(2)%nnodes /= 3) &
+      call pf_stop(__FILE__, __LINE__, 'Validated constraint setup requires 2/3 Lobatto nodes')
+    if (pf%qtype /= 1) &
+      call pf_stop(__FILE__, __LINE__, 'Thickness constraint requires Lobatto nodes')
+    if (pf%levels(level_index)%nsweeps < 1 .or. &
+        pf%levels(level_index)%nsweeps_pred < 1) &
+      call pf_stop(__FILE__, __LINE__, 'Thickness constraint requires at least one sweep')
     call this%imex_bisicles_initialize(pf,level_index)
+    if (any(this%dtsdc <= 0.0_pfdp)) &
+      call pf_stop(__FILE__, __LINE__, 'Thickness constraint requires increasing nodes')
+    if (abs(pf%levels(level_index)%nodes(1)) > 1.0e-14_pfdp .or. &
+        abs(pf%levels(level_index)%nodes(pf%levels(level_index)%nnodes)-1.0_pfdp) > 1.0e-14_pfdp) &
+      call pf_stop(__FILE__, __LINE__, 'Thickness constraint requires both endpoint nodes')
  
  
     !>  Set variables for explicit and implicit parts (just to show you can)
-    this%implicit=.FALSE.
+    this%implicit=.TRUE.
     this%explicit=.TRUE.
  
  
@@ -179,14 +217,45 @@ module pf_my_sweeper
     integer,             intent(in   ) :: piece
  
  
-    !class(bisicles_vector_encap), pointer :: y_encap, f_encap, rhs_encap
-    real(pfdp) :: val
-    ! EL - not implemented
+    class(bisicles_vector_encap), pointer :: y_encap, f_encap, rhs_encap
+    if (piece /= 2) call pf_stop(__FILE__, __LINE__, 'Invalid constraint RHS piece', piece)
+    y_encap => cast_as_bisicles_vector(y)
+    rhs_encap => cast_as_bisicles_vector(rhs)
+    f_encap => cast_as_bisicles_vector(f)
+    call BisiclesThicknessSolve(y_encap%c_encap_ptr, rhs_encap%c_encap_ptr, &
+                                f_encap%c_encap_ptr, real(dtq,c_double))
   end subroutine f_comp
  
  
  
  
+  subroutine project_solution(this, y, t, level_index, c_AmrIceHolderPtr)
+    class(my_sweeper_t), intent(inout) :: this
+    class(pf_encap_t), intent(inout) :: y
+    real(pfdp), intent(in) :: t
+    integer, intent(in) :: level_index
+    type(c_ptr), intent(in) :: c_AmrIceHolderPtr
+    class(bisicles_vector_encap), pointer :: h
+    h => cast_as_bisicles_vector(y)
+    call BisiclesProjectThickness(h%c_encap_ptr)
+  end subroutine project_solution
+
+  subroutine f_eval_implicit(this, y, t, level_index, f_exp, f, c_AmrIceHolderPtr, at_start)
+    class(my_sweeper_t), intent(inout) :: this
+    class(pf_encap_t), intent(in) :: y, f_exp
+    class(pf_encap_t), intent(inout) :: f
+    real(pfdp), intent(in) :: t
+    integer, intent(in) :: level_index
+    type(c_ptr), intent(in) :: c_AmrIceHolderPtr
+    logical, intent(in) :: at_start
+    class(bisicles_vector_encap), pointer :: h, raw, reaction
+    h => cast_as_bisicles_vector(y)
+    raw => cast_as_bisicles_vector(f_exp)
+    reaction => cast_as_bisicles_vector(f)
+    call BisiclesThicknessReaction(h%c_encap_ptr, raw%c_encap_ptr, &
+                                   reaction%c_encap_ptr, logical(at_start,c_bool))
+  end subroutine f_eval_implicit
+
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
  !>  Here are some extra routines to help out
  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -227,6 +296,3 @@ module pf_my_sweeper
  
  
  end module pf_my_sweeper
- 
- 
- 

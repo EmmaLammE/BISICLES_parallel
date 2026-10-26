@@ -72,6 +72,9 @@ module pfasst_main
     ! setup IO stripe width
     !  MPI_Info :: 
      integer :: ierr, info
+     
+     integer :: diagnostic_world_rank, diagnostic_space_rank
+     character(len=32) :: diagnostic_space_dir
 
     ! Create a new info object
     call MPI_Info_create(info, ierr)
@@ -93,6 +96,25 @@ module pfasst_main
      !>  Create the pfasst structure
      call pf_pfasst_create(pf, comm, fname=pf_fname) !< o
      print *, 'created pf pfasst '
+     
+     ! Each spatial lane has its own PFASST time communicator.  Without this
+     ! suffix, different spatial ranks overwrite the same diagnostic files.
+     call MPI_Comm_rank(MPI_COMM_WORLD, diagnostic_world_rank, ierror)
+     if (mod(diagnostic_world_rank, pf%comm%nproc) /= pf%rank) then
+       print *, 'ERROR: diagnostic directory mapping does not match driver MPI split'
+       call MPI_Abort(MPI_COMM_WORLD, 1, ierror)
+     end if
+     diagnostic_space_rank = diagnostic_world_rank / pf%comm%nproc
+     write(diagnostic_space_dir, '("Spatial_",I0.4)') diagnostic_space_rank
+     ! LibPFASST uses 128-character paths for several diagnostic files.
+     if (len_trim(pf%outdir) + 1 + len_trim(diagnostic_space_dir) > 96) then
+       print *, 'ERROR: PFASST diagnostic outdir is too long'
+       call MPI_Abort(MPI_COMM_WORLD, 1, ierror)
+     end if
+     pf%outdir = trim(pf%outdir) // '/' // trim(diagnostic_space_dir)
+     if (pf%rank == 0) then
+       print *, 'PFASST diagnostic directory: dat/' // trim(pf%outdir)
+     end if
      
      !> ----- initialize the vectors & solvers for later, not initial condition of setting values -----
      call PfasstBisiclesInit(pf, lev_shape,crse_nsteps,dt_bisicles,Tfin_bisicles,maxStep_bisicles,evolve_velocity_bisicles,numGridPointsBisicles, AmrIceHolderPtr)
