@@ -141,3 +141,6 @@ pfasst: $(PFASST_APP_OBJECTS)
 
 
 .PHONY: all lib libbike libclean alltest
+
+# Ordered modules; also rebuild after LibPFASST interface changes.
+include Makefile.fortran-modules
