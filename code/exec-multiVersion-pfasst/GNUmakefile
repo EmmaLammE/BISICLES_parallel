@@ -92,7 +92,7 @@ PFASST_APP_MODULES := probin encap pf_my_sweeper pf_my_level hooks pf_space_comm
 PFASST_APP_MODFILES := $(addprefix $(PFASST_APP_MODDIR)/,$(addsuffix .mod,$(PFASST_APP_MODULES)))
 
 # Find application modules before similarly named external modules.
-$(PFASST_APP_OBJECTS): FFLAGS := -I$(PFASST_APP_MODDIR) $(FFLAGS) -J$(PFASST_APP_MODDIR)
+$(PFASST_APP_OBJECTS): FFLAGS := -I$(PFASST_APP_MODDIR) $(FFLAGS) #-J$(PFASST_APP_MODDIR)
 $(PFASST_APP_OBJECTS): | $(PFASST_APP_MODDIR)
 
 $(PFASST_APP_MODDIR): ; mkdir -p "$@"
