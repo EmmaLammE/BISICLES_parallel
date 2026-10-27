@@ -2,31 +2,229 @@ Before unset:
 SLURM_MEM_PER_CPU=1024
 After unset:
 SLURM_MEM_PER_CPU=1024
-Job started at: 2026-10-15 08:52:25
+Job started at: 2026-10-26 21:18:30
+[PFASST constraint] nonnegative thickness; fixed level-0 grid; ice fraction derived from H; prescribed front sink retained
+[PFASST constraint] nonnegative thickness; fixed level-0 grid; ice fraction derived from H; prescribed front sink retained
+[PFASST constraint] nonnegative thickness; fixed level-0 grid; ice fraction derived from H; prescribed front sink retained
+[PFASST constraint] nonnegative thickness; fixed level-0 grid; ice fraction derived from H; prescribed front sink retained
+[PFASST constraint] nonnegative thickness; fixed level-0 grid; ice fraction derived from H; prescribed front sink retained
+[PFASST constraint] nonnegative thickness; fixed level-0 grid; ice fraction derived from H; prescribed front sink retained
+[PFASST constraint] nonnegative thickness; fixed level-0 grid; ice fraction derived from H; prescribed front sink retained
+[PFASST constraint] nonnegative thickness; fixed level-0 grid; ice fraction derived from H; prescribed front sink retained
 No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
 No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for amr.isothermal = false !!!
  opening file pfasst_params.nml  for input
  opening file pfasst_params.nml  for input
  opening file pfasst_params.nml  for input
  opening file pfasst_params.nml  for input
+ opening file pfasst_params.nml  for input
+ opening file pfasst_params.nml  for input
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ time communicator in pfasst, num of procs for one time step            2 , rank            0
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
  time communicator in pfasst, num of procs for one time step            2 , rank            0
  time communicator in pfasst, num of procs for one time step            2 , rank            0
+ opening file pfasst_params.nml  for input
+ opening file pfasst_params.nml  for input
  time communicator in pfasst, num of procs for one time step            2 , rank            0
- time communicator in pfasst, num of procs for one time step            2 , rank            0
+ time communicator in pfasst, num of procs for one time step            2 , rank            1
+ created pf pfasst 
  created pf pfasst 
  before pfasst set up
- created pf pfasst 
+    pf_set_up, before level set up
  before pfasst set up
+    pf_set_up, before level set up
+ created pf pfasst 
+ PFASST diagnostic directory: dat/outdirP0002/Spatial_0000
+ before pfasst set up
+    pf_set_up, before level set up
+ allocating sdc sweepers
+ allocating sdc sweepers
+    allocating function values
+    allocating function values
+ created pf pfasst 
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ allocating sdc sweepers
+ before pfasst set up
+    pf_set_up, before level set up
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+    allocating old function values
+    allocating function values
+ created pf pfasst 
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ PFASST diagnostic directory: dat/outdirP0002/Spatial_0001
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ before pfasst set up
+    pf_set_up, before level set up
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+    allocating old function values
+ allocating sdc sweepers
+ allocating residual
+ created pf pfasst 
+ PFASST diagnostic directory: dat/outdirP0002/Spatial_0002
+ before pfasst set up
+    pf_set_up, before level set up
+    allocating function values
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ created pf pfasst 
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+    allocating old function values
+ before pfasst set up
+    pf_set_up, before level set up
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+    allocating old function values
+ allocating sdc sweepers
+ allocating sdc sweepers
+ allocating sdc sweepers
+    allocating function values
+ allocating residual
+    allocating function values
+ created pf pfasst 
+ PFASST diagnostic directory: dat/outdirP0002/Spatial_0003
+ before pfasst set up
+    pf_set_up, before level set up
+ allocating sdc sweepers
+    allocating function values
+ allocating residual
+    allocating function values
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+    allocating old function values
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ allocating residual
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+    allocating old function values
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ allocating sdc sweepers
+    allocating old function values
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+    allocating function values
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+    allocating old function values
+ allocating residual
+ allocating sdc sweepers
+ allocating residual
+ allocating sdc sweepers
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           2 npieces           2
+    allocating old function values
+    allocating function values
+ allocating residual
+    allocating function values
+ allocating residual
+ allocating sdc sweepers
+ allocating residual
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+    allocating old function values
+    allocating function values
+    pf_set_up, after level set up
+ allocating sdc sweepers
+    allocating function values
+  in pf_set_up, level            2
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+    allocating old function values
+ allocating residual
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ created single init condition 
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+    allocating old function values
+ allocating sdc sweepers
+ casted as bisicles vector 
+ allocating sdc sweepers
+bisicles_fortran.cpp done assign H IC size of H 1
+ allocating sdc sweepers
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+    allocating function values
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+    allocating old function values
+    allocating function values
+    pf_set_up, after level set up
+  in pf_set_up, level            2
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ allocating residual
+ allocating residual
+    allocating function values
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+ allocating residual
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+    allocating old function values
+    pf_set_up, after level set up
+  in pf_set_up, level            2
  after pfasst set up, tauQ allocated  F
  initilized pfasst bisicles 
  ================================================
  ----------- LibPFASST Parameters ---------------
- date:        20261015
- time:        085247.550
+    pf_set_up, after level set up
+  in pf_set_up, level            2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ date:        20261026
+ time:        211848.640
  method:         PFASST
  double precision:              8   bytes
  quad precision:             16   bytes
- Output directory: outdirP0002
+ Output directory: outdirP0002/Spatial_0002
+ added hook 
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
  Nprocs:                 2 ! number of pfasst "time" processors
  Nlevels:                2 ! number of levels
  Niters:                 5 ! maximum number of sdc/pfasst iterations
@@ -36,12 +234,138 @@ No surfaceHeatBoundaryData.type specified, so zero flux set. Only relevant for a
  Nsweeps:                1           1 ! number of sdc sweeps performed per visit to each level
  Nsweeps_pred:                1           1 ! number of sdc sweeps in predictor
  qtype:           1 ! Gauss Lobatto nodes are used
- Implicit matrix is LU  
+ Implicit matrix is backward Euler  
  The Qmat form of stepping is being done
  taui0:              -99 ! cutoff for tau correction
  abs_res_tol:   1.0000000000000000E-014 ! absolute residual tolerance: 
  rel_res_tol:   1.0000000000000000E-014 ! relative residual tolerance: 
- mpibuflen:           4000        4000 ! size of data send between time steps
+ mpibuflen:            800         800 ! size of data send between time steps
+ V-cycling is on
+ Predictor pipelining is ON    
+ PFASST Predictor style  
+ ==================================================
+  
+ Local Variables
+ ----------------
+ num spatial procs per temporal proc:              4
+ num temporal procs:              2 , rank            0
+ Compute velocity:    T
+ Number of spacial dimensions:              2
+ PFASST parameters read from input file pfasst_params.nml                                                                                                               
+ ==================================================
+ added hook 
+    pf_set_up, after level set up
+  in pf_set_up, level            2
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ added hook 
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+    allocating old function values
+ allocating residual
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+    pf_set_up, after level set up
+  in pf_set_up, level            2
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ ================================================
+ ----------- LibPFASST Parameters ---------------
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ date:        20261026
+ time:        211848.641
+ method:         PFASST
+ double precision:              8   bytes
+ quad precision:             16   bytes
+ Output directory: outdirP0002/Spatial_0001
+ Nprocs:                 2 ! number of pfasst "time" processors
+ Nlevels:                2 ! number of levels
+ Niters:                 5 ! maximum number of sdc/pfasst iterations
+ MINiters:               0 ! Minimum number of sdc/pfasst iterations
+                           ! since >1 time procs are being used, this is a parallel pfasst run
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ Nnodes:                 2           3 ! number of sdc nodes per level
+ Nsweeps:                1           1 ! number of sdc sweeps performed per visit to each level
+ Nsweeps_pred:                1           1 ! number of sdc sweeps in predictor
+ qtype:           1 ! Gauss Lobatto nodes are used
+ Implicit matrix is backward Euler  
+ The Qmat form of stepping is being done
+ taui0:              -99 ! cutoff for tau correction
+ abs_res_tol:   1.0000000000000000E-014 ! absolute residual tolerance: 
+ rel_res_tol:   1.0000000000000000E-014 ! relative residual tolerance: 
+ mpibuflen:            800         800 ! size of data send between time steps
+ V-cycling is on
+ Predictor pipelining is ON    
+ PFASST Predictor style  
+ pf_pfasst 0000 before setting val, nnodes           3 npieces           2
+ ==================================================
+  
+ Local Variables
+ ----------------
+ num spatial procs per temporal proc:              4
+ num temporal procs:              2 , rank            0
+ Compute velocity:    T
+ Number of spacial dimensions:              2
+ PFASST parameters read from input file pfasst_params.nml                                                                                                               
+ ==================================================
+ added hook 
+    allocating old function values
+ allocating residual
+ created single init condition 
+ casted as bisicles vector 
+bisicles_fortran.cpp done assign H IC size of H 1
+ --------------------------- Start pfasst run --------------------------------------
+ Start pfasst timing... for            1  repeats
+   pf repeats #            1
+    pf_set_up, after level set up
+  in pf_set_up, level            2
+ after pfasst set up, tauQ allocated  F
+ initilized pfasst bisicles 
+ ================================================
+ ----------- LibPFASST Parameters ---------------
+ date:        20261026
+ time:        211848.641
+ method:         PFASST
+ double precision:              8   bytes
+ quad precision:             16   bytes
+ Output directory: outdirP0002/Spatial_0003
+ Nprocs:                 2 ! number of pfasst "time" processors
+ Nlevels:                2 ! number of levels
+ Niters:                 5 ! maximum number of sdc/pfasst iterations
+ MINiters:               0 ! Minimum number of sdc/pfasst iterations
+                           ! since >1 time procs are being used, this is a parallel pfasst run
+ Nnodes:                 2           3 ! number of sdc nodes per level
+ Nsweeps:                1           1 ! number of sdc sweeps performed per visit to each level
+ Nsweeps_pred:                1           1 ! number of sdc sweeps in predictor
+ qtype:           1 ! Gauss Lobatto nodes are used
+ Implicit matrix is backward Euler  
+ The Qmat form of stepping is being done
+ taui0:              -99 ! cutoff for tau correction
+ allocating residual
+ abs_res_tol:   1.0000000000000000E-014 ! absolute residual tolerance: 
+ rel_res_tol:   1.0000000000000000E-014 ! relative residual tolerance: 
+ mpibuflen:            800         800 ! size of data send between time steps
  V-cycling is on
  Predictor pipelining is ON    
  PFASST Predictor style  
@@ -62,16 +386,18 @@ bisicles_fortran.cpp done assign H IC size of H 1
  --------------------------- Start pfasst run --------------------------------------
  Start pfasst timing... for            1  repeats
    pf repeats #            1
+    pf_set_up, after level set up
+  in pf_set_up, level            2
  after pfasst set up, tauQ allocated  F
  initilized pfasst bisicles 
  ================================================
  ----------- LibPFASST Parameters ---------------
- date:        20261015
- time:        085247.551
+ date:        20261026
+ time:        211848.642
  method:         PFASST
  double precision:              8   bytes
  quad precision:             16   bytes
- Output directory: outdirP0002
+ Output directory: outdirP0002/Spatial_0000
  Nprocs:                 2 ! number of pfasst "time" processors
  Nlevels:                2 ! number of levels
  Niters:                 5 ! maximum number of sdc/pfasst iterations
@@ -81,12 +407,12 @@ bisicles_fortran.cpp done assign H IC size of H 1
  Nsweeps:                1           1 ! number of sdc sweeps performed per visit to each level
  Nsweeps_pred:                1           1 ! number of sdc sweeps in predictor
  qtype:           1 ! Gauss Lobatto nodes are used
- Implicit matrix is LU  
+ Implicit matrix is backward Euler  
  The Qmat form of stepping is being done
  taui0:              -99 ! cutoff for tau correction
  abs_res_tol:   1.0000000000000000E-014 ! absolute residual tolerance: 
  rel_res_tol:   1.0000000000000000E-014 ! relative residual tolerance: 
- mpibuflen:           4000        4000 ! size of data send between time steps
+ mpibuflen:           1600        1600 ! size of data send between time steps
  V-cycling is on
  Predictor pipelining is ON    
  PFASST Predictor style  
@@ -107,419 +433,44 @@ bisicles_fortran.cpp done assign H IC size of H 1
  --------------------------- Start pfasst run --------------------------------------
  Start pfasst timing... for            1  repeats
    pf repeats #            1
- created pf pfasst 
- before pfasst set up
- created pf pfasst 
- before pfasst set up
- after pfasst set up, tauQ allocated  F
- initilized pfasst bisicles 
- ================================================
- ----------- LibPFASST Parameters ---------------
- date:        20261015
- time:        085247.557
- method:         PFASST
- double precision:              8   bytes
- quad precision:             16   bytes
- Output directory: outdirP0002
- Nprocs:                 2 ! number of pfasst "time" processors
- Nlevels:                2 ! number of levels
- Niters:                 5 ! maximum number of sdc/pfasst iterations
- MINiters:               0 ! Minimum number of sdc/pfasst iterations
-                           ! since >1 time procs are being used, this is a parallel pfasst run
- Nnodes:                 2           3 ! number of sdc nodes per level
- Nsweeps:                1           1 ! number of sdc sweeps performed per visit to each level
- Nsweeps_pred:                1           1 ! number of sdc sweeps in predictor
- qtype:           1 ! Gauss Lobatto nodes are used
- Implicit matrix is LU  
- The Qmat form of stepping is being done
- taui0:              -99 ! cutoff for tau correction
- abs_res_tol:   1.0000000000000000E-014 ! absolute residual tolerance: 
- rel_res_tol:   1.0000000000000000E-014 ! relative residual tolerance: 
- mpibuflen:           4000        4000 ! size of data send between time steps
- V-cycling is on
- Predictor pipelining is ON    
- PFASST Predictor style  
- ==================================================
-  
- Local Variables
- ----------------
- num spatial procs per temporal proc:              4
- num temporal procs:              2 , rank            0
- Compute velocity:    T
- Number of spacial dimensions:              2
- PFASST parameters read from input file pfasst_params.nml                                                                                                               
- ==================================================
- added hook 
- created single init condition 
- casted as bisicles vector 
-bisicles_fortran.cpp done assign H IC size of H 1
- --------------------------- Start pfasst run --------------------------------------
- after pfasst set up, tauQ allocated  F
- Start pfasst timing... for            1  repeats
-   pf repeats #            1
- initilized pfasst bisicles 
- ================================================
- ----------- LibPFASST Parameters ---------------
- date:        20261015
- time:        085247.558
- method:         PFASST
- double precision:              8   bytes
- quad precision:             16   bytes
- Output directory: outdirP0002
- Nprocs:                 2 ! number of pfasst "time" processors
- Nlevels:                2 ! number of levels
- Niters:                 5 ! maximum number of sdc/pfasst iterations
- MINiters:               0 ! Minimum number of sdc/pfasst iterations
-                           ! since >1 time procs are being used, this is a parallel pfasst run
- Nnodes:                 2           3 ! number of sdc nodes per level
- Nsweeps:                1           1 ! number of sdc sweeps performed per visit to each level
- Nsweeps_pred:                1           1 ! number of sdc sweeps in predictor
- qtype:           1 ! Gauss Lobatto nodes are used
- Implicit matrix is LU  
- The Qmat form of stepping is being done
- taui0:              -99 ! cutoff for tau correction
- abs_res_tol:   1.0000000000000000E-014 ! absolute residual tolerance: 
- rel_res_tol:   1.0000000000000000E-014 ! relative residual tolerance: 
- mpibuflen:           4000        4000 ! size of data send between time steps
- V-cycling is on
- Predictor pipelining is ON    
- PFASST Predictor style  
- ==================================================
-  
- Local Variables
- ----------------
- num spatial procs per temporal proc:              4
- num temporal procs:              2 , rank            0
- Compute velocity:    T
- Number of spacial dimensions:              2
- PFASST parameters read from input file pfasst_params.nml                                                                                                               
- ==================================================
- added hook 
- created single init condition 
- casted as bisicles vector 
-bisicles_fortran.cpp done assign H IC size of H 1
- --------------------------- Start pfasst run --------------------------------------
- Start pfasst timing... for            1  repeats
-   pf repeats #            1
- opening file pfasst_params.nml  for input
- opening file pfasst_params.nml  for input
- opening file pfasst_params.nml  for input
- opening file pfasst_params.nml  for input
- time communicator in pfasst, num of procs for one time step            2 , rank            1
- time communicator in pfasst, num of procs for one time step            2 , rank            1
- time communicator in pfasst, num of procs for one time step            2 , rank            1
- time communicator in pfasst, num of procs for one time step            2 , rank            1
- created pf pfasst 
- before pfasst set up
- created pf pfasst 
- before pfasst set up
- created pf pfasst 
- before pfasst set up
- after pfasst set up, tauQ allocated  F
- initilized pfasst bisicles 
- added hook 
- created single init condition 
- casted as bisicles vector 
-bisicles_fortran.cpp done assign H IC size of H 1
- --------------------------- Start pfasst run --------------------------------------
- Start pfasst timing... for            1  repeats
-   pf repeats #            1
- after pfasst set up, tauQ allocated  F
- initilized pfasst bisicles 
- added hook 
- created single init condition 
- casted as bisicles vector 
-bisicles_fortran.cpp done assign H IC size of H 1
- --------------------------- Start pfasst run --------------------------------------
- Start pfasst timing... for            1  repeats
-   pf repeats #            1
- after pfasst set up, tauQ allocated  F
- initilized pfasst bisicles 
- added hook 
- created single init condition 
- casted as bisicles vector 
-bisicles_fortran.cpp done assign H IC size of H 1
- --------------------------- Start pfasst run --------------------------------------
- Start pfasst timing... for            1  repeats
-   pf repeats #            1
- created pf pfasst 
- before pfasst set up
- after pfasst set up, tauQ allocated  F
- initilized pfasst bisicles 
- added hook 
- created single init condition 
- casted as bisicles vector 
-bisicles_fortran.cpp done assign H IC size of H 1
- --------------------------- Start pfasst run --------------------------------------
- Start pfasst timing... for            1  repeats
-   pf repeats #            1
-Global average run time = 5249.493, max = 5255.625, min = 5243.360 seconds.
-Global average run time = 5250.418, max = 5256.345, min = 5244.491 seconds.
-Global average run time = 5249.823, max = 5255.826, min = 5243.821 seconds.
-Global average run time = 5240.369, max = 5244.710, min = 5236.027 seconds.
-
-#################################################################################
-Summary of performance statistics
--------------------------------
-
-#################################################################################
-Summary of performance statistics
--------------------------------
+Global average run time = ********, max = ********, min = ******** seconds.
+Global average run time = ********, max = ********, min = ******** seconds.
+Global average run time = ********, max = ********, min = ******** seconds.
+Global average run time = ********, max = ********, min = ******** seconds.
+[PFASST endpoint world=1 space=0] PRE_INSTALL time=50 dt=0.3125 step=160 valid_cells=4000 finite_cells=4000 Hmin=0 Hmax=1706.9548990457511 negative_cells=0 nonfinite_cells=0 structural_errors=0 metadata_errors=0
+[PFASST endpoint world=1 space=0] POST_INSTALL changed_cells=0 layout_error=0
+[PFASST endpoint world=1 space=0] WRITE_RETURNED: endpoint plot writer completed; qend preserved exactly
+PFASST performance counters below are for world rank 0.
 
 #################################################################################
 Summary of performance statistics
 -------------------------------
   Total num of procs       = 8
-  Total num of procs       = 8
-  Total num of procs       = 8
-  Total num of time procs  = 2
-  Total num of time procs  = 2
-  Total num of time procs  = 2
-  Total num of space procs = 4
-  Total num of space procs = 4
-  Total num of space procs = 4
-  Proc rank for this instance:  time = 1  space =  2
-  Proc rank for this instance:  time = 1  space =  0
-  Proc rank for this instance:  time = 1  space =  1
-Parameters that influence the run speeds (a lot)
-Parameters that influence the run speeds (a lot)
-Parameters that influence the run speeds (a lot)
-  Compute velocity? = 1
-  Compute velocity? = 1
-  Compute velocity? = 1
-  Num of time steps = 16
-  Num of time steps = 16
-  Num of time steps = 16
-  Final time        = 50 years
-  
-Total simulation time using PFASST: ! 5270.67 ! sec
-  Final time        = 50 years
-  
-Total simulation time using PFASST: ! 5270.67 ! sec
-  Final time        = 50 years
-  
-Total simulation time using PFASST: ! 5270.67 ! sec
-________________________________________________________________________________________________________
-________________________________________________________________________________________________________
-________________________________________________________________________________________________________
-| Function name (short) |        call counts |     Total duration (sec) |   Ratio of total time (%) |
-| Function name (short) |        call counts |     Total duration (sec) |   Ratio of total time (%) |
-| Function name (short) |        call counts |     Total duration (sec) |   Ratio of total time (%) |
---------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------
-| Pack                  |                  7 |               0.00008733 |                0.00000166 |
-| Pack                  |                  7 |               0.00013003 |                0.00000247 |
-| Pack                  |                  7 |               0.00008307 |                0.00000158 |
-| Unpack                |                 95 |               0.00083381 |                0.00001582 |
-| Unpack                |                 95 |               0.00133067 |                0.00002525 |
-| Unpack                |                 95 |               0.00093606 |                0.00001776 |
-| setState(FEval)       |                528 |            2958.38495582 |               56.12923802 |
-| setState(FEval)       |                528 |            2958.20409160 |               56.12581050 |
-| setState(FEval)       |                528 |            2958.45398776 |               56.13054539 |
-| dHdt(FEval)           |                528 |            2054.05378251 |               38.97142373 |
-| dHdt(FEval)           |                528 |            2054.31409232 |               38.97636535 |
-| dHdt(FEval)           |                528 |            2053.97364000 |               38.96990154 |
-________________________________________________________________________________________________________
-________________________________________________________________________________________________________
-________________________________________________________________________________________________________
---------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------
-  EL - results saved as: plot.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-###########################################################################
-  EL - results saved as: plot.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-###########################################################################
-  EL - results saved as: plot.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-###########################################################################
-##############        EL - End of PFASST simulation     ###################
-##############        EL - End of PFASST simulation     ###################
-##############        EL - End of PFASST simulation     ###################
-###########################################################################
-###########################################################################
-###########################################################################
-
-#################################################################################
-Summary of performance statistics
--------------------------------
-  Total num of procs       = 8
-  Total num of time procs  = 2
-  Total num of space procs = 4
-  Proc rank for this instance:  time = 1  space =  3
-Parameters that influence the run speeds (a lot)
-  Compute velocity? = 1
-  Num of time steps = 16
-  Final time        = 50 years
-  
-Total simulation time using PFASST: ! 5270.73 ! sec
-________________________________________________________________________________________________________
-| Function name (short) |        call counts |     Total duration (sec) |   Ratio of total time (%) |
---------------------------------------------------------------------------------------------------------
-| Pack                  |                  7 |               0.00008970 |                0.00000170 |
-| Unpack                |                 95 |               0.00106059 |                0.00002012 |
-| setState(FEval)       |                528 |            2958.28758819 |               56.12672468 |
-| dHdt(FEval)           |                528 |            2054.10189247 |               38.97187408 |
-________________________________________________________________________________________________________
---------------------------------------------------------------------------------------------------------
-  EL - results saved as: plot.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-###########################################################################
-##############        EL - End of PFASST simulation     ###################
-###########################################################################
-
-#################################################################################
-Summary of performance statistics
--------------------------------
-  Total num of procs       = 8
-  Total num of time procs  = 2
-  Total num of space procs = 4
-  Proc rank for this instance:  time = 0  space =  3
-Parameters that influence the run speeds (a lot)
-  Compute velocity? = 1
-  Num of time steps = 16
-
-#################################################################################
-Summary of performance statistics
--------------------------------
-  Final time        = 50 years
-  
-Total simulation time using PFASST: ! 5284.3 ! sec
-________________________________________________________________________________________________________
-| Function name (short) |        call counts |     Total duration (sec) |   Ratio of total time (%) |
---------------------------------------------------------------------------------------------------------
-
-#################################################################################
-Summary of performance statistics
--------------------------------
-  Total num of procs       = 8
-
-#################################################################################
-Summary of performance statistics
--------------------------------
-| Pack                  |                 95 |               0.00112563 |                0.00002130 |
-| Unpack                |                  7 |               0.00008154 |                0.00000154 |
-| setState(FEval)       |                512 |            2527.99753871 |               47.83981909 |
-| dHdt(FEval)           |                512 |            2114.60890669 |               40.01685365 |
-________________________________________________________________________________________________________
---------------------------------------------------------------------------------------------------------
-  Total num of procs       = 8
-  Total num of time procs  = 2
-  Total num of procs       = 8
-  EL - results saved as: plot.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-###########################################################################
-##############        EL - End of PFASST simulation     ###################
-###########################################################################
-  Total num of time procs  = 2
-  Total num of space procs = 4
   Total num of time procs  = 2
   Total num of space procs = 4
   Proc rank for this instance:  time = 0  space =  0
-  Total num of space procs = 4
-  Proc rank for this instance:  time = 0  space =  1
-Parameters that influence the run speeds (a lot)
-  Proc rank for this instance:  time = 0  space =  2
 Parameters that influence the run speeds (a lot)
   Compute velocity? = 1
-Parameters that influence the run speeds (a lot)
-  Compute velocity? = 1
-  Num of time steps = 16
-  Compute velocity? = 1
-  Num of time steps = 16
+  Num of time steps = 160
   Final time        = 50 years
   
-Total simulation time using PFASST: ! 5284.3 ! sec
-  Num of time steps = 16
-  Final time        = 50 years
-  
-Total simulation time using PFASST: ! 5284.3 ! sec
-________________________________________________________________________________________________________
-  Final time        = 50 years
-  
-Total simulation time using PFASST: ! 5284.3 ! sec
-________________________________________________________________________________________________________
-| Function name (short) |        call counts |     Total duration (sec) |   Ratio of total time (%) |
+Total simulation time using PFASST: ! 23104.3 ! sec
 ________________________________________________________________________________________________________
 | Function name (short) |        call counts |     Total duration (sec) |   Ratio of total time (%) |
 --------------------------------------------------------------------------------------------------------
-| Function name (short) |        call counts |     Total duration (sec) |   Ratio of total time (%) |
---------------------------------------------------------------------------------------------------------
-| Pack                  |                 95 |               0.00189162 |                0.00003580 |
---------------------------------------------------------------------------------------------------------
-| Pack                  |                 95 |               0.00115966 |                0.00002195 |
-| Unpack                |                  7 |               0.00021533 |                0.00000407 |
-| Pack                  |                 95 |               0.00093786 |                0.00001775 |
-| Unpack                |                  7 |               0.00013337 |                0.00000252 |
-| setState(FEval)       |                512 |            2527.89355563 |               47.83785622 |
-| Unpack                |                  7 |               0.00014531 |                0.00000275 |
-| setState(FEval)       |                512 |            2528.09637735 |               47.84168880 |
-| dHdt(FEval)           |                512 |            2114.83289548 |               40.02109652 |
-| setState(FEval)       |                512 |            2528.13756250 |               47.84246679 |
-| dHdt(FEval)           |                512 |            2114.57188617 |               40.01615248 |
-________________________________________________________________________________________________________
-| dHdt(FEval)           |                512 |            2114.50176227 |               40.01482429 |
+| Pack                  |                959 |               0.10521054 |                0.00045537 |
+| Unpack                |                 79 |               0.00937143 |                0.00004056 |
+| setState(FEval)       |               5120 |           21579.49379891 |               93.40038716 |
+| dHdt(FEval)           |               5120 |              11.94691797 |                0.05170866 |
 ________________________________________________________________________________________________________
 --------------------------------------------------------------------------------------------------------
-________________________________________________________________________________________________________
---------------------------------------------------------------------------------------------------------
-  EL - results saved as: plot.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-###########################################################################
---------------------------------------------------------------------------------------------------------
-  EL - results saved as: plot.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-###########################################################################
-##############        EL - End of PFASST simulation     ###################
-  EL - results saved as: plot.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
+PFASST endpoint export returned on all ranks; plot prefix: plot.crse.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst.
 ###########################################################################
 ##############        EL - End of PFASST simulation     ###################
 ###########################################################################
-##############        EL - End of PFASST simulation     ###################
-###########################################################################
-###########################################################################
 
 ..............Updating fine-grained using serial................
-  results saved as: plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-
-
-Time taken by serial run: 2864.08894800 seconds
-
-..............Updating fine-grained using serial................
-  results saved as: plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-
-
-Time taken by serial run: 2864.08987000 seconds
-
-..............Updating fine-grained using serial................
-  results saved as: plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-
-
-Time taken by serial run: 2864.08989100 seconds
-
-..............Updating fine-grained using serial................
-  results saved as: plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-
-
-Time taken by serial run: 2864.04921300 seconds
-
-..............Updating fine-grained using serial................
-  results saved as: plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-
-
-Time taken by serial run: 2904.89721400 seconds
-
-..............Updating fine-grained using serial................
-  results saved as: plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-
-
-Time taken by serial run: 2904.89769200 seconds
-
-..............Updating fine-grained using serial................
-  results saved as: plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-
-
-Time taken by serial run: 2904.89735600 seconds
-
-..............Updating fine-grained using serial................
-  results saved as: plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst....
-
-
-Time taken by serial run: 2904.89735800 seconds
-Job ended at: 2026-10-15 11:09:17
-Job took 2 hours, 16 minutes, and 52 seconds to complete.
+Serial output prefix: plot.fine.isomip24.melt4.l1l2.prlim.l0.Chombo.A2.2e-17.constfriction.sg4.a0.3-noPython-pfasst.
+Time taken by serial run: 2635.59424400 seconds
+Job ended at: 2026-10-27 04:27:48
+Job took 7 hours, 9 minutes, and 18 seconds to complete.

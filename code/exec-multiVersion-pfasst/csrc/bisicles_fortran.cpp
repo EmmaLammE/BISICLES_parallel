@@ -488,7 +488,7 @@ void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, const double *buffer,
       auto start_setState = std::chrono::high_resolution_clock::now();
       // PFASST gives the physical time of this quadrature node.  Melt
       // and other time-dependent forcing must see that time on every call.
-      amrObjHolderPtr->setState(H, t, evolve_velocity);
+      amrObjHolderPtr->setPFASSTState(H, t, dt, evolve_velocity);
       auto end_setState = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> duration_setState = end_setState - start_setState;
       
@@ -496,7 +496,11 @@ void BisiclesVectorUnpack(BisiclesVector *bisicles_vector, const double *buffer,
 
       // time computedHdt function
       auto start_compute_dHdt = std::chrono::high_resolution_clock::now();
-      amrObjHolderPtr->compute_dHdt(dHdtVect, H, dt, evolve_velocity);
+      // Use the same prepared geometry for PPM and cell-to-face averaging.
+      // Its physical ghosts have been filled and velocity was solved above.
+      Vector<LevelData<FArrayBox>* > installedH;
+      amrObjHolderPtr->amrThickness(installedH);
+      amrObjHolderPtr->compute_dHdt(dHdtVect, installedH, dt, false);
       auto end_compute_dHdt = std::chrono::high_resolution_clock::now();
       std::chrono::duration<double> duration_compute_dHdt = end_compute_dHdt - start_compute_dHdt;// cout<<"dHdtVect norm 2: ";
       

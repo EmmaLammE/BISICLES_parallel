@@ -96,7 +96,9 @@ CalvingModel.front_hi = 1 0
 #  CRSE-INTEGRATOR ATTRIBUTES 
 #####################################################
 
-main.numCrseIntervals = 16
+main.numCrseIntervals = 160
+crse.amr.evolve_ice_frac = false
+crse.amr.mask_sources = false
 
 #AMR mesh options
 crse.amr.num_cells = 200 20 10 
@@ -106,7 +108,7 @@ crse.amr.is_periodic = 0 0 0
 # in a way which means we have to be this way)
 #crse.amr.grounding_line_subdivision = 4
 
-crse.amr.maxLevel = 10 # finest level allowed in simulation
+crse.amr.maxLevel = 0 # finest level allowed in simulation
 crse.amr.ref_ratio = 2 2 2 2 2 2 2 2 2 2 2
 crse.amr.regrid_interval = 1  # number of timesteps between regridding
 crse.amr.blockFactor = 4      # block factor used in grid generation
@@ -189,6 +191,8 @@ crse.amr.use_ppm_for_face_values = true
 #####################################################
 
 main.numFineIntervals = 4
+fine.amr.evolve_ice_frac = false
+fine.amr.mask_sources = false
 
 #AMR mesh options
 fine.amr.num_cells = 200 20 10 
@@ -198,7 +202,7 @@ fine.amr.is_periodic = 0 0 0
 # this is defined outside of coarse and fine
 #fine.amr.grounding_line_subdivision = 4
 
-fine.amr.maxLevel = 10 # finest level allowed in simulation
+fine.amr.maxLevel = 0 # finest level allowed in simulation
 fine.amr.ref_ratio = 2 2 2 2 2 2 2 2 2 2 2
 fine.amr.regrid_interval = 1  # number of timesteps between regridding
 fine.amr.blockFactor = 4      # block factor used in grid generation

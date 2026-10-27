@@ -1093,48 +1093,20 @@ FineInterp::s_default_boundary_limit_type = 0;
     ParmParse ppcrse("crse");
     int crselevel = 0;
     ppcrse.get("amr.maxLevel", crselevel);
-    // Temporary full vector, may contain NULL entries.
-    Vector<LevelData<FArrayBox>* > crseH_raw(crselevel + 1, NULL);
-    int finestLevel = -1;
-    for (int lvl = 0; lvl <= crselevel; ++lvl)
-    {
-        const DisjointBoxLayout& grids = amrObjectCrse.grids(lvl);
-        if (grids.isClosed())
-        {
-            finestLevel = lvl;
-            crseH_raw[lvl] = new LevelData<FArrayBox>(
-                grids,
-                1,
-                IntVect::Zero
-            );
-            DataIterator dit = crseH_raw[lvl]->dataIterator();
-            for (dit.begin(); dit.ok(); ++dit)
-            {
-                // (*crseH_raw[lvl])[dit].setVal(1000.0); // setting whole thickness field to 1000 m
-                
-               // Get the thickness already initialized from the input.      
-                Vector<LevelData<FArrayBox>* > inputH;
-                amrObjectCrse.amrThickness(inputH);
-                
-                const int numActiveLevels = amrObjectCrse.finestLevel() + 1;
-                // Keep an independent snapshot of the active AMR levels.
-                Vector<LevelData<FArrayBox>* > crseH(numActiveLevels, NULL);
-                for (int lvl = 0; lvl < numActiveLevels; ++lvl)
-                {
-                    crseH[lvl] = new LevelData<FArrayBox>;
-                    reshapeAndFill(*crseH[lvl], *inputH[lvl]);
-                }
-            }
-        }
-    }
-    CH_assert(finestLevel >= 0);
-    const int numActiveLevels = finestLevel + 1;
-    // Compact H vector: no NULL entries.
+    // Take one independent snapshot of the initialized active hierarchy.
+    // Do not allocate a new hierarchy inside a per-box loop: the holder
+    // must receive these populated fields, not an uninitialized allocation.
+    Vector<LevelData<FArrayBox>* > inputH;
+    amrObjectCrse.amrThickness(inputH);
+    const int numActiveLevels = amrObjectCrse.finestLevel() + 1;
+    CH_assert(numActiveLevels > 0);
+    CH_assert(inputH.size() >= numActiveLevels);
     Vector<LevelData<FArrayBox>* > crseH(numActiveLevels, NULL);
     for (int lvl = 0; lvl < numActiveLevels; ++lvl)
     {
-        CH_assert(crseH_raw[lvl] != NULL);
-        crseH[lvl] = crseH_raw[lvl];
+        CH_assert(inputH[lvl] != NULL);
+        crseH[lvl] = new LevelData<FArrayBox>;
+        reshapeAndFill(*crseH[lvl], *inputH[lvl]);
     }
     // Compact velocity vector the same way.
     const Vector<LevelData<FArrayBox>* >& crseVel_raw = amrObjectCrse.amrVelocity();

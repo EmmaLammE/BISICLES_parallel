@@ -219,6 +219,12 @@ public:
   */
   void setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
                 Real a_cur_time, bool a_recalculateVelocity);
+
+  /// Install an admissible fixed-level PFASST state and refresh its physical
+  /// boundaries.  This preserves every valid thickness value and supports
+  /// only NoCalvingModel or DomainEdgeCalvingModel.
+  void setPFASSTState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
+                     Real a_cur_time, Real a_dt, bool a_recalculateVelocity);
     
 
   /// set ice sheet state based on inputs

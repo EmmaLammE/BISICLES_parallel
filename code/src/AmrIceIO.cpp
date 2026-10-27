@@ -403,7 +403,7 @@ AmrIce::writeExternalStatePlot(
   // Install the chosen PFASST endpoint, with its physical output metadata.
   m_dt = a_dt;
   m_cur_step = a_completedStep;
-  setState(a_thicknessVect, a_time, true);
+  setPFASSTState(a_thicknessVect, a_time, a_dt, true);
 
   long long changedLocal = 0, changedGlobal = 0;
   int installedLayoutLocal = 0, installedLayoutGlobal = 0;

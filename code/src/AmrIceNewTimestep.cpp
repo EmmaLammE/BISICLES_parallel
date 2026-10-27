@@ -38,6 +38,8 @@ using std::string;
 #include "LoadBalance.H"
 #include "MayDay.H"
 #include "AmrIce.H"
+#include "CalvingModel.H"
+#include "SPMD.H"
 #include "computeNorm.H" 
 #include "PatchGodunov.H"
 #include "AdvectPhysics.H"
@@ -570,6 +572,83 @@ AmrIce::compute_dHdt(Vector<LevelData<FArrayBox>* >& a_dHdt,
 
 
 
+/// Install a constrained PFASST state without using its stale physical ghosts.
+void
+AmrIce::setPFASSTState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
+                      Real a_cur_time, Real a_dt, bool a_recalculateVelocity)
+{
+  CH_TIME("AmrIce::setPFASSTState");
+  if (!std::isfinite(a_cur_time) || !std::isfinite(a_dt) || a_dt <= 0.0)
+    MayDay::Error("Invalid PFASST state time or timestep");
+
+  DomainEdgeCalvingModel* edge = dynamic_cast<DomainEdgeCalvingModel*>(m_calvingModelPtr);
+  if (edge == NULL && dynamic_cast<NoCalvingModel*>(m_calvingModelPtr) == NULL)
+    MayDay::Error("PFASST state installation supports only DomainEdgeCalvingModel or NoCalvingModel");
+
+  // Check before setState: its legacy clipping must never conceal an invalid
+  // PFASST unknown.  All space ranks agree before any later collective solve.
+  int invalidLocal = (m_finest_level != 0 || a_thicknessVect.size() != 1);
+  if (!invalidLocal)
+    {
+      if (a_thicknessVect[0] == NULL || !a_thicknessVect[0]->isDefined() ||
+          a_thicknessVect[0]->nComp() != 1)
+        invalidLocal = 1;
+      else
+        {
+          const LevelData<FArrayBox>& inputH = *a_thicknessVect[0];
+          const DisjointBoxLayout& grids = inputH.disjointBoxLayout();
+          if (!(grids == m_amrGrids[0]) || &inputH == &m_vect_coordSys[0]->getH())
+            invalidLocal = 1;
+          else
+            for (DataIterator dit = inputH.dataIterator(); dit.ok(); ++dit)
+              for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
+                if (!std::isfinite(inputH[dit()](bit(), 0)) || inputH[dit()](bit(), 0) < 0.0)
+                  invalidLocal = 1;
+        }
+    }
+  int invalidGlobal = invalidLocal;
+#ifdef CH_MPI
+  MPI_Allreduce(&invalidLocal, &invalidGlobal, 1, MPI_INT, MPI_MAX, Chombo_MPI::comm);
+#endif
+  if (invalidGlobal)
+    MayDay::Error("PFASST state requires independent, finite nonnegative thickness on the fixed level-0 layout");
+
+  m_dt = a_dt;
+  setState(a_thicknessVect, a_cur_time, false);
+  LevelData<FArrayBox>& installedH = m_vect_coordSys[0]->getH();
+
+  // setState has filled the geometry IBCs. DomainEdge additionally removes
+  // exterior front ghosts; do this even when the velocity is frozen. Calling
+  // only the supported model avoids new generic calving/observer side effects.
+  if (edge != NULL)
+    edge->applyCriterion(installedH, *m_calvedIceThickness[0],
+                         *m_addedIceThickness[0], *m_removedIceThickness[0],
+                         *m_iceFrac[0], *this, 0, CalvingModel::PostThicknessAdvection);
+  m_vect_coordSys[0]->recomputeGeometry(NULL, -1);
+  setIceFrac(installedH, 0);
+  installedH.copyTo(*m_old_thickness[0]);
+
+  if (m_evolve_velocity && a_recalculateVelocity)
+    solveVelocityField(true, m_velocitySolveInitialResidualNorm);
+
+  // A velocity/calving operation must not silently replace the state whose
+  // derivative PFASST requested. Physical ghosts may change; valid cells may not.
+  const LevelData<FArrayBox>& inputH = *a_thicknessVect[0];
+  const DisjointBoxLayout& grids = inputH.disjointBoxLayout();
+  invalidLocal = 0;
+  for (DataIterator dit = inputH.dataIterator(); dit.ok(); ++dit)
+    for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
+      if (!std::isfinite(installedH[dit()](bit(), 0)) ||
+          installedH[dit()](bit(), 0) != inputH[dit()](bit(), 0))
+        invalidLocal = 1;
+  invalidGlobal = invalidLocal;
+#ifdef CH_MPI
+  MPI_Allreduce(&invalidLocal, &invalidGlobal, 1, MPI_INT, MPI_MAX, Chombo_MPI::comm);
+#endif
+  if (invalidGlobal)
+    MayDay::Error("PFASST state installation or velocity/calving changed valid-cell thickness");
+}
+
 /// set ice sheet state based on inputs
 /**  New interface function for SUNDIALS and Parallel-in-time
      Take provided ice thickness and current time, reset ice sheet to match
@@ -702,6 +781,14 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
         }      
   }
   
+  // Refill physical ghosts from the installed valid state, as on finer levels.
+  // PFASST communicates valid cells only; its exterior ghosts are not state.
+  // Reflection at physical corners can read transverse inter-box/periodic
+  // ghosts, so exchange those before applying the physical boundary rule.
+  thisLevelH.exchange();
+  m_thicknessIBCPtr->setGeometryBCs(*m_vect_coordSys[0], m_amrDomains[0],
+                                  m_amrDx[0]*RealVect::Unit, m_time, m_dt);
+
   /// recompute geometry
   {
     LevelSigmaCS* crseCoords = NULL;

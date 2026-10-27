@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --job-name=mmp
-#SBATCH --time=1-01:00:00
+#SBATCH --job-name=t2s4
+#SBATCH --time=2-01:00:00
 #SBATCH -p serc
-#SBATCH --mem-per-cpu=2GB
-#SBATCH --cpus-per-task=2
+#SBATCH --mem-per-cpu=1GB
+#SBATCH --cpus-per-task=1
 #SBATCH --ntasks=8
 #SBATCH -o ./sbatch_outputs/out_pf_mmp_t2s4.out
 

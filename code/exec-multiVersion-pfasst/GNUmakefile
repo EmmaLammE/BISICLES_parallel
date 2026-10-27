@@ -77,69 +77,6 @@ driver:  libbike ../lib/libBisicles$(config).a
 
 alltest: libbike ../lib/libBisicles$(config).a 
 
-# fixed fsrc dependency
-PFASST_APP_UNITS := x_probin y_encap z_sweeper v_level u_hooks w_comm s_pfasst_bisicles t_pfasst_main
-
-# Use the object paths selected by Chombo for linking.
-pfasst_app_object = $(if $(strip $(objects)),$(or $(firstword $(filter %/$(1).o $(1).o,$(objects))),$(error No object for $(1) in Chombo objects)),$(OBJ_DIR)/$(1).o)
-
-PFASST_APP_OBJECTS := $(foreach unit,$(PFASST_APP_UNITS),$(call pfasst_app_object,$(unit)))
-
-# Store all application .mod files in one dedicated directory.
-PFASST_APP_MODDIR := $(abspath $(dir $(firstword $(PFASST_APP_OBJECTS)))/pfasst-modules)
-
-PFASST_APP_MODULES := probin encap pf_my_sweeper pf_my_level hooks pf_space_comm pfasst_bisicles pfasst_main
-PFASST_APP_MODFILES := $(addprefix $(PFASST_APP_MODDIR)/,$(addsuffix .mod,$(PFASST_APP_MODULES)))
-
-# Find application modules before similarly named external modules.
-$(PFASST_APP_OBJECTS): FFLAGS := -I$(PFASST_APP_MODDIR) $(FFLAGS) #-J$(PFASST_APP_MODDIR)
-$(PFASST_APP_OBJECTS): | $(PFASST_APP_MODDIR)
-
-$(PFASST_APP_MODDIR): ; mkdir -p "$@"
-
-# Rebuild if any generated application module is missing.
-ifneq ($(words $(wildcard $(PFASST_APP_MODFILES))),$(words $(PFASST_APP_MODFILES)))
-.PHONY: pfasst-missing-module
-$(PFASST_APP_OBJECTS): pfasst-missing-module
-endif
-
-# Dependencies between the current Fortran source files.
-$(call pfasst_app_object,x_probin): fsrc/x_probin.f90
-
-$(call pfasst_app_object,y_encap): fsrc/y_encap.f90 \
-    $(call pfasst_app_object,x_probin)
-
-$(call pfasst_app_object,z_sweeper): fsrc/z_sweeper.f90 \
-    $(call pfasst_app_object,y_encap)
-
-$(call pfasst_app_object,v_level): fsrc/v_level.f90 \
-    $(call pfasst_app_object,y_encap)
-
-$(call pfasst_app_object,u_hooks): fsrc/u_hooks.f90 \
-    $(call pfasst_app_object,y_encap) \
-    $(call pfasst_app_object,z_sweeper)
-
-$(call pfasst_app_object,w_comm): fsrc/w_comm.f90
-
-$(call pfasst_app_object,s_pfasst_bisicles): fsrc/s_pfasst_bisicles.f90 \
-    $(call pfasst_app_object,x_probin) \
-    $(call pfasst_app_object,y_encap) \
-    $(call pfasst_app_object,z_sweeper) \
-    $(call pfasst_app_object,v_level)
-
-$(call pfasst_app_object,t_pfasst_main): fsrc/t_pfasst_main.f90 \
-    $(call pfasst_app_object,x_probin) \
-    $(call pfasst_app_object,y_encap) \
-    $(call pfasst_app_object,z_sweeper) \
-    $(call pfasst_app_object,v_level) \
-    $(call pfasst_app_object,u_hooks) \
-    $(call pfasst_app_object,w_comm) \
-    $(call pfasst_app_object,s_pfasst_bisicles)
-
-.PHONY: pfasst
-pfasst: $(PFASST_APP_OBJECTS)
-
-
 .PHONY: all lib libbike libclean alltest
 
 # Ordered modules; also rebuild after LibPFASST interface changes.

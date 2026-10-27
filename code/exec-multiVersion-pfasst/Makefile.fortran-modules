@@ -1,0 +1,37 @@
+# Include once, after Make.example has selected object paths and flags.
+PFASST_APP_UNITS := x_probin y_encap z_sweeper v_level u_hooks w_comm s_pfasst_bisicles t_pfasst_main
+pfasst_app_object = $(if $(strip $(objects)),$(or $(firstword $(filter %/$(1).o $(1).o,$(objects))),$(error No object for $(1) in Chombo objects)),$(OBJ_DIR)/$(1).o)
+PFASST_APP_OBJECTS := $(foreach unit,$(PFASST_APP_UNITS),$(call pfasst_app_object,$(unit)))
+PFASST_APP_MODDIR := $(abspath $(dir $(firstword $(PFASST_APP_OBJECTS)))/pfasst-modules)
+PFASST_LIB_MODDIR := $(abspath $(LIBPFASST)/include)
+PFASST_APP_MODULES := probin encap pf_my_sweeper pf_my_level hooks pf_space_comm pfasst_bisicles pfasst_main
+PFASST_APP_MODFILES := $(addprefix $(PFASST_APP_MODDIR)/,$(addsuffix .mod,$(PFASST_APP_MODULES)))
+
+# This is the only application module-output flag assignment.
+$(PFASST_APP_OBJECTS): FFLAGS := -I$(PFASST_APP_MODDIR) -I$(PFASST_LIB_MODDIR) $(FFLAGS) -J$(PFASST_APP_MODDIR)
+$(PFASST_APP_OBJECTS): | $(PFASST_APP_MODDIR)
+$(PFASST_APP_MODDIR):
+	mkdir -p "$@"
+
+$(call pfasst_app_object,x_probin): fsrc/x_probin.f90
+$(call pfasst_app_object,y_encap): fsrc/y_encap.f90 $(call pfasst_app_object,x_probin)
+$(call pfasst_app_object,z_sweeper): fsrc/z_sweeper.f90 $(call pfasst_app_object,y_encap)
+$(call pfasst_app_object,v_level): fsrc/v_level.f90 $(call pfasst_app_object,y_encap)
+$(call pfasst_app_object,u_hooks): fsrc/u_hooks.f90 $(call pfasst_app_object,y_encap) $(call pfasst_app_object,z_sweeper)
+$(call pfasst_app_object,w_comm): fsrc/w_comm.f90
+$(call pfasst_app_object,s_pfasst_bisicles): fsrc/s_pfasst_bisicles.f90 $(call pfasst_app_object,x_probin) $(call pfasst_app_object,y_encap) $(call pfasst_app_object,z_sweeper) $(call pfasst_app_object,v_level)
+$(call pfasst_app_object,t_pfasst_main): fsrc/t_pfasst_main.f90 $(call pfasst_app_object,x_probin) $(call pfasst_app_object,y_encap) $(call pfasst_app_object,z_sweeper) $(call pfasst_app_object,v_level) $(call pfasst_app_object,u_hooks) $(call pfasst_app_object,w_comm) $(call pfasst_app_object,s_pfasst_bisicles)
+
+# Keep every normal non-source prerequisite after the source declarations.
+ifneq ($(words $(wildcard $(PFASST_APP_MODFILES))),$(words $(PFASST_APP_MODFILES)))
+.PHONY: pfasst-missing-module
+$(PFASST_APP_OBJECTS): pfasst-missing-module
+endif
+
+# Recompile application modules after a LibPFASST type/interface change.
+# These follow source prerequisites so recipes using $< still see the source.
+PFASST_LIBRARY_INTERFACES := $(wildcard $(PFASST_LIB_MODDIR)/*.mod) $(wildcard $(LIBPFASST)/lib/libpfasst.a)
+$(PFASST_APP_OBJECTS): Makefile.fortran-modules $(PFASST_LIBRARY_INTERFACES)
+
+.PHONY: pfasst
+pfasst: $(PFASST_APP_OBJECTS)
