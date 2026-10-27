@@ -14,6 +14,8 @@
 #include <cstdio>
 #include <cmath>
 #include <functional>
+#include <limits>
+#include <sstream>
 #ifdef HAVE_UDUNITS2
 #include <udunits2.h>
 #endif
@@ -196,90 +198,283 @@ AmrIce::writePlotFile()
   if (m_plot_style_amr) writeAMRPlotFile();
 }
 
+// void
+// AmrIce::writeExternalStatePlot(
+//     Vector<LevelData<FArrayBox>* >& a_thicknessVect,
+//     Real a_time, Real a_dt, int a_completedStep)
+// {
+//   if (!std::isfinite(a_time) || !std::isfinite(a_dt) ||
+//       a_dt <= 0.0 || a_completedStep < 1)
+//     {
+//       MayDay::Error("Invalid external time-integrator output metadata");
+//     }
+
+//   // Reject invalid endpoints before the velocity solve.  In particular,
+//   // setState must not silently replace negative endpoint thickness by zero.
+//   int invalidLocal = (a_thicknessVect.size() != m_finest_level + 1);
+//   for (int lev = 0; lev < a_thicknessVect.size(); ++lev)
+//     {
+//       if (lev > m_finest_level || a_thicknessVect[lev] == NULL ||
+//           !a_thicknessVect[lev]->isDefined() ||
+//           a_thicknessVect[lev]->nComp() != 1)
+//         {
+//           invalidLocal = 1;
+//           continue;
+//         }
+//       const LevelData<FArrayBox>& H = *a_thicknessVect[lev];
+//       const DisjointBoxLayout& grids = H.disjointBoxLayout();
+//       if (!(grids == m_amrGrids[lev]))
+//         {
+//           invalidLocal = 1;
+//           continue;
+//         }
+//       for (DataIterator dit = H.dataIterator(); dit.ok(); ++dit)
+//         for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
+//           if (!std::isfinite(H[dit()](bit(), 0)) || H[dit()](bit(), 0) < 0.0)
+//             invalidLocal = 1;
+//     }
+//   int invalidGlobal = invalidLocal;
+// #ifdef CH_MPI
+//   MPI_Allreduce(&invalidLocal, &invalidGlobal, 1, MPI_INT, MPI_MAX,
+//                 Chombo_MPI::comm);
+// #endif
+//   if (invalidGlobal)
+//     MayDay::Error("Cannot export PFASST endpoint: invalid/nonfinite/negative "
+//                   "thickness or inconsistent fixed-grid layout");
+
+//   // setState uses m_dt for boundary conditions.  Set output metadata first.
+//   m_dt = a_dt;
+//   m_cur_step = a_completedStep;
+
+//   // Install the selected endpoint instead of writing the last RHS stage.
+//   // Recompute velocity when velocity evolution is enabled, then verify
+//   // that BISICLES' geometry/calving handling preserved all valid H values.
+//   setState(a_thicknessVect, a_time, true);
+//   invalidLocal = 0;
+//   for (int lev = 0; lev < a_thicknessVect.size(); ++lev)
+//     {
+//       const LevelData<FArrayBox>& H = *a_thicknessVect[lev];
+//       const LevelData<FArrayBox>& installedH = m_vect_coordSys[lev]->getH();
+//       const DisjointBoxLayout& grids = H.disjointBoxLayout();
+//       CH_assert(installedH.disjointBoxLayout() == grids);
+//       for (DataIterator dit = H.dataIterator(); dit.ok(); ++dit)
+//         for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
+//           if (!std::isfinite(installedH[dit()](bit(), 0)) ||
+//               installedH[dit()](bit(), 0) != H[dit()](bit(), 0))
+//             invalidLocal = 1;
+//     }
+//   invalidGlobal = invalidLocal;
+// #ifdef CH_MPI
+//   MPI_Allreduce(&invalidLocal, &invalidGlobal, 1, MPI_INT, MPI_MAX,
+//                 Chombo_MPI::comm);
+// #endif
+//   if (invalidGlobal)
+//     MayDay::Error("Cannot export PFASST endpoint: setState/velocity/calving "
+//                   "changed valid-cell thickness");
+
+//   // The serial old_thickness field is not PFASST's previous endpoint;
+//   // its finite difference would give a misleading dThickness/dt component.
+//   const bool write_dHDt = m_write_dHDt;
+//   m_write_dHDt = false;
+//   writePlotFile();
+//   m_write_dHDt = write_dHDt;
+//   pout() << "Wrote PFASST endpoint: time=" << a_time
+//          << ", dt=" << a_dt << ", completed step=" << a_completedStep
+//          << "; installed valid-cell thickness matches qend exactly."
+//          << std::endl;
+// }
+
+// add thickness extrema, negative/nonfinite counts, layout errors and offending cells
 void
 AmrIce::writeExternalStatePlot(
     Vector<LevelData<FArrayBox>* >& a_thicknessVect,
     Real a_time, Real a_dt, int a_completedStep)
 {
+  int worldRank = 0, spaceRank = 0;
+#ifdef CH_MPI
+  MPI_Comm_rank(MPI_COMM_WORLD, &worldRank);
+  MPI_Comm_rank(Chombo_MPI::comm, &spaceRank);
+#endif
+  const auto report = [&](const std::string& message) {
+    std::ostringstream line;
+    line << "[PFASST endpoint world=" << worldRank
+         << " space=" << spaceRank << "] " << message << '\n';
+    std::cerr << line.str() << std::flush;
+  };
+  const auto abortExport = [&](const char* message) {
+    if (spaceRank == 0) report(message);
+#ifdef CH_MPI
+    // Other temporal groups may already be waiting at the driver's barrier.
+    // Flush the root's summary before any peer terminates the MPI job.
+    MPI_Barrier(Chombo_MPI::comm);
+    MPI_Abort(MPI_COMM_WORLD, 96);
+#endif
+    MayDay::Error(message);
+  };
+
+  // Counters: scanned valid cells, finite cells, finite negative cells,
+  // nonfinite cells, structural errors, invalid metadata.
+  long long local[6] = {0, 0, 0, 0, 0, 0}, global[6];
+  Real hmin = std::numeric_limits<Real>::max();
+  Real hmax = -std::numeric_limits<Real>::max();
+  int samples = 0;
+  const auto structureError = [&](int lev, const char* reason) {
+    ++local[4];
+    std::ostringstream s;
+    s << "STRUCTURE level=" << lev << ": " << reason;
+    report(s.str());
+  };
   if (!std::isfinite(a_time) || !std::isfinite(a_dt) ||
       a_dt <= 0.0 || a_completedStep < 1)
     {
-      MayDay::Error("Invalid external time-integrator output metadata");
+      local[5] = 1;
+      report("METADATA: require finite time, positive finite dt, step >= 1");
     }
+  if (m_finest_level < 0 || a_thicknessVect.size() != m_finest_level + 1)
+    structureError(-1, "endpoint level count differs from finest_level + 1");
 
-  // Reject invalid endpoints before the velocity solve.  In particular,
-  // setState must not silently replace negative endpoint thickness by zero.
-  int invalidLocal = (a_thicknessVect.size() != m_finest_level + 1);
   for (int lev = 0; lev < a_thicknessVect.size(); ++lev)
     {
-      if (lev > m_finest_level || a_thicknessVect[lev] == NULL ||
-          !a_thicknessVect[lev]->isDefined() ||
-          a_thicknessVect[lev]->nComp() != 1)
-        {
-          invalidLocal = 1;
-          continue;
-        }
+      if (lev > m_finest_level || lev >= m_amrGrids.size())
+        { structureError(lev, "missing corresponding BISICLES grid level"); continue; }
+      if (lev >= m_vect_coordSys.size() || m_vect_coordSys[lev] == NULL)
+        { structureError(lev, "missing corresponding BISICLES geometry level"); continue; }
+      if (a_thicknessVect[lev] == NULL)
+        { structureError(lev, "null endpoint LevelData pointer"); continue; }
       const LevelData<FArrayBox>& H = *a_thicknessVect[lev];
+      if (!H.isDefined())
+        { structureError(lev, "undefined endpoint LevelData"); continue; }
+      if (H.nComp() != 1)
+        { structureError(lev, "endpoint must have exactly one component"); continue; }
       const DisjointBoxLayout& grids = H.disjointBoxLayout();
       if (!(grids == m_amrGrids[lev]))
-        {
-          invalidLocal = 1;
-          continue;
-        }
+        { structureError(lev, "endpoint layout differs from BISICLES layout"); continue; }
       for (DataIterator dit = H.dataIterator(); dit.ok(); ++dit)
         for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
-          if (!std::isfinite(H[dit()](bit(), 0)) || H[dit()](bit(), 0) < 0.0)
-            invalidLocal = 1;
+          {
+            const Real value = H[dit()](bit(), 0);
+            ++local[0];
+            if (!std::isfinite(value)) ++local[3];
+            else
+              {
+                ++local[1];
+                if (value < hmin) hmin = value;
+                if (value > hmax) hmax = value;
+                if (value < 0.0) ++local[2];
+              }
+            if ((!std::isfinite(value) || value < 0.0) && samples < 5)
+              {
+                ++samples;
+                std::ostringstream s;
+                s.precision(17);
+                s << "BAD_CELL level=" << lev << " index=(";
+                for (int d = 0; d < SpaceDim; ++d)
+                  s << (d == 0 ? "" : ",") << bit()[d];
+                s << ") H=" << value << " reason="
+                  << (std::isfinite(value) ? "negative" : "nonfinite");
+                report(s.str());
+              }
+          }
     }
-  int invalidGlobal = invalidLocal;
+  Real globalMin = hmin, globalMax = hmax;
 #ifdef CH_MPI
-  MPI_Allreduce(&invalidLocal, &invalidGlobal, 1, MPI_INT, MPI_MAX,
-                Chombo_MPI::comm);
+  MPI_Allreduce(local, global, 6, MPI_LONG_LONG_INT, MPI_SUM, Chombo_MPI::comm);
+  MPI_Allreduce(&hmin, &globalMin, 1, MPI_CH_REAL, MPI_MIN, Chombo_MPI::comm);
+  MPI_Allreduce(&hmax, &globalMax, 1, MPI_CH_REAL, MPI_MAX, Chombo_MPI::comm);
+#else
+  for (int i = 0; i < 6; ++i) global[i] = local[i];
 #endif
-  if (invalidGlobal)
-    MayDay::Error("Cannot export PFASST endpoint: invalid/nonfinite/negative "
-                  "thickness or inconsistent fixed-grid layout");
+  if (spaceRank == 0)
+    {
+      std::ostringstream s;
+      s.precision(17);
+      s << "PRE_INSTALL time=" << a_time << " dt=" << a_dt
+        << " step=" << a_completedStep << " valid_cells=" << global[0]
+        << " finite_cells=" << global[1];
+      if (global[1] > 0) s << " Hmin=" << globalMin << " Hmax=" << globalMax;
+      else s << " Hmin=none Hmax=none";
+      s << " negative_cells=" << global[2] << " nonfinite_cells=" << global[3]
+        << " structural_errors=" << global[4] << " metadata_errors=" << global[5];
+      report(s.str());
+    }
+  if (global[2] || global[3] || global[4] || global[5] || global[0] == 0)
+    abortExport("REJECTED before setState; see PRE_INSTALL and per-rank diagnostics");
 
-  // setState uses m_dt for boundary conditions.  Set output metadata first.
+  // Install the chosen PFASST endpoint, with its physical output metadata.
   m_dt = a_dt;
   m_cur_step = a_completedStep;
-
-  // Install the selected endpoint instead of writing the last RHS stage.
-  // Recompute velocity when velocity evolution is enabled, then verify
-  // that BISICLES' geometry/calving handling preserved all valid H values.
   setState(a_thicknessVect, a_time, true);
-  invalidLocal = 0;
+
+  long long changedLocal = 0, changedGlobal = 0;
+  int installedLayoutLocal = 0, installedLayoutGlobal = 0;
+  samples = 0;
   for (int lev = 0; lev < a_thicknessVect.size(); ++lev)
     {
+      if (lev >= m_vect_coordSys.size() || m_vect_coordSys[lev] == NULL)
+        {
+          installedLayoutLocal = 1;
+          report("POST_INSTALL: missing geometry level");
+          continue;
+        }
       const LevelData<FArrayBox>& H = *a_thicknessVect[lev];
       const LevelData<FArrayBox>& installedH = m_vect_coordSys[lev]->getH();
       const DisjointBoxLayout& grids = H.disjointBoxLayout();
-      CH_assert(installedH.disjointBoxLayout() == grids);
+      if (!installedH.isDefined() || installedH.nComp() != 1 ||
+          !(installedH.disjointBoxLayout() == grids))
+        {
+          installedLayoutLocal = 1;
+          std::ostringstream s;
+          s << "POST_INSTALL: undefined/mismatched geometry at level=" << lev;
+          report(s.str());
+          continue;
+        }
       for (DataIterator dit = H.dataIterator(); dit.ok(); ++dit)
         for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
-          if (!std::isfinite(installedH[dit()](bit(), 0)) ||
-              installedH[dit()](bit(), 0) != H[dit()](bit(), 0))
-            invalidLocal = 1;
+          {
+            const Real before = H[dit()](bit(), 0);
+            const Real after = installedH[dit()](bit(), 0);
+            if (!std::isfinite(after) || after != before)
+              {
+                ++changedLocal;
+                if (samples++ < 5)
+                  {
+                    std::ostringstream s;
+                    s.precision(17);
+                    s << "CHANGED_CELL level=" << lev << " index=(";
+                    for (int d = 0; d < SpaceDim; ++d)
+                      s << (d == 0 ? "" : ",") << bit()[d];
+                    s << ") qend=" << before << " installed=" << after;
+                    report(s.str());
+                  }
+              }
+          }
     }
-  invalidGlobal = invalidLocal;
 #ifdef CH_MPI
-  MPI_Allreduce(&invalidLocal, &invalidGlobal, 1, MPI_INT, MPI_MAX,
+  MPI_Allreduce(&changedLocal, &changedGlobal, 1, MPI_LONG_LONG_INT, MPI_SUM,
                 Chombo_MPI::comm);
+  MPI_Allreduce(&installedLayoutLocal, &installedLayoutGlobal, 1, MPI_INT,
+                MPI_MAX, Chombo_MPI::comm);
+#else
+  changedGlobal = changedLocal;
+  installedLayoutGlobal = installedLayoutLocal;
 #endif
-  if (invalidGlobal)
-    MayDay::Error("Cannot export PFASST endpoint: setState/velocity/calving "
-                  "changed valid-cell thickness");
+  if (spaceRank == 0)
+    {
+      std::ostringstream s;
+      s << "POST_INSTALL changed_cells=" << changedGlobal
+        << " layout_error=" << installedLayoutGlobal;
+      report(s.str());
+    }
+  if (changedGlobal || installedLayoutGlobal)
+    abortExport("REJECTED after setState: installed thickness differs from qend");
 
-  // The serial old_thickness field is not PFASST's previous endpoint;
-  // its finite difference would give a misleading dThickness/dt component.
+  // Serial old_thickness is not the preceding PFASST endpoint.
   const bool write_dHDt = m_write_dHDt;
   m_write_dHDt = false;
   writePlotFile();
   m_write_dHDt = write_dHDt;
-  pout() << "Wrote PFASST endpoint: time=" << a_time
-         << ", dt=" << a_dt << ", completed step=" << a_completedStep
-         << "; installed valid-cell thickness matches qend exactly."
-         << std::endl;
+  if (spaceRank == 0)
+    report("WRITE_RETURNED: endpoint plot writer completed; qend preserved exactly");
 }
 
 /// write hdf5 plotfile to the standard location

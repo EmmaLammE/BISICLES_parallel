@@ -1170,6 +1170,15 @@ AmrIce::setState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
     eliminateRemoteIce();
 #endif
   
+  // For thickness-only integration, ice fraction is a diagnostic derived
+  // from this installed state, not a separately advected state variable.
+  if (!m_evolve_ice_frac)
+  {
+      for (int lev = 0; lev <= m_finest_level; ++lev)
+      {
+          setIceFrac(m_vect_coordSys[lev]->getH(), lev);
+      }
+  }
   //applyCalvingCriterion(CalvingModel::PostRegrid);
 
   if (m_evolve_velocity)

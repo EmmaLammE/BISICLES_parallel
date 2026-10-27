@@ -2685,8 +2685,18 @@ AmrIce::postUpdate()
       LevelSigmaCS& levelCoords = *(m_vect_coordSys[lev]);
       LevelData<FArrayBox>& levelH = levelCoords.getH();
 
-      updateIceFrac(levelH, lev);
-      
+      // updateIceFrac(levelH, lev);
+      // Match updateGeometryFromThickness: an external thickness-only
+      // integrator must not use an unadvanced ice-fraction field to remove H.
+      if (m_evolve_ice_frac)
+      {
+          updateIceFrac(levelH, lev);
+      }
+      else
+      {
+          setIceFrac(levelH, lev);
+      }
+
       DataIterator dit = levelGrids.dataIterator();
 
       for (DataIterator dit(levelGrids); dit.ok(); ++dit)
