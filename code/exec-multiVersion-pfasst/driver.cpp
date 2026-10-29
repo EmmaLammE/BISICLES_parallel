@@ -132,7 +132,7 @@ FineInterp::s_default_boundary_limit_type = 0;
       {
         checkPFASSTThicknessOnlyInput();
         if (rank == 0)
-          std::cout << "[PFASST constraint] nonnegative thickness; fixed level-0 grid; "
+          std::cout << "[PFASST constraint] nonnegative thickness; fixed AMR hierarchy; "
                     << "ice fraction derived from H; prescribed front sink retained" << std::endl;
       }
     // SYSTEM_INFO siSysInfo;

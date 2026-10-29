@@ -16,10 +16,10 @@ static void checkPFASSTThicknessOnlyInput()
       ParmParse pp(amrPrefixes[k]);
       int maxLevel = -1;
       pp.query("maxLevel", maxLevel);
-      if (maxLevel != 0)
+      if (maxLevel < 0)
         {
           const std::string message = std::string(amrPrefixes[k]) +
-            ".maxLevel must be 0 for this fixed single-AMR-level PFASST patch.";
+            ".maxLevel must be a nonnegative maximum AMR level.";
           MayDay::Error(message.c_str());
         }
       bool evolveIceFrac = true;

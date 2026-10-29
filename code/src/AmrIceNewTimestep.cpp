@@ -585,25 +585,36 @@ AmrIce::setPFASSTState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   if (edge == NULL && dynamic_cast<NoCalvingModel*>(m_calvingModelPtr) == NULL)
     MayDay::Error("PFASST state installation supports only DomainEdgeCalvingModel or NoCalvingModel");
 
-  // Check before setState: its legacy clipping must never conceal an invalid
-  // PFASST unknown.  All space ranks agree before any later collective solve.
-  int invalidLocal = (m_finest_level != 0 || a_thicknessVect.size() != 1);
+  // PFASST vectors retain the initialized active hierarchy, which can be
+  // smaller than maxLevel + 1. Every stored level needs an explicit tendency.
+  if (finestTimestepLevel() != m_finest_level)
+    MayDay::Error("PFASST requires timestepping every active AMR level; use amr.finest_timestep_level = -1");
+
+  // Validate the whole hierarchy before changing geometry. All space ranks
+  // agree before any ghost exchange or collective velocity solve.
+  int invalidLocal = (m_finest_level < 0 ||
+                      static_cast<int>(a_thicknessVect.size()) != m_finest_level + 1);
   if (!invalidLocal)
+    for (int lev = 0; lev <= m_finest_level; ++lev)
     {
-      if (a_thicknessVect[0] == NULL || !a_thicknessVect[0]->isDefined() ||
-          a_thicknessVect[0]->nComp() != 1)
+      if (a_thicknessVect[lev] == NULL || !a_thicknessVect[lev]->isDefined() ||
+          a_thicknessVect[lev]->nComp() != 1)
         invalidLocal = 1;
       else
         {
-          const LevelData<FArrayBox>& inputH = *a_thicknessVect[0];
+          const LevelData<FArrayBox>& inputH = *a_thicknessVect[lev];
           const DisjointBoxLayout& grids = inputH.disjointBoxLayout();
-          if (!(grids == m_amrGrids[0]) || &inputH == &m_vect_coordSys[0]->getH())
+          if (!(grids == m_amrGrids[lev]))
             invalidLocal = 1;
-          else
-            for (DataIterator dit = inputH.dataIterator(); dit.ok(); ++dit)
-              for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
-                if (!std::isfinite(inputH[dit()](bit(), 0)) || inputH[dit()](bit(), 0) < 0.0)
-                  invalidLocal = 1;
+          for (int other = 0; other <= m_finest_level; ++other)
+            if (&inputH == &m_vect_coordSys[other]->getH() ||
+                &inputH == m_old_thickness[other] ||
+                (other != lev && &inputH == a_thicknessVect[other]))
+          invalidLocal = 1;
+      for (DataIterator dit = inputH.dataIterator(); dit.ok(); ++dit)
+        for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
+          if (!std::isfinite(inputH[dit()](bit(), 0)) || inputH[dit()](bit(), 0) < 0.0)
+            invalidLocal = 1;
         }
     }
   int invalidGlobal = invalidLocal;
@@ -611,36 +622,82 @@ AmrIce::setPFASSTState(Vector<LevelData<FArrayBox>* >& a_thicknessVect,
   MPI_Allreduce(&invalidLocal, &invalidGlobal, 1, MPI_INT, MPI_MAX, Chombo_MPI::comm);
 #endif
   if (invalidGlobal)
-    MayDay::Error("PFASST state requires independent, finite nonnegative thickness on the fixed level-0 layout");
+     MayDay::Error("PFASST state requires independent, finite nonnegative thickness on every level of the fixed AMR hierarchy");
 
+  m_time = a_cur_time;
   m_dt = a_dt;
-  setState(a_thicknessVect, a_cur_time, false);
-  LevelData<FArrayBox>& installedH = m_vect_coordSys[0]->getH();
+  m_A_valid = false;
+  m_groundingLineProximity_valid = false;
+  m_viscousTensor_valid = false;
 
-  // setState has filled the geometry IBCs. DomainEdge additionally removes
-  // exterior front ghosts; do this even when the velocity is frozen. Calling
-  // only the supported model avoids new generic calving/observer side effects.
-  if (edge != NULL)
-    edge->applyCriterion(installedH, *m_calvedIceThickness[0],
-                         *m_addedIceThickness[0], *m_removedIceThickness[0],
-                         *m_iceFrac[0], *this, 0, CalvingModel::PostThicknessAdvection);
-  m_vect_coordSys[0]->recomputeGeometry(NULL, -1);
-  setIceFrac(installedH, 0);
-  installedH.copyTo(*m_old_thickness[0]);
+    // Install only valid unknowns. Incoming PFASST ghosts are not communicated
+  // and may be stale. The fixed layout does not need setState's regridding.
+  // Do not average down covered coarse cells here: they are also stored in
+  // the PFASST vector, and replacing them would change y = rhs + dtq*g.
+  for (int lev = 0; lev <= m_finest_level; ++lev)
+    {
+      LevelData<FArrayBox>& installedH = m_vect_coordSys[lev]->getH();
+      const LevelData<FArrayBox>& inputH = *a_thicknessVect[lev];
+      const DisjointBoxLayout& grids = m_amrGrids[lev];
+      for (DataIterator dit = installedH.dataIterator(); dit.ok(); ++dit)
+        installedH[dit()].copy(inputH[dit()], grids[dit()], 0, grids[dit()], 0, 1);
+    }
+
+  // Prepare geometry from coarse to fine so every level sees current coarse
+  // thickness and geometry before computing its own face values and masks.
+  for (int lev = 0; lev <= m_finest_level; ++lev)
+    {
+      LevelData<FArrayBox>& installedH = m_vect_coordSys[lev]->getH();
+      LevelSigmaCS* coarseCoords = lev > 0 ? &(*m_vect_coordSys[lev-1]) : NULL;
+      const int refRatio = lev > 0 ? m_refinement_ratios[lev-1] : -1;
+      if (lev > 0)
+        {
+          PiecewiseLinearFillPatch thicknessFiller(m_amrGrids[lev], m_amrGrids[lev-1],
+                                                   1, m_amrDomains[lev-1], refRatio,
+                                                   installedH.ghostVect()[0]);
+          const LevelData<FArrayBox>& coarseH = coarseCoords->getH();
+          thicknessFiller.fillInterp(installedH, coarseH, coarseH, 0.0, 0, 0, 1);
+        }
+      installedH.exchange();
+      m_thicknessIBCPtr->setGeometryBCs(*m_vect_coordSys[lev], m_amrDomains[lev],
+                                      m_amrDx[lev]*RealVect::Unit, m_time, m_dt);
+      m_vect_coordSys[lev]->recomputeGeometry(coarseCoords, refRatio);
+
+      // DomainEdge removes exterior front ghosts even with frozen velocity.
+      // Its supported settings preserve all valid thickness values.
+      if (edge != NULL)
+        {
+          edge->applyCriterion(installedH, *m_calvedIceThickness[lev],
+                               *m_addedIceThickness[lev], *m_removedIceThickness[lev],
+                               *m_iceFrac[lev], *this, lev, CalvingModel::PostThicknessAdvection);
+          m_vect_coordSys[lev]->recomputeGeometry(coarseCoords, refRatio);
+        }
+      setIceFrac(installedH, lev);
+
+      // PPM reads old-thickness ghosts too; copy them explicitly because a
+      // LevelData::copyTo need only transfer valid source cells.
+      for (DataIterator dit = installedH.dataIterator(); dit.ok(); ++dit)
+        (*m_old_thickness[lev])[dit()].copy(installedH[dit()]);
+    }
+  updateTemperature();
 
   if (m_evolve_velocity && a_recalculateVelocity)
     solveVelocityField(true, m_velocitySolveInitialResidualNorm);
 
   // A velocity/calving operation must not silently replace the state whose
   // derivative PFASST requested. Physical ghosts may change; valid cells may not.
-  const LevelData<FArrayBox>& inputH = *a_thicknessVect[0];
-  const DisjointBoxLayout& grids = inputH.disjointBoxLayout();
   invalidLocal = 0;
-  for (DataIterator dit = inputH.dataIterator(); dit.ok(); ++dit)
-    for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
-      if (!std::isfinite(installedH[dit()](bit(), 0)) ||
-          installedH[dit()](bit(), 0) != inputH[dit()](bit(), 0))
-        invalidLocal = 1;
+  for (int lev = 0; lev <= m_finest_level; ++lev)
+    {
+      const LevelData<FArrayBox>& inputH = *a_thicknessVect[lev];
+      const LevelData<FArrayBox>& installedH = m_vect_coordSys[lev]->getH();
+      const DisjointBoxLayout& grids = inputH.disjointBoxLayout();
+      for (DataIterator dit = inputH.dataIterator(); dit.ok(); ++dit)
+        for (BoxIterator bit(grids[dit()]); bit.ok(); ++bit)
+          if (!std::isfinite(installedH[dit()](bit(), 0)) ||
+              installedH[dit()](bit(), 0) != inputH[dit()](bit(), 0))
+            invalidLocal = 1;
+    }
   invalidGlobal = invalidLocal;
 #ifdef CH_MPI
   MPI_Allreduce(&invalidLocal, &invalidGlobal, 1, MPI_INT, MPI_MAX, Chombo_MPI::comm);
