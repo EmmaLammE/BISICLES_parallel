@@ -188,8 +188,8 @@ module pfasst_main
      call MPI_REDUCE(elapse_time_per_repeat_min,elapse_time_min,1,MPI_REAL,mpi_min,0,pf_comm_fromBisicles,ierror) ! compute mpi global sum and put to root processor 0
      call MPI_REDUCE(elapse_time,elapse_time_sum,1,MPI_REAL,mpi_sum,0,pf_comm_fromBisicles,ierror) ! compute mpi global sum and put to root processor 0
      if(pf%rank==0) then
-       print '("Global average run time = ",f8.3,", max = ",f8.3,", min = ",f8.3," seconds.")',elapse_time_sum/nproc,elapse_time_max,elapse_time_min
-     end if
+      print '("Global average run time = ",f0.3,", max = ",f0.3,", min =",f0.3," seconds.")',elapse_time_sum/nproc,elapse_time_max,elapse_time_min
+      end if
  
      !> save the results
      call pfasst_bisicles_save_results(pf, AmrIceHolderPtr)
