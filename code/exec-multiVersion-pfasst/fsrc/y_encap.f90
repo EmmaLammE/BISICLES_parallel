@@ -189,6 +189,7 @@ contains
     select type(x)
     type is (bisicles_vector_encap)
        do i = 1, n
+           print *,"in bisicles encap creating array, i ",i,", n ",n
            call BisiclesVectorCreate(x(i)%c_encap_ptr,num_grid_points, cptr_AmrIceHolder)
            !call BisiclesVectorAxpy(x(i)%c_encap_ptr, intialization_factor, x(i)%c_encap_ptr, cptr_AmrIceHolder)
            x%vector_size = num_grid_points

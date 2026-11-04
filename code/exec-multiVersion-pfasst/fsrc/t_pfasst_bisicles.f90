@@ -94,10 +94,10 @@ contains
     end do
     !>  Set up some pfasst stuff
     ! level = 1 -> tauQ=8; level = 2 -> tauQ=16, no third level???
-    ! print *, 'before pfasst set up'
+    print *, 'before pfasst set up'
     ! call pf%levels(pf%nlevels)%Q(1)%eprint()
     call pf_pfasst_setup(pf)
-    ! print *, '--------------------------- done pf additional setup ---------------------------------'
+    print *, '--------------------------- done pf additional setup ---------------------------------'
     ! lev => pf%levels(2)
     ! print *, 'after pfasst set up, tauQ allocated ',allocated(pf%levels(2)%tauQ),'  print Q(1)'
     ! call pf%levels(pf%nlevels)%Q(1)%eprint()
