@@ -8,7 +8,9 @@ PFASST_APP_MODULES := probin encap pf_my_sweeper pf_my_level hooks pf_space_comm
 PFASST_APP_MODFILES := $(addprefix $(PFASST_APP_MODDIR)/,$(addsuffix .mod,$(PFASST_APP_MODULES)))
 
 # This is the only application module-output flag assignment.
-$(PFASST_APP_OBJECTS): FFLAGS := -I$(PFASST_APP_MODDIR) -I$(PFASST_LIB_MODDIR) $(FFLAGS) -J$(PFASST_APP_MODDIR)
+$(PFASST_APP_OBJECTS): override FFLAGS := \
+    -I$(PFASST_APP_MODDIR) -I$(PFASST_LIB_MODDIR) \
+    $(FFLAGS) -cpp -J$(PFASST_APP_MODDIR)
 $(PFASST_APP_OBJECTS): | $(PFASST_APP_MODDIR)
 $(PFASST_APP_MODDIR):
 	mkdir -p "$@"

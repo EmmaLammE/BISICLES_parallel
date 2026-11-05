@@ -1,0 +1,103 @@
+# -*- Mode: Makefile -*-
+LIBPFASST = ../../../PFASST_icesheet
+USE_PFASST = TRUE
+MPI = TRUE
+HDF5 = TRUE
+USE_PETSC = FALSE
+
+# One MPI wrapper for the library and application. Override MPI_FC on the
+# command line to select a particular installation for both.
+MPI_FC ?= mpifort
+MPI_CC ?= cc
+override FC = $(MPI_FC)
+override FC_COMPILE = $(MPI_FC) -cpp -O3
+
+ebase := driver
+src_dirs = fsrc csrc
+.DEFAULT_GOAL := all
+
+# Serialize this legacy Chombo build, including direct `make driver` calls.
+.NOTPARALLEL:
+all: libbike driver pfasst
+driver: libbike
+
+include ../mk/Make.defs
+
+# Keep Chombo's object-directory selection; do not override OBJ_DIR afterwards.
+-include $(OBJ_DIR)/*.d
+
+# Application modules get their own -I/-J directory in the include below.
+FFLAGS += -I$(abspath $(LIBPFASST)/include) -ffree-line-length-none
+LDFLAGS += -lstdc++ -lquadmath -L$(LIBPFASST)/lib -lpfasst
+LDFLAGS += -Wl,--copy-dt-needed-entries
+LIBFLAGS := -L../lib/ -lBisicles$(config) $(LIBFLAGS) -L$(LIBPFASST)/lib -lpfasst -lgfortran
+LIBFLAGS += -lstdc++
+MPI_FORTRAN_LINK_FLAGS := $(filter -L% -l% -Wl% -pthread,$(shell $(MPI_FC) -show))
+LIBFLAGS += $(MPI_FORTRAN_LINK_FLAGS)
+
+# PFASST's .depend has paths relative to PFASST, so only its recursive make
+# should read it. The old application .depend has obsolete source/object names.
+include Makefile.fortran-modules
+-include Makefile.cpp-headers
+
+# Rebuild PFASST on first use, a changed MPI/compiler environment, changed
+# PFASST sources, or missing public modules. Never reuse unverified old modules.
+PFASST_ROOT := $(abspath $(LIBPFASST))
+PFASST_READY := $(abspath .pfasst-mpi-ready)
+# Legacy MPI calls use different buffer types; this GNU compatibility flag is
+# separate from the stale MPI_Status module problem addressed by rebuilding.
+PFASST_BUILD_FLAGS := -Ibuild -Jinclude -cpp -ffree-line-length-none -fallow-argument-mismatch -O3
+ifeq ($(DEBUG),TRUE)
+PFASST_BUILD_FLAGS += -g -fcheck=all -fbacktrace
+endif
+PFASST_TOOLCHAIN := $(shell { command -v $(MPI_FC); $(MPI_FC) -show; $(MPI_FC) --version; command -v gfortran; gfortran --version; printf '%s\n' '$(LOADEDMODULES)' '$(PFASST_ROOT)' '$(MPI_CC)' '$(PFASST_BUILD_FLAGS)' '$(FFLAGS_EXTRA)'; } 2>/dev/null | cksum)
+PFASST_SAVED_TOOLCHAIN := $(shell cat $(PFASST_READY) 2>/dev/null)
+PFASST_REQUIRED_MODULES := pfasst pf_mod_dtype pf_mod_mpi pf_mod_imex_sweeper_bisicles
+PFASST_REQUIRED_FILES := $(addprefix $(PFASST_ROOT)/include/,$(addsuffix .mod,$(PFASST_REQUIRED_MODULES))) $(PFASST_ROOT)/lib/libpfasst.a
+
+ifneq ($(PFASST_TOOLCHAIN),$(PFASST_SAVED_TOOLCHAIN))
+$(PFASST_READY): pfasst-force-rebuild
+endif
+ifneq ($(words $(wildcard $(PFASST_REQUIRED_FILES))),$(words $(PFASST_REQUIRED_FILES)))
+$(PFASST_READY): pfasst-force-rebuild
+endif
+
+$(PFASST_READY): GNUmakefile Makefile.fortran-modules \
+    $(wildcard $(PFASST_ROOT)/src/*.[fF]90 $(PFASST_ROOT)/Makefile* $(PFASST_ROOT)/.depend) \
+    $(wildcard $(PFASST_ROOT)/lib/libpfasst.a)
+	@command -v $(MPI_FC) >/dev/null || { echo 'MPI_FC wrapper not found: $(MPI_FC)'; exit 1; }
+	@echo 'Rebuilding PFASST and invalidating old application modules for $(MPI_FC)'
+	rm -f "$@"
+	$(MAKE) -C "$(PFASST_ROOT)" LIBPFASST="$(PFASST_ROOT)" clean
+	# Remove generated modules that can shadow -I paths, including old copies
+	# moved into ./include. Source files stay intact.
+	@for directory in . include fsrc "$(PFASST_APP_MODDIR)" "$(dir $(firstword $(PFASST_APP_OBJECTS)))" "$(PFASST_ROOT)" "$(PFASST_ROOT)/src"; do \
+	    if test -d "$$directory"; then \
+	        find "$$directory" -maxdepth 1 -type f \( -iname '*.mod' -o -iname '*.smod' \) -exec rm -f {} +; \
+	    fi; \
+	done
+	rm -f $(PFASST_APP_OBJECTS) $(PFASST_APP_MODFILES)
+	$(MAKE) -C "$(PFASST_ROOT)" -j1 LIBPFASST="$(PFASST_ROOT)" \
+	    FC="$(MPI_FC)" CC="$(MPI_CC)" LD="$(MPI_FC)" \
+	    FFLAGS="$(PFASST_BUILD_FLAGS)" build/libpfasst.a
+	@printf '%s\n' '$(PFASST_TOOLCHAIN)' > "$@"
+
+# Follow the explicit source prerequisites in the helper so $< stays a source.
+$(PFASST_APP_OBJECTS): $(PFASST_READY)
+libbike: $(PFASST_READY)
+	$(MAKE) -C ../lib lib FC="$(MPI_FC)" FC_COMPILE="$(FC_COMPILE)"
+
+libclean:
+	$(MAKE) -C ../lib realclean
+reallyclean: realclean libclean pfasst-module-clean
+pfasst-module-clean:
+	rm -f "$(PFASST_READY)" $(PFASST_APP_OBJECTS) $(PFASST_APP_MODFILES)
+
+# Force a fresh MPI-consistent rebuild; the two recursive makes are sequential.
+rebuild-mpi:
+	$(MAKE) reallyclean MPI_FC="$(MPI_FC)" MPI_CC="$(MPI_CC)"
+	$(MAKE) driver MPI_FC="$(MPI_FC)" MPI_CC="$(MPI_CC)"
+
+driver: ../lib/libBisicles$(config).a
+alltest: libbike ../lib/libBisicles$(config).a
+.PHONY: all libbike libclean alltest reallyclean pfasst-module-clean rebuild-mpi pfasst-force-rebuild
